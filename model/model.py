@@ -12,19 +12,17 @@ class Model:
         self.path = path
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
-        self.tables = self.generate_tables()
-        self.relationships = self.generate_relationships()
+        self.tables = self.extract_tables()
+        self.relationships = self.extract_relationships()
 
 
-    def generate_tables(self):
+    def extract_tables(self):
         tables = []
         for table in self.model_bim_file['model']['tables']:
 
             # table name
             table_name: str = table['name']
-            if table_name.startswith('LocalDateTable_'):
-                continue
-            if table_name.startswith('DateTableTemplate_'):
+            if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
                 continue
 
             # table id
@@ -37,41 +35,21 @@ class Model:
             table_import_mode: str = table_partitions['mode']
             table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(
                 table_partitions['source']['expression'], str) else table_partitions['source']['expression']
-            table_type = table_partitions['source']['type']
-            table_type = 'table' if table_type == 'm' else table_type
+            table_type = 'table' if table_partitions['source']['type'] == 'm' else table_partitions['source']['type']
 
-            # table itens:
             # table columns
             table_columns: list = []
             if 'columns' in table:
-                for column in table['columns']:
-                    table_columns.append(TableItem(
-                        table_item_id=column.get('lineageTag'),
-                        name=column.get('name'),
-                        data_type=column.get('dataType'),
-                        table_item_type=column.get('type', 'column'),
-                        expression=column.get('expression'),
-                        format_string=column.get('formatString'),
-                        is_hidden=column.get('isHidden', False)
-                    ))
+                self.extract_columns(table, table_columns)
 
             # table measures
             table_measures: list = []
             if 'measures' in table:
-                for measure in table['measures']:
-                    table_measures.append(TableItem(
-                        name=measure.get('name'),
-                        table_item_id=measure.get('lineageTag'),
-                        table_item_type='measure',
-                        is_hidden=measure.get('isHidden', False),
-                        display_folder=measure.get('displayFolder'),
-                        format_string=measure.get('formatString'),
-                        expression=[measure.get('expression')] if isinstance(measure.get('expression'),
-                                                                             str) else measure.get('expression')
-                    ))
+                self.extract_measures(table, table_measures)
 
             table_itens = table_columns + table_measures
-            table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
+            if table_itens:
+                table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
 
             tables.append(Table(
                 table_id=table_id,
@@ -85,7 +63,32 @@ class Model:
 
         return sorted(tables, key=lambda x: x.name)
 
-    def generate_relationships(self):
+    def extract_measures(self, table, table_measures):
+        for measure in table['measures']:
+            table_measures.append(TableItem(
+                name=measure.get('name'),
+                table_item_id=measure.get('lineageTag'),
+                table_item_type='measure',
+                is_hidden=measure.get('isHidden', False),
+                display_folder=measure.get('displayFolder'),
+                format_string=measure.get('formatString'),
+                expression=[measure.get('expression')] if isinstance(measure.get('expression'),
+                                                                     str) else measure.get('expression')
+            ))
+
+    def extract_columns(self, table, table_columns):
+        for column in table['columns']:
+            table_columns.append(TableItem(
+                table_item_id=column.get('lineageTag'),
+                name=column.get('name'),
+                data_type=column.get('dataType'),
+                table_item_type=column.get('type', 'column'),
+                expression=column.get('expression'),
+                format_string=column.get('formatString'),
+                is_hidden=column.get('isHidden', False)
+            ))
+
+    def extract_relationships(self):
         """
         Atributos:
         o padrão é 1 - *
