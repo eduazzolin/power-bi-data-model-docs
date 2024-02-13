@@ -3,12 +3,13 @@ class Table:
     Table class to represent a table in a model.
     """
 
-    def __init__(self, table_id: str, name: str, table_type: str, table_itens: list, import_mode: str,
+    def __init__(self, table_id: str, name: str, description: list, table_type: str, table_itens: list, import_mode: str,
                  power_query_steps: list):
         """
         Constructor of the class
         :param table_id: the table id
         :param name: the table name
+        :param description: the table description
         :param table_type: the table type, can be 'table' or 'calculated'
         :param table_itens: list of objects of type TableItem
         :param import_mode: the import mode of the table, can be 'import' or 'directquery'
@@ -16,6 +17,7 @@ class Table:
         """
         self.table_id: str = table_id
         self.name: str = name
+        self.description: list = description
         self.table_type: str = table_type
         self.table_itens: list = table_itens
         self.import_mode: str = import_mode
@@ -29,6 +31,7 @@ class Table:
         """
         result = ''
         result += f'Name: {self.name}\n'
+        result += f'Description: {" ".join(self.description)}\n'
         result += f'Type: {self.table_type}\n'
         result += f'Import Mode: {self.import_mode}\n'
         result += f'Power Query Steps: {self.power_query_steps}\n'

@@ -44,7 +44,12 @@ class Model:
                 continue
 
             # table id
-            table_id = table['lineageTag']
+            table_id = table.get('lineageTag', None)
+
+            # table description
+            table_description = table.get('description', [])
+            table_description = [table_description] if isinstance(table_description, str) else table_description
+
 
             # table import mode
             # table power query steps
@@ -70,6 +75,7 @@ class Model:
             tables.append(Table(
                 table_id=table_id,
                 name=table_name,
+                description=table_description,
                 table_itens=table_itens,
                 table_type=table_type,
                 import_mode=table_import_mode,

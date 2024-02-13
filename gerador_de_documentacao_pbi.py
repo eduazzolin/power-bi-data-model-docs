@@ -84,6 +84,8 @@ class GeradorDeDocumentacaoPBI:
             md += f'- **Nome:** {t.name}\n'
             md += f'- **Tipo:** {t.table_type}\n'
             md += f'- **Modo de importação:** {t.import_mode}\n'
+            if t.description:
+                md += f'- **Descrição:** {" ".join(t.description)}\n'
 
             md += f'\n#### Colunas\n' if has_columns else ''
             count = 0
