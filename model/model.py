@@ -7,8 +7,21 @@ from .table_item import TableItem
 
 
 class Model:
+    """
+    Class to extract and store information from a Power BI pbip folder.
+    """
 
     def __init__(self, path: str):
+        """
+        Constructor
+        :param path: path of the pbip folder
+        :attr model_bim_file: .Dataset/model.bim file
+        :attr report_json_file: .Report/report.json file
+        :attr tables: list of tables
+        :attr relationships: list of relationships
+        :attr name: model name
+        :attr size: model size in bytes
+        """
         self.path = path
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
@@ -18,6 +31,10 @@ class Model:
         self.size = self.extract_model_size()
 
     def extract_tables(self):
+        """
+        Extract tables from model.bim file
+        :return: list of tables
+        """
         tables = []
         for table in self.model_bim_file['model']['tables']:
 
@@ -38,20 +55,18 @@ class Model:
                 table_partitions['source']['expression'], str) else table_partitions['source']['expression']
             table_type = 'table' if table_partitions['source']['type'] == 'm' else table_partitions['source']['type']
 
-            # table columns
+            # table items
             table_columns: list = []
             if 'columns' in table:
                 self.extract_columns(table, table_columns)
-
-            # table measures
             table_measures: list = []
             if 'measures' in table:
                 self.extract_measures(table, table_measures)
-
             table_itens = table_columns + table_measures
             if table_itens:
                 table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
 
+            # table object
             tables.append(Table(
                 table_id=table_id,
                 name=table_name,
@@ -59,12 +74,16 @@ class Model:
                 table_type=table_type,
                 import_mode=table_import_mode,
                 power_query_steps=table_power_query_steps,
-                measures=table_measures
             ))
 
         return sorted(tables, key=lambda x: x.name)
 
     def extract_measures(self, table, table_measures):
+        """
+        Extract measures from table
+        :param table: table dictionary
+        :param table_measures: list to hold measures
+        """
         for measure in table['measures']:
             table_measures.append(TableItem(
                 name=measure.get('name'),
@@ -78,6 +97,11 @@ class Model:
             ))
 
     def extract_columns(self, table, table_columns):
+        """
+        Extract columns from table
+        :param table: table dictionary
+        :param table_columns: list to hold columns
+        """
         for column in table['columns']:
             table_columns.append(TableItem(
                 table_item_id=column.get('lineageTag'),
@@ -92,15 +116,8 @@ class Model:
 
     def extract_relationships(self):
         """
-        Atributos:
-        o padrão é 1 - *
-        - 'name': id
-        - 'toColumn', 'toTable': a que filtra ORIGIN
-        - 'fromColumn','fromTable': a que é filtrada TARGET
-        - 'toCardinality',  'fromCardinality': podem ser 'one' ou 'many' e quando uma aparece a outra não
-        - 'crossFilteringBehavior': pode ser 'bothDirections'
-        - 'name': id
-        - 'joinOnDateBehavior': irrelevante
+        Extract relationships from model.bim file
+        :return: list of relationships objects
         """
         relationships = []
         if 'relationships' in self.model_bim_file['model']:
@@ -124,6 +141,10 @@ class Model:
         return sorted(relationships, key=lambda x: x.origin_table)
 
     def open_model_bim_file(self):
+        """
+        Open model.bim file
+        :return: the file in json format
+        """
         model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
@@ -136,6 +157,10 @@ class Model:
         return None
 
     def open_report_json_file(self):
+        """
+        Open report.json file
+        :return: the file in json format
+        """
         report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
                          os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
         try:
@@ -147,13 +172,11 @@ class Model:
             print(f'\033[93mReport file not found!\033[0m')
         return None
 
-    def extract_model_name(self):
-        item_metadata_json_file = self.open_item_metadata_json_file()
-        if item_metadata_json_file:
-            return item_metadata_json_file.get('displayName', 'Model')
-        pass
-
     def open_item_metadata_json_file(self):
+        """
+        Open item.metadata.json file
+        :return: the file in json format
+        """
         model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
@@ -165,7 +188,21 @@ class Model:
             print(f'\033[93mitem.metadata.json not found!\033[0m')
         return None
 
+    def extract_model_name(self):
+        """
+        Extract model name from item.metadata.json file
+        :return: string name
+        """
+        item_metadata_json_file = self.open_item_metadata_json_file()
+        if item_metadata_json_file:
+            return item_metadata_json_file.get('displayName', 'Model')
+        pass
+
     def extract_model_size(self):
+        """
+        Calculate model size in bytes
+        :return: int size
+        """
         total = 0
         for root, dirs, files in os.walk(self.path):
             for file in files:

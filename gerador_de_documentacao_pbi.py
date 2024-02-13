@@ -1,14 +1,27 @@
 import datetime as dt
 import os
+
 from model.model import Model
 
 
 class GeradorDeDocumentacaoPBI:
+    """
+    Classe responsável por gerar a documentação de um modelo de dados do Power BI.
+    """
 
     def __init__(self, path):
+        """
+        Inicializa a classe.
+        :param path: caminho da pasta raiz do modelo de dados pbip.
+        """
         self.model = Model(path)
 
     def gerar_md(self):
+        """
+        Gera a documentação em formato markdown.
+        :return: string com a documentação.
+        """
+
         md = ''
         md += f'# {self.model.name}\n'
         md += f'- Data do relatório: {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
@@ -34,7 +47,10 @@ class GeradorDeDocumentacaoPBI:
             origin = f'{r.origin_table}[{r.origin_column}]'
             target = f'{r.target_table}[{r.target_column}]'
             direction = f'{" <--> " if r.is_both_directions else " ---> "}'
-            md += f'| {origin} | {r.origin_cardinality} | {direction} | {r.target_cardinality} | {target}\n'
+            if r.is_active:
+                md += f'| {origin} | {r.origin_cardinality} | {direction} | {r.target_cardinality} | {target}\n'
+            else:
+                md += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* | {direction} | *{r.target_cardinality}* | *{target}*\n'
         md += f'|  |  |  |  |  |\n'
         md += f'\n### Medidas\n'
         count = 1
@@ -64,7 +80,6 @@ class GeradorDeDocumentacaoPBI:
                 if i.table_item_type == 'calculated':
                     has_calculated_columns = True
 
-
             md += f'\n### {t.name}\n'
             md += f'- **Nome:** {t.name}\n'
             md += f'- **Tipo:** {t.table_type}\n'
@@ -77,18 +92,23 @@ class GeradorDeDocumentacaoPBI:
                     count += 1
                     md += f'{str(count)}. {c.name}\n'
 
-
             if is_in_relationship:
                 md += f'\n#### Relacionamentos\n'
                 md += f'|  |  |  |  |  |\n'
                 md += f'| ---- | ---- | ---- | ---- | ---- |\n'
-                when_both = [r for r in self.model.relationships if r.is_both_directions if r.origin_table == t.name or r.target_table == t.name]
-                when_target = [r for r in self.model.relationships if r.target_table == t.name if r.relationship_id not in [r.relationship_id for r in when_both]]
-                when_origin = [r for r in self.model.relationships if r.origin_table == t.name if r.relationship_id not in [r.relationship_id for r in when_both]]
+                when_both = [r for r in self.model.relationships if r.is_both_directions if
+                             r.origin_table == t.name or r.target_table == t.name]
+                when_target = [r for r in self.model.relationships if r.target_table == t.name if
+                               r.relationship_id not in [r.relationship_id for r in when_both]]
+                when_origin = [r for r in self.model.relationships if r.origin_table == t.name if
+                               r.relationship_id not in [r.relationship_id for r in when_both]]
                 for r in when_origin:
                     origin = f'{r.origin_table}[{r.origin_column}]'
                     target = f'{r.target_table}[{r.target_column}]'
-                    md += f'| {origin} | {r.origin_cardinality} |   -->   | {r.target_cardinality} | {target} |\n'
+                    if r.is_active:
+                        md += f'| {origin} | {r.origin_cardinality} |   -->   | {r.target_cardinality} | {target} |\n'
+                    else:
+                        md += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   -->   | *{r.target_cardinality}* | *{target}*\n'
                 for r in when_both:
                     origin = f'{r.origin_table}[{r.origin_column}]'
                     target = f'{r.target_table}[{r.target_column}]'
@@ -99,14 +119,19 @@ class GeradorDeDocumentacaoPBI:
                         origin = f'{r.target_table}[{r.target_column}]'
                         target_cardinality = r.origin_cardinality
                         origin_cardinality = r.target_cardinality
-                    md += f'| {origin} | {r.origin_cardinality} |   <->   | {r.target_cardinality} | {target} |\n'
+                    if r.is_active:
+                        md += f'| {origin} | {r.origin_cardinality} |   <->   | {r.target_cardinality} | {target} |\n'
+                    else:
+                        md += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <->   | *{r.target_cardinality}* | *{target}*\n'
                 for r in when_target:
                     target = f'{r.origin_table}[{r.origin_column}]'
                     origin = f'{r.target_table}[{r.target_column}]'
                     target_cardinality = r.origin_cardinality
                     origin_cardinality = r.target_cardinality
-                    md += f'| {origin} | {r.origin_cardinality} |   <--   | {r.target_cardinality} | {target} |\n'
-
+                    if r.is_active:
+                        md += f'| {origin} | {r.origin_cardinality} |   <--   | {r.target_cardinality} | {target} |\n'
+                    else:
+                        md += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <--   | *{r.target_cardinality}* | *{target}*\n'
                 md += f'|  |  |  |  |  |\n'
 
             if t.query:
@@ -121,10 +146,6 @@ class GeradorDeDocumentacaoPBI:
                 for step in t.power_query_steps:
                     md += f'{step}\n'
                 md += f'```\n'
-
-
-
-
 
             md += f'\n#### Colunas calculadas\n' if has_calculated_columns else ''
             for c in t.table_itens:
@@ -156,8 +177,7 @@ class GeradorDeDocumentacaoPBI:
 
 
 if __name__ == '__main__':
-    #path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    path = r'C:\Users\eduaz\Desktop\WORKSPACES\gerador_de_documentacao_pbi\exemplo'
+    path = input('Digite o caminho da pasta raiz do modelo de dados: ')
     gerador = GeradorDeDocumentacaoPBI(path)
     md = gerador.gerar_md()
     try:
