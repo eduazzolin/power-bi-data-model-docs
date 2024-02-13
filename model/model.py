@@ -12,20 +12,11 @@ class Model:
         self.path = path
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
-        self.tables = self.get_tables()
-        self.relationships = self.get_relationships()
+        self.tables = self.generate_tables()
+        self.relationships = self.generate_relationships()
 
-    # ANSI escape codes for text color #TODO remove this
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    BOLD = '\033[1m'
-    ITALIC = '\033[3m'
-    UNDERLINE = '\033[4m'
-    RESET = '\033[0m'
 
-    def get_tables(self):
+    def generate_tables(self):
         tables = []
         for table in self.model_bim_file['model']['tables']:
 
@@ -41,20 +32,24 @@ class Model:
 
             # table import mode
             # table power query steps
+            # table type
             table_partitions: dict = table['partitions'][0]
             table_import_mode: str = table_partitions['mode']
             table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(
                 table_partitions['source']['expression'], str) else table_partitions['source']['expression']
+            table_type = table_partitions['source']['type']
+            table_type = 'table' if table_type == 'm' else table_type
 
+            # table itens:
             # table columns
             table_columns: list = []
             if 'columns' in table:
                 for column in table['columns']:
                     table_columns.append(TableItem(
-                        id=column.get('lineageTag'),
+                        table_item_id=column.get('lineageTag'),
                         name=column.get('name'),
                         data_type=column.get('dataType'),
-                        type=column.get('type', 'column'),
+                        table_item_type=column.get('type', 'column'),
                         expression=column.get('expression'),
                         format_string=column.get('formatString'),
                         is_hidden=column.get('isHidden', False)
@@ -66,7 +61,8 @@ class Model:
                 for measure in table['measures']:
                     table_measures.append(TableItem(
                         name=measure.get('name'),
-                        id=measure.get('lineageTag'),
+                        table_item_id=measure.get('lineageTag'),
+                        table_item_type='measure',
                         is_hidden=measure.get('isHidden', False),
                         display_folder=measure.get('displayFolder'),
                         format_string=measure.get('formatString'),
@@ -74,18 +70,22 @@ class Model:
                                                                              str) else measure.get('expression')
                     ))
 
+            table_itens = table_columns + table_measures
+            table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
+
             tables.append(Table(
-                id=table_id,
+                table_id=table_id,
                 name=table_name,
-                columns=table_columns,
+                table_itens=table_itens,
+                table_type=table_type,
                 import_mode=table_import_mode,
                 power_query_steps=table_power_query_steps,
                 measures=table_measures
             ))
 
-        return tables
+        return sorted(tables, key=lambda x: x.name)
 
-    def get_relationships(self):
+    def generate_relationships(self):
         """
         Atributos:
         o padrão é 1 - *
@@ -106,7 +106,7 @@ class Model:
                     continue
 
                 relationships.append(Relationship(
-                    id=relation.get('name', None),
+                    relationship_id=relation.get('name', None),
                     origin_table=relation.get('toTable', None),
                     origin_column=relation.get('toColumn', None),
                     target_table=relation.get('fromTable', None),
@@ -116,7 +116,7 @@ class Model:
                     origin_cardinality=relation.get('toCardinality', 'one'),
                     target_cardinality=relation.get('fromCardinality', 'many')
                 ))
-        return sorted(relationships, key=lambda x: x.originTable)
+        return sorted(relationships, key=lambda x: x.origin_table)
 
     def open_model_bim_file(self):
         model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
@@ -124,10 +124,10 @@ class Model:
         try:
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
-            print(f'{Model.GREEN}Model file loaded!{Model.RESET}')
+            print(f'\033[92mModel.bim loaded!\033[0m')
             return model
         except Exception:
-            print(f'{Model.YELLOW}Model file not found!{Model.RESET}')
+            print(f'\033[93mModel.bim not found!\033[0m')
         return None
 
     def open_report_json_file(self):
@@ -136,23 +136,10 @@ class Model:
         try:
             with open(report_folder[0], 'r', encoding='utf-8') as file:
                 file = json.load(file)
-            print(f'{Model.GREEN}Report.json loaded!{Model.RESET}')
+            print(f'\033[92mReport.json loaded!\033[0m')
             return file
         except Exception:
-            print(f'{Model.YELLOW}Report file not found!{Model.RESET}')
+            print(f'\033[93mReport file not found!\033[0m')
         return None
 
 
-if __name__ == '__main__':
-    controller = Model('..\\..\\exemplo')
-    for t in controller.tables:
-        print(t, '\n\n')
-    for r in controller.relationships:
-        print(r)
-    #     print(f'{origin[:30]:30}     {cardinality}     {target}')
-    # for table in controller.tables:
-    #     print(f'{table.name}')
-    #     for column in table.columns:
-    #         print(f'    {column.name} - {column.type} - {column.dataType}')
-    #         if column.expression:
-    #             print(f'        {column.expression}')

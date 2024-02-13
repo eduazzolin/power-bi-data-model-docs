@@ -9,8 +9,7 @@ class GeradorDeDocumentacaoPBI:
 def main():
     model = Model('..\\exemplo')
     for t in model.tables:
-        print(t, '\n\n\n')
-
+        print(f'{t.name[:30]:30} - {t.table_type}')
 
 if __name__ == '__main__':
     main()

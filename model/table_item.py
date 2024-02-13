@@ -1,13 +1,13 @@
 class TableItem:
-    def __init__(self, id: str, name: str, type: str = 'column', data_type: str = None, format_string: str = None,
+    def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None, format_string: str = None,
                  display_folder: str = None, is_hidden: bool = False, expression: list = None):
-        self.id = id
+        self.table_item_id = table_item_id
         self.name = name
-        self.type = type
-        self.dataType = data_type
-        self.formatString = format_string
-        self.displayFolder = display_folder
-        self.isHidden = is_hidden
+        self.table_item_type = table_item_type
+        self.data_type = data_type
+        self.format_string = format_string
+        self.display_folder = display_folder
+        self.is_hidden = is_hidden
         self.expression = expression
 
     def __str__(self):

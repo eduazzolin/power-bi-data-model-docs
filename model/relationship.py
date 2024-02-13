@@ -1,18 +1,18 @@
 class Relationship:
-    def __init__(self, id: str, origin_column: str, origin_table: str, origin_cardinality: str, target_column: str,
+    def __init__(self, relationship_id: str, origin_column: str, origin_table: str, origin_cardinality: str, target_column: str,
                  target_table: str, target_cardinality: str, is_active: bool, is_both_directions: bool):
-        self.id = id
-        self.originColumn = origin_column
-        self.originTable = origin_table
-        self.targetColumn = target_column
-        self.targetTable = target_table
-        self.isActive = is_active
-        self.originCardinality = origin_cardinality
-        self.targetCardinality = target_cardinality
-        self.isBothDirections = is_both_directions
+        self.relationship_id = relationship_id
+        self.origin_column = origin_column
+        self.origin_table = origin_table
+        self.target_column = target_column
+        self.target_table = target_table
+        self.is_active = is_active
+        self.origin_cardinality = origin_cardinality
+        self.target_cardinality = target_cardinality
+        self.is_both_directions = is_both_directions
         
     def __str__(self):
-        origin = f'{self.originTable}[{self.originColumn}]'
-        target = f'{self.targetTable}[{self.targetColumn}]'
-        cardinality = f'{self.originCardinality:4} {" <--> " if self.isBothDirections else " ---> "} {self.targetCardinality:4}'
+        origin = f'{self.origin_table}[{self.origin_column}]'
+        target = f'{self.target_table}[{self.target_column}]'
+        cardinality = f'{self.origin_cardinality:4} {" <--> " if self.is_both_directions else " ---> "} {self.target_cardinality:4}'
         return f'{origin[:35]:35}     {cardinality}     {target[:35]:35}'
