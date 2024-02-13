@@ -1,9 +1,9 @@
 import json
 import os
 
-from .table_item import TableItem
 from .relationship import Relationship
 from .table import Table
+from .table_item import TableItem
 
 
 class Model:
@@ -14,7 +14,8 @@ class Model:
         self.report_json_file = self.open_report_json_file()
         self.tables = self.extract_tables()
         self.relationships = self.extract_relationships()
-
+        self.name = self.extract_model_name()
+        self.size = self.extract_model_size()
 
     def extract_tables(self):
         tables = []
@@ -83,7 +84,8 @@ class Model:
                 name=column.get('name'),
                 data_type=column.get('dataType'),
                 table_item_type=column.get('type', 'column'),
-                expression=column.get('expression'),
+                expression=[column.get('expression')] if isinstance(column.get('expression'),
+                                                                    str) else column.get('expression'),
                 format_string=column.get('formatString'),
                 is_hidden=column.get('isHidden', False)
             ))
@@ -145,4 +147,28 @@ class Model:
             print(f'\033[93mReport file not found!\033[0m')
         return None
 
+    def extract_model_name(self):
+        item_metadata_json_file = self.open_item_metadata_json_file()
+        if item_metadata_json_file:
+            return item_metadata_json_file.get('displayName', 'Model')
+        pass
 
+    def open_item_metadata_json_file(self):
+        model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
+                        os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
+        try:
+            with open(model_folder[0], 'r', encoding='utf-8') as file:
+                model = json.load(file)
+            print(f'\033[92mitem.metadata.json loaded!\033[0m')
+            return model
+        except Exception:
+            print(f'\033[93mitem.metadata.json not found!\033[0m')
+        return None
+
+    def extract_model_size(self):
+        total = 0
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                total += os.path.getsize(file_path)
+        return total

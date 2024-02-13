@@ -11,4 +11,12 @@ class TableItem:
         self.expression = expression
 
     def __str__(self):
-        return f'{self.name} {self.type}'
+        result = ''
+        result += f'Name: {self.name}\n'
+        result += f'Type: {self.table_item_type}\n'
+        result += f'Data Type: {self.data_type}\n'
+        result += f'Format String: {self.format_string}\n'
+        result += f'Display Folder: {self.display_folder}\n'
+        result += f'Is Hidden: {self.is_hidden}\n'
+        result += f'Expression: {self.expression}\n'
+        return result

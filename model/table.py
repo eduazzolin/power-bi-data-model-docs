@@ -11,20 +11,38 @@ class Table:
         self.query = self.format_query()
 
 
+
     def __str__(self):
         power_query_steps = '\n    '.join(self.power_query_steps)
         table_itens = '\n    '.join(str(column) for column in self.table_itens)
-        return f"""
-{self.name}
-{'-' * len(self.name)}
+        columns_len = len([item for item in self.table_itens if item.table_item_type == 'column'])
+        measures_len = len([item for item in self.table_itens if item.table_item_type == 'measure'])
+        calculated_columns_len = len([item for item in self.table_itens if item.table_item_type == 'calculated'])
+        query_with_tab = self.query.replace('\n', '\n    ') if self.query else ''
+
+        result = ''
+
+        result += f"""
+Table: {self.name}
+Type: {self.table_type}
 Import Mode: {self.import_mode}
-Power query steps: 
+Columns: {str(columns_len)}
+Calculated Columns: {str(calculated_columns_len)}
+Measures: {str(measures_len)}
+
+{f'Query: ' if self.query else ''}
+{'   ' + query_with_tab if query_with_tab else ''}
+
+Power Query Steps: 
     {power_query_steps}
-{'Query:' if self.query else ''}
-{self.query if self.query else ''}
+
+
 Columns:
-    {table_itens}
+    
 """
+        for ti in self.table_itens:
+            result += f'{ti}\n'
+        return result
 
     def format_query(self):
         for i in range(len(self.power_query_steps)):

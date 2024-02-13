@@ -15,4 +15,4 @@ class Relationship:
         origin = f'{self.origin_table}[{self.origin_column}]'
         target = f'{self.target_table}[{self.target_column}]'
         cardinality = f'{self.origin_cardinality:4} {" <--> " if self.is_both_directions else " ---> "} {self.target_cardinality:4}'
-        return f'{origin[:35]:35}     {cardinality}     {target[:35]:35}'
+        return f'{origin[:50]:50}     {cardinality}     {target}'
