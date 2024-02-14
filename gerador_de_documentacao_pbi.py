@@ -4,6 +4,8 @@ import os
 from model.model import Model
 
 
+#TODO API DO CHAT GPT PARA GERAR DESCRIÇÕES EM LINGUAGEM NATURAL
+
 class GeradorDeDocumentacaoPBI:
     """
     Classe responsável por gerar a documentação de um modelo de dados do Power BI.
