@@ -37,7 +37,7 @@ class GeradorDeDocumentacaoPBI:
         md += f'\n## Tabelas\n'
         count = 1
         for t in self.model.tables:
-            md += f'{str(count)}. {t.name}\n'
+            md += f'{str(count)}. [{t.name}](#{t.table_id})\n'
             count += 1
 
         md += f'\n## Relacionamentos\n\n'
@@ -57,7 +57,7 @@ class GeradorDeDocumentacaoPBI:
         for t in self.model.tables:
             for m in t.table_itens:
                 if m.table_item_type == 'measure':
-                    md += f'{str(count)}. [{m.name}]\n'
+                    md += f'{str(count)}. [{m.name}](#{m.table_item_id})\n'
                     count += 1
 
         md += f'\n# Detalhamento das tabelas\n'
@@ -79,7 +79,7 @@ class GeradorDeDocumentacaoPBI:
                     has_measures = True
                 if i.table_item_type == 'calculated':
                     has_calculated_columns = True
-
+            md += f'\n<a id="{t.table_id}"></a>\n'
             md += f'\n## {t.name}\n'
             md += f'- **Nome:** {t.name}\n'
             md += f'- **Tipo:** {t.table_type}\n'
@@ -93,6 +93,13 @@ class GeradorDeDocumentacaoPBI:
                 if c.table_item_type == 'column':
                     count += 1
                     md += f'{str(count)}. {c.name}\n'
+
+            md += f'\n### Medidas\n' if has_measures else ''
+            count = 0
+            for m in t.table_itens:
+                if m.table_item_type == 'measure':
+                    count += 1
+                    md += f'{str(count)}. [{m.name}](#{m.table_item_id})\n'
 
             if is_in_relationship:
                 md += f'\n### Relacionamentos\n'
@@ -158,23 +165,28 @@ class GeradorDeDocumentacaoPBI:
                     md += f'{c_expression}\n'
                     md += f'```\n'
 
-            md += f'\n### Medidas\n' if has_measures else ''
+        md += f'\n# Detalhamento das medidas\n'
+        for t in self.model.tables:
             for m in t.table_itens:
                 if m.table_item_type == 'measure':
+
                     if m.expression:
                         while m.expression[0] == '':
                             m.expression.pop(0)
-
                         m_expression = '\n'.join(m.expression)
                     else:
                         m_expression = 'Vazio'
-                    md += f'\n**{m.name}**\n'
+
+                    md += f'\n<a id="{m.table_item_id}"></a>\n'
+                    md += f'\n## {m.name}\n'
                     md += f'- **Nome:** {m.name}\n'
+                    md += f'- **Tabela:** {t.name}\n'
                     md += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     md += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
                     md += f'\n```dax\n'
                     md += f'{m_expression}\n'
                     md += f'```\n'
+
         return md
 
 
