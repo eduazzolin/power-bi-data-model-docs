@@ -41,7 +41,7 @@ class Table:
             result += f'{item}\n'
         return result
 
-    def format_query(self):
+    def format_query(self) -> str:
         """
         Method to format the query in the power query steps
         the query is replaced by a token _CUSTOM_QUERY_ in the steps

@@ -30,7 +30,7 @@ class Model:
         self.name = self.extract_model_name()
         self.size = self.extract_model_size()
 
-    def extract_tables(self):
+    def extract_tables(self) -> list:
         """
         Extract tables from model.bim file
         :return: list of tables
@@ -146,10 +146,10 @@ class Model:
                 ))
         return sorted(relationships, key=lambda x: x.origin_table)
 
-    def open_model_bim_file(self):
+    def open_model_bim_file(self) -> dict:
         """
         Open model.bim file
-        :return: the file in json format
+        :return: the file in dict format
         """
         model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
@@ -162,10 +162,10 @@ class Model:
             print(f'\033[93mModel.bim not found!\033[0m')
         return None
 
-    def open_report_json_file(self):
+    def open_report_json_file(self) -> dict:
         """
         Open report.json file
-        :return: the file in json format
+        :return: the file in dict format
         """
         report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
                          os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
@@ -178,10 +178,10 @@ class Model:
             print(f'\033[93mReport file not found!\033[0m')
         return None
 
-    def open_item_metadata_json_file(self):
+    def open_item_metadata_json_file(self) -> dict:
         """
         Open item.metadata.json file
-        :return: the file in json format
+        :return: the file in dict format
         """
         model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
@@ -194,7 +194,7 @@ class Model:
             print(f'\033[93mitem.metadata.json not found!\033[0m')
         return None
 
-    def extract_model_name(self):
+    def extract_model_name(self) -> str:
         """
         Extract model name from item.metadata.json file
         :return: string name
@@ -204,7 +204,7 @@ class Model:
             return item_metadata_json_file.get('displayName', 'Model')
         pass
 
-    def extract_model_size(self):
+    def extract_model_size(self) -> int:
         """
         Calculate model size in bytes
         :return: int size
