@@ -1,6 +1,6 @@
 import json
 import os
-
+import time
 from .relationship import Relationship
 from .table import Table
 from .table_item import TableItem
@@ -42,6 +42,9 @@ class Model:
             table_name: str = table['name']
             if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
                 continue
+
+            print(f'Extracting table: {table_name}')
+            time.sleep(0.01)
 
             # table id
             table_id = table.get('lineageTag', None)
@@ -133,6 +136,9 @@ class Model:
                 if relation.get('fromTable', None).startswith('DateTableTemplate_'):
                     continue
 
+                print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
+                time.sleep(0.01)
+
                 relationships.append(Relationship(
                     relationship_id=relation.get('name', None),
                     origin_table=relation.get('toTable', None),
@@ -201,6 +207,8 @@ class Model:
         """
         item_metadata_json_file = self.open_item_metadata_json_file()
         if item_metadata_json_file:
+            print(f'Extracting model name: {item_metadata_json_file.get("displayName", "Model")}')
+            time.sleep(0.01)
             return item_metadata_json_file.get('displayName', 'Model')
         pass
 
