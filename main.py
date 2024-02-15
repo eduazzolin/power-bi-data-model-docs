@@ -6,14 +6,15 @@ from model.model import Model
 
 class Main:
     """
-    Class to generate documentation from a Power BI data model.
-    The methods that generate documentation in portuguese are written in the same language.
+    Class to execute the documentation generation.
+    The methods are written in Portuguese, as the
+    documentation is exported in the same language.
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         """
-        Inicializa a classe.
-        :param path: caminho da pasta raiz do modelo de dados pbip.
+        Initializes the class with the path of the pbip data model.
+        :param path: str
         """
         self.model = Model(path)
 
