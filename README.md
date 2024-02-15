@@ -3,7 +3,7 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 
 ## How to use
 1. Locate the folder where the Power BI pbip file is stored.
-2. Run the script `main.py` and past the path of the folder.
+2. Run the script `main.py` and paste the path of the folder.
 3. The script will generate a markdown file with the data model documentation in the same folder.
 
 ## Power BI pbip format
