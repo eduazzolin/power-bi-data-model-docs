@@ -4,7 +4,7 @@ import os
 from model.model import Model
 
 
-class PowerBiDataModelDocumentor:
+class Main:
     """
     Class to generate documentation from a Power BI data model.
     The methods that generate documentation in portuguese are written in the same language.
@@ -270,7 +270,7 @@ class PowerBiDataModelDocumentor:
 
 if __name__ == '__main__':
     path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    generator = PowerBiDataModelDocumentor(path)
+    generator = Main(path)
     md = generator.gerar_md()
     try:
         with open(os.path.join(path, 'Documentação.md'), 'w', encoding='utf-8') as f:
