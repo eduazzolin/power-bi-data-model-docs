@@ -4,11 +4,10 @@ import os
 from model.model import Model
 
 
-#TODO API DO CHAT GPT PARA GERAR DESCRIÇÕES EM LINGUAGEM NATURAL
-
-class GeradorDeDocumentacaoPBI:
+class PowerBiDataModelDocumentor:
     """
-    Classe responsável por gerar a documentação de um modelo de dados do Power BI.
+    Class to generate documentation from a Power BI data model.
+    The methods that generate documentation in portuguese are written in the same language.
     """
 
     def __init__(self, path):
@@ -271,8 +270,8 @@ class GeradorDeDocumentacaoPBI:
 
 if __name__ == '__main__':
     path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    gerador = GeradorDeDocumentacaoPBI(path)
-    md = gerador.gerar_md()
+    generator = PowerBiDataModelDocumentor(path)
+    md = generator.gerar_md()
     try:
         with open(os.path.join(path, 'Documentação.md'), 'w', encoding='utf-8') as f:
             f.write(md)
