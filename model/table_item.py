@@ -1,3 +1,5 @@
+from openai import OpenAI
+
 class TableItem:
     """
     TableItem class to represent a column or measure in a table.
@@ -39,3 +41,37 @@ class TableItem:
         result += f'Is Hidden: {self.is_hidden}\n'
         result += f'Expression: {self.expression}\n'
         return result
+
+    def generate_comment_openai(self):
+        """
+        Method to generate a comment for the table item using OpenAI's GPT-3
+        :return: string
+        """
+        with open ('openai-key.txt', 'r') as file:
+            client = OpenAI(api_key=file.read())
+
+
+
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "You are an assistant, skilled in explaining complex programming concepts with simplicity."},
+                {"role": "user", "content": "Explique a medida " + self.name + ": " "\n".join(self.expression)}
+            ],
+            max_tokens=150
+        )
+
+        return completion.choices[0].message
+
+if __name__ == '__main__':
+    table_item = TableItem('1', 'total price', 'measure')
+    table_item.expression = [
+    'CALCULATE(',
+	'[Vendas abs.],   //aqui vai estar a modificação',
+	'FILTER( //filtra vendas abs. pg_co_canal a partir de dim_semanas',
+	'	ALLSELECTED("DIM_SEMANAS"),',
+	'	ISONORAFTER("DIM_SEMANAS"[NOME SEMANA], MAX("DIM_SEMANAS"[NOME SEMANA]), DESC)',
+	')']
+    print(table_item.generate_comment_openai())
+    pass
