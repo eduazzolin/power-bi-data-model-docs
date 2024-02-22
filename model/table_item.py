@@ -1,11 +1,14 @@
 from openai import OpenAI
+import time
+
 
 class TableItem:
     """
     TableItem class to represent a column or measure in a table.
     """
 
-    def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None, format_string: str = None,
+    def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None,
+                 format_string: str = None,
                  display_folder: str = None, is_hidden: bool = False, expression: list = None):
         """
         Constructor of the class
@@ -44,34 +47,23 @@ class TableItem:
 
     def generate_comment_openai(self):
         """
-        Method to generate a comment for the table item using OpenAI's GPT-3
+        Method to generate a comment for the table item using OpenAI's GPT-3.5
         :return: string
         """
-        with open ('openai-key.txt', 'r') as file:
+        with open('model\\openai-key.txt', 'r') as file:
             client = OpenAI(api_key=file.read())
 
-
-
+        expression = '\n'.join(self.expression)
         completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system",
-                 "content": "You are an assistant, skilled in explaining complex programming concepts with simplicity."},
-                {"role": "user", "content": "Explique a medida " + self.name + ": " "\n".join(self.expression)}
+                 "content": "Você responde de forma resumida em texto pleno sobre medidas dax e colunas calculadas do Power BI"},
+                {"role": "user",
+                 "content": f"Explique resumidamente a medida '{self.name}': `{expression}`"}
             ],
-            max_tokens=150
+            max_tokens=200
         )
 
-        return completion.choices[0].message
-
-if __name__ == '__main__':
-    table_item = TableItem('1', 'total price', 'measure')
-    table_item.expression = [
-    'CALCULATE(',
-	'[Vendas abs.],   //aqui vai estar a modificação',
-	'FILTER( //filtra vendas abs. pg_co_canal a partir de dim_semanas',
-	'	ALLSELECTED("DIM_SEMANAS"),',
-	'	ISONORAFTER("DIM_SEMANAS"[NOME SEMANA], MAX("DIM_SEMANAS"[NOME SEMANA]), DESC)',
-	')']
-    print(table_item.generate_comment_openai())
-    pass
+        print(f'Generating AI comment for table item: {self.name}')
+        return completion.choices[0].message.content

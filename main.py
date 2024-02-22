@@ -11,12 +11,13 @@ class Main:
     documentation is exported in the same language.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, gerar_interpretacao_ia: bool = False):
         """
         Initializes the class with the path of the pbip data model.
         :param path: str
         """
         self.model = Model(path)
+        self.gerar_interpretacao_ia = gerar_interpretacao_ia
 
     def gerar_md(self):
         """
@@ -151,6 +152,7 @@ class Main:
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
                     c_expression = '\n'.join(c.expression)
                     retorno += f'\n**{c.name}**\n'
+                    retorno += f'- **Interpretação IA:** {c.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
                     retorno += f'```dax\n'
                     retorno += f'{c_expression}\n'
                     retorno += f'```\n'
@@ -253,6 +255,7 @@ class Main:
                     retorno += f'- **Tabela:** {t.name}\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
+                    retorno += f'- **Interpretação IA:** {m.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
                     retorno += f'\n```dax\n'
                     retorno += f'{m_expression}\n'
                     retorno += f'```\n'
@@ -271,8 +274,10 @@ class Main:
 
 if __name__ == '__main__':
     path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    generator = Main(path)
-    md = generator.gerar_md()
+    gerar_interprecacao_ia = input('Deseja gerar interpretação de medidas com IA? (s/n): ').lower() == 's'
+
+    main = Main(path, gerar_interprecacao_ia)
+    md = main.gerar_md()
     try:
         with open(os.path.join(path, 'Documentação.md'), 'w', encoding='utf-8') as f:
             f.write(md)
