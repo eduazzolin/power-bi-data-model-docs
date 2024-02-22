@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 from .relationship import Relationship
 from .table import Table
@@ -158,15 +159,16 @@ class Model:
         Open model.bim file
         :return: the file in dict format
         """
-        model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
-                        os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
+            model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
+                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
             print(f'\033[92mModel.bim loaded!\033[0m')
             return model
-        except Exception:
+        except Exception as e:
             print(f'\033[93mModel.bim not found!\033[0m')
+            raise e
         return None
 
     def open_report_json_file(self) -> dict:
@@ -174,15 +176,16 @@ class Model:
         Open report.json file
         :return: the file in dict format
         """
-        report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
-                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
         try:
+            report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
+                             os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
             with open(report_folder[0], 'r', encoding='utf-8') as file:
                 file = json.load(file)
             print(f'\033[92mReport.json loaded!\033[0m')
             return file
-        except Exception:
+        except Exception as e:
             print(f'\033[93mReport file not found!\033[0m')
+            raise e
         return None
 
     def open_item_metadata_json_file(self) -> dict:
@@ -190,15 +193,16 @@ class Model:
         Open item.metadata.json file
         :return: the file in dict format
         """
-        model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
-                        os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
+            model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
+                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
             print(f'\033[92mitem.metadata.json loaded!\033[0m')
             return model
-        except Exception:
+        except Exception as e:
             print(f'\033[93mitem.metadata.json not found!\033[0m')
+            raise e
         return None
 
     def extract_model_name(self) -> str:
