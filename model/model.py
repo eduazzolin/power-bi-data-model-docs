@@ -19,6 +19,7 @@ class Model:
         :param skip_loading: if True, it will not print the loading messages
         :attr model_bim_file: .Dataset/model.bim file
         :attr report_json_file: .Report/report.json file
+        :attr item_metadata_json_file: .Dataset/item.metadata.json file
         :attr tables: list of tables
         :attr relationships: list of relationships
         :attr name: model name
@@ -168,7 +169,7 @@ class Model:
                             os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
-            print(f'\033[92mModel.bim loaded!\033[0m')
+            print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
             return model
         except Exception as e:
             print(f'\033[93mModel.bim not found!\033[0m')
@@ -185,7 +186,7 @@ class Model:
                              os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
             with open(report_folder[0], 'r', encoding='utf-8') as file:
                 file = json.load(file)
-            print(f'\033[92mReport.json loaded!\033[0m')
+            print(f'\033[92mReport.json loaded!\033[0m' if not self.skip_loading else '')
             return file
         except Exception as e:
             print(f'\033[93mReport file not found!\033[0m')
@@ -202,7 +203,7 @@ class Model:
                             os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
-            print(f'\033[92mitem.metadata.json loaded!\033[0m')
+            print(f'\033[92mitem.metadata.json loaded!\033[0m' if not self.skip_loading else '')
             return model
         except Exception as e:
             print(f'\033[93mitem.metadata.json not found!\033[0m')
