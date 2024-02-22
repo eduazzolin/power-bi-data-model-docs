@@ -49,11 +49,22 @@ class Table:
         :return: query string
         """
         for i in range(len(self.power_query_steps)):
+            # Google BigQuery
             if 'NativeQuery' in self.power_query_steps[i]:
                 line = self.power_query_steps[i]
                 prefix: str = line[:line.find('[Data],') + 9]
                 postfix: str = line[line.rfind(', null') - 1:]
                 query: str = line[line.find('[Data],') + 9:line.rfind(', null') - 1]
+                query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
+                self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
+                return query
+
+            # Oracle DB
+            if 'Oracle.Database(' in self.power_query_steps[i] and 'Query="' in self.power_query_steps[i]:
+                line = self.power_query_steps[i]
+                prefix: str = line[:line.find('Query=') + 7]
+                postfix: str = line[len(line) - 3:]
+                query: str = line[line.find('Query=') + 7:len(line) - 3]
                 query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
                 self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
                 return query
