@@ -159,11 +159,10 @@ class Main:
                 retorno = f'\n### Definições das colunas calculadas\n'
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
                     retorno += f'\n<a id="{c.table_item_id}"></a>\n'
-                    c_expression = '\n'.join(c.expression)
                     retorno += f'\n**{c.name}**\n'
                     retorno += f'- **Interpretação IA:** {c.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
                     retorno += f'```dax\n'
-                    retorno += f'{c_expression}\n'
+                    retorno += f'{c.get_expression_cleaned()}\n'
                     retorno += f'```\n'
                 return retorno
 
@@ -252,12 +251,6 @@ class Main:
             retorno = f'\n# Detalhamento das medidas\n'
             for t in self.model.tables:
                 for m in [item for item in t.table_itens if item.table_item_type == 'measure']:
-                    if m.expression:
-                        while m.expression[0] == '':
-                            m.expression.pop(0)
-                        m_expression = '\n'.join(m.expression)
-                    else:
-                        m_expression = 'Vazio'
 
                     retorno += f'\n<a id="{m.table_item_id}"></a>\n'
                     retorno += f'\n## {m.name}\n'
@@ -267,7 +260,7 @@ class Main:
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
                     retorno += f'- **Interpretação IA:** {m.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
                     retorno += f'\n```dax\n'
-                    retorno += f'{m_expression}\n'
+                    retorno += f'{m.get_expression_cleaned()}\n'
                     retorno += f'```\n'
             return retorno
 

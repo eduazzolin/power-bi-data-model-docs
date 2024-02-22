@@ -67,3 +67,26 @@ class TableItem:
 
         print(f'Generating AI comment for table item: {self.name}')
         return completion.choices[0].message.content
+
+    def get_expression_cleaned(self) -> str:
+        """
+        Returns the expression without blank lines at the
+        start and end.
+        :return: string
+        """
+        if not self.expression:
+            return ''
+
+        result = self.expression.copy()
+
+        i = 0
+        while i < len(result) and result[i] == '':
+            result.pop(i)
+            i += 1
+
+        i = len(result)-1
+        while i >= 0 and result[i] == '':
+            result.pop(i)
+            i -= 1
+
+        return '\n'.join(result)
