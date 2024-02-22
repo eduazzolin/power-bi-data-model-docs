@@ -25,6 +25,7 @@ class Model:
         self.path = path
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
+        self.item_metadata_json_file = self.open_item_metadata_json_file()
         self.tables = self.extract_tables()
         self.relationships = self.extract_relationships()
         self.name = self.extract_model_name()
@@ -205,11 +206,11 @@ class Model:
         Extract model name from item.metadata.json file
         :return: string name
         """
-        item_metadata_json_file = self.open_item_metadata_json_file()
-        if item_metadata_json_file:
-            print(f'Extracting model name: {item_metadata_json_file.get("displayName", "Model")}')
+
+        if self.item_metadata_json_file:
+            print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
             time.sleep(0.01)
-            return item_metadata_json_file.get('displayName', 'Model')
+            return self.item_metadata_json_file.get('displayName', 'Model')
         pass
 
     def extract_model_size(self) -> int:

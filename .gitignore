@@ -153,5 +153,4 @@ dmypy.json
 cython_debug/
 
 .idea/
-
-model/openai-key.txt
+/model/openai-key.txt

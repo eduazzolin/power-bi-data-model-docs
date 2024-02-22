@@ -136,7 +136,15 @@ class Main:
                 count = 0
                 for c in [item for item in t.table_itens if item.table_item_type == 'column']:
                     count += 1
-                    retorno += f'{str(count)}. {c.name}\n'
+                    retorno += f'{str(count)}. {c.name}:  _{c.data_type}_\n'
+                return retorno
+
+            def gerar_md_detalhamento_tabelas_colunas_calculadas(t) -> str:
+                retorno = f'\n### Colunas calculadas\n'
+                count = 0
+                for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
+                    count += 1
+                    retorno += f'{str(count)}. [{c.name}](#{c.table_item_id}):  _{c.data_type}_\n'
                 return retorno
 
             def gerar_md_detalhamento_tabelas_medidas(t) -> str:
@@ -147,9 +155,10 @@ class Main:
                     retorno += f'{str(count)}. [{m.name}](#{m.table_item_id})\n'
                 return retorno
 
-            def gerar_md_detalhamento_tabelas_colunas_calculadas(t) -> str:
-                retorno = f'\n### Colunas calculadas\n'
+            def gerar_md_detalhamento_tabelas_definicao_colunas_calculadas(t) -> str:
+                retorno = f'\n### Definições das colunas calculadas\n'
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
+                    retorno += f'\n<a id="{c.table_item_id}"></a>\n'
                     c_expression = '\n'.join(c.expression)
                     retorno += f'\n**{c.name}**\n'
                     retorno += f'- **Interpretação IA:** {c.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
@@ -188,18 +197,18 @@ class Main:
                         target_cardinality = r.origin_cardinality
                         origin_cardinality = r.target_cardinality
                     if r.is_active:
-                        retorno += f'| {origin} | {r.origin_cardinality} |   <->   | {r.target_cardinality} | {target} |\n'
+                        retorno += f'| {origin} | {origin_cardinality} |   <->   | {target_cardinality} | {target} |\n'
                     else:
-                        retorno += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <->   | *{r.target_cardinality}* | *{target}*\n'
+                        retorno += f'| (Desativado) *{origin}* | *{origin_cardinality}* |   <->   | *{target_cardinality}* | *{target}*\n'
                 for r in when_target:
                     target = f'{r.origin_table}[{r.origin_column}]'
                     origin = f'{r.target_table}[{r.target_column}]'
                     target_cardinality = r.origin_cardinality
                     origin_cardinality = r.target_cardinality
                     if r.is_active:
-                        retorno += f'| {origin} | {r.origin_cardinality} |   <--   | {r.target_cardinality} | {target} |\n'
+                        retorno += f'| {origin} | {origin_cardinality} |   <--   | {target_cardinality} | {target} |\n'
                     else:
-                        retorno += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <--   | *{r.target_cardinality}* | *{target}*\n'
+                        retorno += f'| (Desativado) *{origin}* | *{origin_cardinality}* |   <--   | *{target_cardinality}* | *{target}*\n'
 
                 retorno += f'|  |  |  |  |  |\n'
                 return retorno
@@ -224,11 +233,12 @@ class Main:
                 is_in_relationship, has_columns, has_measures, has_calculated_columns = verificar_tabela(t)
                 retorno += gerar_md_detalhamento_tabelas_descricao(t)
                 retorno += gerar_md_detalhamento_tabelas_colunas(t) if has_columns else ''
+                retorno += gerar_md_detalhamento_tabelas_colunas_calculadas(t) if has_calculated_columns else ''
                 retorno += gerar_md_detalhamento_tabelas_medidas(t) if has_measures else ''
                 retorno += gerar_md_detalhamento_tabelas_relacionamentos(t) if is_in_relationship else ''
                 retorno += gerar_md_detalhamento_tabelas_query(t) if t.query else ''
                 retorno += gerar_md_detalhamento_tabelas_power_query(t) if t.power_query_steps else ''
-                retorno += gerar_md_detalhamento_tabelas_colunas_calculadas(t) if has_calculated_columns else ''
+                retorno += gerar_md_detalhamento_tabelas_definicao_colunas_calculadas(t) if has_calculated_columns else ''
             return retorno
 
         def gerar_md_detalhamento_medidas(self) -> str:
