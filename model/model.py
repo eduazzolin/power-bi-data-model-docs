@@ -16,6 +16,7 @@ class Model:
         """
         Constructor
         :param path: path of the pbip folder
+        :param skip_loading: if True, it will not print the loading messages
         :attr model_bim_file: .Dataset/model.bim file
         :attr report_json_file: .Report/report.json file
         :attr tables: list of tables
