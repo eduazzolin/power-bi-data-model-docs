@@ -195,18 +195,18 @@ class Main:
                         target_cardinality = r.origin_cardinality
                         origin_cardinality = r.target_cardinality
                     if r.is_active:
-                        retorno += f'| {origin} | {r.origin_cardinality} |   <->   | {r.target_cardinality} | {target} |\n'
+                        retorno += f'| {origin} | {origin_cardinality} |   <->   | {target_cardinality} | {target} |\n'
                     else:
-                        retorno += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <->   | *{r.target_cardinality}* | *{target}*\n'
+                        retorno += f'| (Desativado) *{origin}* | *{origin_cardinality}* |   <->   | *{target_cardinality}* | *{target}*\n'
                 for r in when_target:
                     target = f'{r.origin_table}[{r.origin_column}]'
                     origin = f'{r.target_table}[{r.target_column}]'
                     target_cardinality = r.origin_cardinality
                     origin_cardinality = r.target_cardinality
                     if r.is_active:
-                        retorno += f'| {origin} | {r.origin_cardinality} |   <--   | {r.target_cardinality} | {target} |\n'
+                        retorno += f'| {origin} | {origin_cardinality} |   <--   | {target_cardinality} | {target} |\n'
                     else:
-                        retorno += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* |   <--   | *{r.target_cardinality}* | *{target}*\n'
+                        retorno += f'| (Desativado) *{origin}* | *{origin_cardinality}* |   <--   | *{target_cardinality}* | *{target}*\n'
 
                 retorno += f'|  |  |  |  |  |\n'
                 return retorno
