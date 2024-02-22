@@ -12,7 +12,7 @@ class Model:
     Class to extract and store information from a Power BI pbip folder.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, skip_loading: bool = False):
         """
         Constructor
         :param path: path of the pbip folder
@@ -24,6 +24,7 @@ class Model:
         :attr size: model size in bytes
         """
         self.path = path
+        self.skip_loading = skip_loading
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
         self.item_metadata_json_file = self.open_item_metadata_json_file()
@@ -45,8 +46,9 @@ class Model:
             if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
                 continue
 
-            print(f'Extracting table: {table_name}')
-            time.sleep(0.01)
+            if not self.skip_loading:
+                print(f'Extracting table: {table_name}')
+                time.sleep(0.01)
 
             # table id
             table_id = table.get('lineageTag', None)
@@ -138,8 +140,9 @@ class Model:
                 if relation.get('fromTable', None).startswith('DateTableTemplate_'):
                     continue
 
-                print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
-                time.sleep(0.01)
+                if not self.skip_loading:
+                    print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
+                    time.sleep(0.01)
 
                 relationships.append(Relationship(
                     relationship_id=relation.get('name', None),
@@ -212,8 +215,9 @@ class Model:
         """
 
         if self.item_metadata_json_file:
-            print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
-            time.sleep(0.01)
+            if not self.skip_loading:
+                print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
+                time.sleep(0.01)
             return self.item_metadata_json_file.get('displayName', 'Model')
         pass
 
