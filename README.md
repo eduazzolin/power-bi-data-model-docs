@@ -9,3 +9,19 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 ## Power BI pbip format
 - The Power BI pbip format is currently a preview feature in Power BI Desktop that can be activated in the preview options. Instead of saving the report in a single .pbix file, it saves it in a folder with the .pbip extension. The folder contains all the information of the report in the form of .json and .bim files. For more information about the pbip format, visit the [official documentation](https://learn.microsoft.com/pt-br/power-bi/developer/projects/projects-overview).
 - If your report is in the .pbix format, you can save a copy of the report in the .pbip format by going to `File > Save As > Power BI project (.pbip)`, after activating the preview feature.
+
+## Contributing
+Feel free to contribute to this project by opening an issue or a pull request. I'm open to suggestions and improvements. To create new forms of exporting the data model documentation, you just need to use the following classes and methods:
+```python
+from model.model import Model
+
+# Create a model object:
+model = Model('path/to/folder', skip_loading=True)
+
+# Your data model object is now ready to be used:
+for table in model.tables:
+    print(f'The table {table.name} has the following columns:')
+    for column in table.table_itens:
+        print(f'  - {column.name}')
+    print('\n')
+```

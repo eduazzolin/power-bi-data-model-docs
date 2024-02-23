@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import time
 from .relationship import Relationship
 from .table import Table
@@ -11,18 +12,21 @@ class Model:
     Class to extract and store information from a Power BI pbip folder.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, skip_loading: bool = False):
         """
         Constructor
         :param path: path of the pbip folder
+        :param skip_loading: if True, it will not print the loading messages
         :attr model_bim_file: .Dataset/model.bim file
         :attr report_json_file: .Report/report.json file
+        :attr item_metadata_json_file: .Dataset/item.metadata.json file
         :attr tables: list of tables
         :attr relationships: list of relationships
         :attr name: model name
         :attr size: model size in bytes
         """
         self.path = path
+        self.skip_loading = skip_loading
         self.model_bim_file = self.open_model_bim_file()
         self.report_json_file = self.open_report_json_file()
         self.item_metadata_json_file = self.open_item_metadata_json_file()
@@ -44,8 +48,9 @@ class Model:
             if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
                 continue
 
-            print(f'Extracting table: {table_name}')
-            time.sleep(0.01)
+            if not self.skip_loading:
+                print(f'Extracting table: {table_name}')
+                time.sleep(0.01)
 
             # table id
             table_id = table.get('lineageTag', None)
@@ -137,8 +142,9 @@ class Model:
                 if relation.get('fromTable', None).startswith('DateTableTemplate_'):
                     continue
 
-                print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
-                time.sleep(0.01)
+                if not self.skip_loading:
+                    print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
+                    time.sleep(0.01)
 
                 relationships.append(Relationship(
                     relationship_id=relation.get('name', None),
@@ -158,15 +164,16 @@ class Model:
         Open model.bim file
         :return: the file in dict format
         """
-        model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
-                        os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
+            model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
+                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
-            print(f'\033[92mModel.bim loaded!\033[0m')
+            print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
             return model
-        except Exception:
+        except Exception as e:
             print(f'\033[93mModel.bim not found!\033[0m')
+            raise e
         return None
 
     def open_report_json_file(self) -> dict:
@@ -174,15 +181,16 @@ class Model:
         Open report.json file
         :return: the file in dict format
         """
-        report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
-                         os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
         try:
+            report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
+                             os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
             with open(report_folder[0], 'r', encoding='utf-8') as file:
                 file = json.load(file)
-            print(f'\033[92mReport.json loaded!\033[0m')
+            print(f'\033[92mReport.json loaded!\033[0m' if not self.skip_loading else '')
             return file
-        except Exception:
+        except Exception as e:
             print(f'\033[93mReport file not found!\033[0m')
+            raise e
         return None
 
     def open_item_metadata_json_file(self) -> dict:
@@ -190,15 +198,16 @@ class Model:
         Open item.metadata.json file
         :return: the file in dict format
         """
-        model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
-                        os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
         try:
+            model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
+                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
             with open(model_folder[0], 'r', encoding='utf-8') as file:
                 model = json.load(file)
-            print(f'\033[92mitem.metadata.json loaded!\033[0m')
+            print(f'\033[92mitem.metadata.json loaded!\033[0m' if not self.skip_loading else '')
             return model
-        except Exception:
+        except Exception as e:
             print(f'\033[93mitem.metadata.json not found!\033[0m')
+            raise e
         return None
 
     def extract_model_name(self) -> str:
@@ -208,8 +217,9 @@ class Model:
         """
 
         if self.item_metadata_json_file:
-            print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
-            time.sleep(0.01)
+            if not self.skip_loading:
+                print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
+                time.sleep(0.01)
             return self.item_metadata_json_file.get('displayName', 'Model')
         pass
 

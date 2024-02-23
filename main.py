@@ -255,7 +255,7 @@ class Main:
                     retorno += f'\n<a id="{m.table_item_id}"></a>\n'
                     retorno += f'\n## {m.name}\n'
                     retorno += f'- **Nome:** {m.name}\n'
-                    retorno += f'- **Tabela:** {t.name}\n'
+                    retorno += f'- **Tabela:** [{t.name}](#{t.table_id})\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
                     retorno += f'- **Interpretação IA:** {m.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
