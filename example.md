@@ -1,5 +1,5 @@
 # Sales & Returns Sample v201912
-- Data do relatório: 15/02/2024 07:30:20
+- Data do relatório: 23/02/2024 14:46:40
 
 # Resumo do modelo de dados
 - **Tamanho do modelo:** 11.86 MB
@@ -126,8 +126,8 @@ GENERATESERIES(0, 60, 1)
 - **Modo de importação:** import
 
 ### Colunas
-1. Age
-2. Age Bucket
+1. Age:  _int64_
+2. Age Bucket:  _string_
 
 ### Definição no PowerQuery:
 ```M
@@ -200,9 +200,12 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Product
-2. Product Image
-3. ProductID
+1. Product:  _string_
+2. Product Image:  _string_
+3. ProductID:  _int64_
+
+### Colunas calculadas
+1. [Segmented by](#fb119aef-7041-49d7-9430-941c9c672041):  _string_
 
 ### Relacionamentos
 |  |  |  |  |  |
@@ -224,7 +227,9 @@ in
     #"Renamed Columns"
 ```
 
-### Colunas calculadas
+### Definições das colunas calculadas
+
+<a id="fb119aef-7041-49d7-9430-941c9c672041"></a>
 
 **Segmented by**
 ```dax
@@ -239,18 +244,18 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Importance
-2. LeftItemSetId
-3. Probability
-4. RightItemSetId
-5. RuleID
-6. Support
+1. Importance:  _double_
+2. LeftItemSetId:  _int64_
+3. Probability:  _double_
+4. RightItemSetId:  _int64_
+5. RuleID:  _int64_
+6. Support:  _int64_
 
 ### Relacionamentos
 |  |  |  |  |  |
 | ---- | ---- | ---- | ---- | ---- |
-| Association[RightItemSetId] | one |   <--   | many | Associated Product[ProductID] |
-| Association[LeftItemSetId] | one |   <--   | many | Product[ProductID] |
+| Association[RightItemSetId] | many |   <--   | one | Associated Product[ProductID] |
+| Association[LeftItemSetId] | many |   <--   | one | Product[ProductID] |
 |  |  |  |  |  |
 
 ### Definição no PowerQuery:
@@ -275,10 +280,13 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Date
-2. Month
-3. MonthSort
-4. Week
+1. Date:  _dateTime_
+2. Month:  _string_
+3. MonthSort:  _int64_
+4. Week:  _int64_
+
+### Colunas calculadas
+1. [Empty](#b95bebd9-1156-475f-9561-268b1c226fa9):  _string_
 
 ### Relacionamentos
 |  |  |  |  |  |
@@ -298,7 +306,9 @@ in
     #"Removed Columns"
 ```
 
-### Colunas calculadas
+### Definições das colunas calculadas
+
+<a id="b95bebd9-1156-475f-9561-268b1c226fa9"></a>
 
 **Empty**
 ```dax
@@ -313,25 +323,25 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Age
-2. Amount
-3. Category
-4. Gender
-5. ID
-6. Issue
-7. Price Range
-8. Product
-9. Promotion
-10. Segment
-11. Store
-12. Type
-13. Unit
+1. Age:  _string_
+2. Amount:  _int64_
+3. Category:  _string_
+4. Gender:  _string_
+5. ID:  _int64_
+6. Issue:  _string_
+7. Price Range:  _string_
+8. Product:  _string_
+9. Promotion:  _string_
+10. Segment:  _string_
+11. Store:  _string_
+12. Type:  _string_
+13. Unit:  _int64_
 
 ### Relacionamentos
 |  |  |  |  |  |
 | ---- | ---- | ---- | ---- | ---- |
 | Customer[ID] | one |   <->   | one | Sales[ID] |
-| Customer[Product] | one |   <--   | many | Associated Product[Product] |
+| Customer[Product] | many |   <--   | one | Associated Product[Product] |
 |  |  |  |  |  |
 
 ### Definição no PowerQuery:
@@ -413,10 +423,10 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. DFSort
-2. Design Factor
-3. TSort
-4. Topic
+1. DFSort:  _int64_
+2. Design Factor:  _string_
+3. TSort:  _int64_
+4. Topic:  _string_
 
 ### Medidas
 1. [Info Tooltip](#3a13ef24-a51d-44ee-b493-0f98326de4a7)
@@ -439,9 +449,9 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. ID
-2. Issue
-3. Promotion
+1. ID:  _int64_
+2. Issue:  _string_
+3. Promotion:  _string_
 
 ### Definição no PowerQuery:
 ```M
@@ -462,18 +472,18 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Category
-2. Category Image
-3. CategoryID
-4. Price
-5. Price Range
-6. Product
-7. Product Image
-8. ProductID
-9. Segement Color
-10. Segment
-11. Segment image
-12. SegmentID
+1. Category:  _string_
+2. Category Image:  _string_
+3. CategoryID:  _int64_
+4. Price:  _int64_
+5. Price Range:  _string_
+6. Product:  _string_
+7. Product Image:  _string_
+8. ProductID:  _int64_
+9. Segement Color:  _string_
+10. Segment:  _string_
+11. Segment image:  _string_
+12. SegmentID:  _int64_
 
 ### Relacionamentos
 |  |  |  |  |  |
@@ -500,8 +510,8 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Metric
-2. Sort
+1. Metric:  _string_
+2. Sort:  _int64_
 
 ### Definição no PowerQuery:
 ```M
@@ -520,21 +530,21 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Amount
-2. Date
-3. ID
-4. ProductID
-5. Status
-6. StoreID
-7. Unit
+1. Amount:  _int64_
+2. Date:  _dateTime_
+3. ID:  _int64_
+4. ProductID:  _int64_
+5. Status:  _string_
+6. StoreID:  _int64_
+7. Unit:  _int64_
 
 ### Relacionamentos
 |  |  |  |  |  |
 | ---- | ---- | ---- | ---- | ---- |
 | Sales[ID] | one |   <->   | one | Customer[ID] |
-| Sales[Date] | one |   <--   | many | Calendar[Date] |
-| Sales[ProductID] | one |   <--   | many | Product[ProductID] |
-| Sales[StoreID] | one |   <--   | many | Store[StoreID] |
+| Sales[Date] | many |   <--   | one | Calendar[Date] |
+| Sales[ProductID] | many |   <--   | one | Product[ProductID] |
+| Sales[StoreID] | many |   <--   | one | Store[StoreID] |
 |  |  |  |  |  |
 
 ### Definição no PowerQuery:
@@ -565,12 +575,12 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. Latitude
-2. Longitude
-3. Store
-4. StoreID
-5. Type
-6. image
+1. Latitude:  _double_
+2. Longitude:  _double_
+3. Store:  _string_
+4. StoreID:  _int64_
+5. Type:  _string_
+6. image:  _string_
 
 ### Relacionamentos
 |  |  |  |  |  |
@@ -596,9 +606,12 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. DLINK
-2. URL
-3. nombre
+1. DLINK:  _string_
+2. URL:  _string_
+3. nombre:  _string_
+
+### Colunas calculadas
+1. [Empty](#26a850f3-d918-47ee-8b9b-7fb3c3b1a11e):  _string_
 
 ### Definição no PowerQuery:
 ```M
@@ -609,7 +622,9 @@ in
     #"Changed Type"
 ```
 
-### Colunas calculadas
+### Definições das colunas calculadas
+
+<a id="26a850f3-d918-47ee-8b9b-7fb3c3b1a11e"></a>
 
 **Empty**
 ```dax
@@ -624,9 +639,9 @@ in
 - **Modo de importação:** import
 
 ### Colunas
-1. DLINK
-2. Nombre
-3. URL
+1. DLINK:  _string_
+2. Nombre:  _string_
+3. URL:  _string_
 
 ### Definição no PowerQuery:
 ```M
@@ -643,7 +658,7 @@ in
 
 ## % Return Rate Value
 - **Nome:** % Return Rate Value
-- **Tabela:** % Return Rate
+- **Tabela:** [% Return Rate](#c0de6d6f-57dc-41b4-96e1-55ad0a9f5c58)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -655,7 +670,7 @@ SELECTEDVALUE('% Return Rate'[% Return Rate])/100
 
 ## Last 2 Months Net Sales
 - **Nome:** Last 2 Months Net Sales
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -667,7 +682,7 @@ SELECTEDVALUE('% Return Rate'[% Return Rate])/100
 
 ## Last 2 Months Returns
 - **Nome:** Last 2 Months Returns
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -679,7 +694,7 @@ SELECTEDVALUE('% Return Rate'[% Return Rate])/100
 
 ## Net Sales
 - **Nome:** Net Sales
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -691,7 +706,7 @@ CALCULATE(SUM(Sales[Amount]),Sales[Status]="Sold")
 
 ## Net Sales PM
 - **Nome:** Net Sales PM
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -703,7 +718,7 @@ CALCULATE([Net Sales],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Net Sales Variance
 - **Nome:** Net Sales Variance
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -715,7 +730,7 @@ CALCULATE([Net Sales],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Net Sales Variance %
 - **Nome:** Net Sales Variance %
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0.0%;-0.0%;0.0%``
 
@@ -727,7 +742,7 @@ DIVIDE([Net Sales],[Net Sales PM],0)-1
 
 ## Profit Difference
 - **Nome:** Profit Difference
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -739,7 +754,7 @@ DIVIDE([WIF Adjusted Sales],[Net Sales],0)-1
 
 ## Return Rate
 - **Nome:** Return Rate
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0%;-0%;0%``
 
@@ -751,7 +766,7 @@ DIVIDE((ROUND(((DIVIDE([Returns],SUM(Sales[Amount]),0))*100),0)),100,0)
 
 ## Returns
 - **Nome:** Returns
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -763,7 +778,7 @@ CALCULATE(SUM(Sales[Amount]),Sales[Status]="Returned")
 
 ## Returns PM
 - **Nome:** Returns PM
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -775,7 +790,7 @@ CALCULATE([Returns],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Returns Variance
 - **Nome:** Returns Variance
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -787,7 +802,7 @@ CALCULATE([Returns],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Returns Variance %
 - **Nome:** Returns Variance %
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0.0%;-0.0%;0.0%``
 
@@ -799,7 +814,7 @@ CALCULATE([Returns],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Total Return Rate
 - **Nome:** Total Return Rate
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0%;-0%;0%``
 
@@ -811,7 +826,7 @@ CALCULATE([Return Rate],ALL('Calendar'[Date].[Month]))
 
 ## Units Returned
 - **Nome:** Units Returned
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``#,0``
 
@@ -823,7 +838,7 @@ CALCULATE(SUM(Sales[Unit]),Sales[Status]="Returned")
 
 ## Units Returned PM
 - **Nome:** Units Returned PM
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -835,7 +850,7 @@ CALCULATE([Units Returned],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Units Returned Variance %
 - **Nome:** Units Returned Variance %
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -847,7 +862,7 @@ DIVIDE([Units Returned],[Units Returned PM],0)-1
 
 ## Units Sold
 - **Nome:** Units Sold
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``#,0``
 
@@ -859,7 +874,7 @@ CALCULATE(SUM(Sales[Unit]),Sales[Status]="Sold")
 
 ## Units Sold PM
 - **Nome:** Units Sold PM
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``#,0``
 
@@ -871,7 +886,7 @@ CALCULATE([Units Sold],PREVIOUSMONTH('Calendar'[Date]))
 
 ## Units Sold Variance %
 - **Nome:** Units Sold Variance %
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -883,7 +898,7 @@ DIVIDE([Units Sold],[Units Sold PM],0)-1
 
 ## WIF Adjusted Net Sales
 - **Nome:** WIF Adjusted Net Sales
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -895,7 +910,7 @@ DIVIDE([Units Sold],[Units Sold PM],0)-1
 
 ## WIF Adjusted Sales
 - **Nome:** WIF Adjusted Sales
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -907,7 +922,7 @@ DIVIDE([Units Sold],[Units Sold PM],0)-1
 
 ## WIF Adjusted Units Returned
 - **Nome:** WIF Adjusted Units Returned
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -919,7 +934,7 @@ DIVIDE((SUM(Sales[Unit])*'% Return Rate'[% Return Rate Value]),1,0)
 
 ## WIF Forecast
 - **Nome:** WIF Forecast
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -931,7 +946,7 @@ DIVIDE((SUM(Sales[Unit])*'% Return Rate'[% Return Rate Value]),1,0)
 
 ## WIF Price per Unit
 - **Nome:** WIF Price per Unit
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -943,7 +958,7 @@ DIVIDE([Net Sales],[Units Sold],0)
 
 ## WIF Profit
 - **Nome:** WIF Profit
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -955,7 +970,7 @@ IF([WIF Same]=0,0,IF(ROUNDDOWN([WIF Adjusted Net Sales]-[Net Sales],0)<0,0,ROUND
 
 ## WIF Profit Difference
 - **Nome:** WIF Profit Difference
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0.0%;-0.0%;0.0%``
 
@@ -967,7 +982,7 @@ DIVIDE([WIF Forecast],[Net Sales],0)-1
 
 ## WIF Sales
 - **Nome:** WIF Sales
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -979,7 +994,7 @@ CALCULATE([Net Sales],ALL('Calendar'[Date].[Month]))
 
 ## WIF Same
 - **Nome:** WIF Same
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -991,7 +1006,7 @@ IF([% Return Rate Value]>=CALCULATE([Return Rate],ALL(Store[Type]),ALL(Store[Sto
 
 ## WIF Total Forecast
 - **Nome:** WIF Total Forecast
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1003,7 +1018,7 @@ CALCULATE([WIF Forecast],ALL('Calendar'[Date].[Month]))
 
 ## WIF Total Profit
 - **Nome:** WIF Total Profit
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1015,7 +1030,7 @@ CALCULATE([WIF Profit],ALL('Calendar'[Date].[Month]))
 
 ## WIF Units Returned
 - **Nome:** WIF Units Returned
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1027,7 +1042,7 @@ IF([Units Returned]-[WIF Units Returned Average]<0,0,[Units Returned]-[WIF Units
 
 ## WIF Units Returned Average
 - **Nome:** WIF Units Returned Average
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1039,7 +1054,7 @@ DIVIDE([WIF Units Returned Difference],CALCULATE(DISTINCTCOUNT('Calendar'[Date])
 
 ## WIF Units Returned Difference
 - **Nome:** WIF Units Returned Difference
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1051,7 +1066,7 @@ DIVIDE([WIF Units Returned Difference],CALCULATE(DISTINCTCOUNT('Calendar'[Date])
 
 ## WIF Units Returned_1
 - **Nome:** WIF Units Returned_1
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -1063,7 +1078,7 @@ CALCULATE([Units Returned], ALLSELECTED('Calendar'[Date]))
 
 ## WIF Units Returned_2
 - **Nome:** WIF Units Returned_2
-- **Tabela:** Analysis DAX
+- **Tabela:** [Analysis DAX](#445c1cb0-47b0-4e8b-986b-300a640b0447)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1075,7 +1090,7 @@ CALCULATE([WIF Adjusted Units Returned], ALLSELECTED('Calendar'[Date]))
 
 ## Association
 - **Nome:** Association
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1087,7 +1102,7 @@ VALUE(CONCATENATE([Product Top N],(SUM(Association[Importance]))))
 
 ## Lift Label
 - **Nome:** Lift Label
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1099,7 +1114,7 @@ CONCATENATE(FORMAT(SUM(Association[Importance]),"0.0"),"x")
 
 ## Net Sales Indicator
 - **Nome:** Net Sales Indicator
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1111,7 +1126,7 @@ CONCATENATE(IF([Net Sales Variance %]<=0,"","+"),FORMAT([Net Sales Variance %],"
 
 ## Net Sales Label
 - **Nome:** Net Sales Label
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1123,7 +1138,7 @@ CONCATENATE("",FORMAT([Net Sales],"$0,000"))
 
 ## Product Returns Other
 - **Nome:** Product Returns Other
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0.###############;(\$#,0.###############);\$#,0.###############``
 
@@ -1135,7 +1150,7 @@ IF([ProductR Top N]>3,[Returns],0)
 
 ## Product Returns Top 3
 - **Nome:** Product Returns Top 3
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1147,7 +1162,7 @@ IF([ProductR Top N]<4,[Returns],0)
 
 ## Product Sales Other
 - **Nome:** Product Sales Other
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1159,7 +1174,7 @@ IF([Product Top N]>3,[Net Sales],0)
 
 ## Product Sales Top 3
 - **Nome:** Product Sales Top 3
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1171,7 +1186,7 @@ IF([Product Top N]<4,[Net Sales],0)
 
 ## Product Top N
 - **Nome:** Product Top N
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -1190,7 +1205,7 @@ SWITCH(
 
 ## ProductR Top N
 - **Nome:** ProductR Top N
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -1209,7 +1224,7 @@ SWITCH(
 
 ## Profit Indicator
 - **Nome:** Profit Indicator
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1221,7 +1236,7 @@ CONCATENATE(IF([WIF Profit Difference]<=0,"","+"),FORMAT([WIF Profit Difference]
 
 ## Returns Indicator
 - **Nome:** Returns Indicator
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1233,7 +1248,7 @@ CONCATENATE(IF([Returns Variance %]<=0,"","+"),FORMAT([Returns Variance %],"0.0%
 
 ## Returns Sales Top 3
 - **Nome:** Returns Sales Top 3
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1245,7 +1260,7 @@ IF([StoreR Top N]<4,[Returns],0)
 
 ## Store Returns Other
 - **Nome:** Store Returns Other
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1257,7 +1272,7 @@ IF([StoreR Top N]>3,[Returns],0)
 
 ## Store Sales Other
 - **Nome:** Store Sales Other
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1269,7 +1284,7 @@ IF([Store Top N]>3,[Net Sales],0)
 
 ## Store Sales Top 3
 - **Nome:** Store Sales Top 3
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``\$#,0;-\$#,0;\$#,0``
 
@@ -1281,7 +1296,7 @@ IF([Store Top N]<4,[Net Sales],0)
 
 ## Store Top N
 - **Nome:** Store Top N
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -1293,7 +1308,7 @@ RANKX(ALL('Store'[Store]),[Net Sales],,DESC)
 
 ## StoreR Top N
 - **Nome:** StoreR Top N
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``0``
 
@@ -1305,7 +1320,7 @@ RANKX(ALL('Store'[Store]),[Returns],,DESC)
 
 ## Units Returned Indicator
 - **Nome:** Units Returned Indicator
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1317,7 +1332,7 @@ CONCATENATE(IF([Returns Variance %]<=0,"","+"),FORMAT([Returns Variance %],"0.0%
 
 ## Units Sold Indicator
 - **Nome:** Units Sold Indicator
-- **Tabela:** Design DAX
+- **Tabela:** [Design DAX](#27b86990-cbf9-49a1-9d2e-d8ee7816e592)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1329,7 +1344,7 @@ CONCATENATE(IF([Units Sold Variance %]<=0,"","+"),FORMAT([Units Sold Variance %]
 
 ## Info Tooltip
 - **Nome:** Info Tooltip
-- **Tabela:** Details
+- **Tabela:** [Details](#c675f364-7e23-4cf7-94fa-fabea9a19d7e)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
@@ -1341,7 +1356,7 @@ CONCATENATE(IF([Units Sold Variance %]<=0,"","+"),FORMAT([Units Sold Variance %]
 
 ## Info Tooltip 2
 - **Nome:** Info Tooltip 2
-- **Tabela:** Details
+- **Tabela:** [Details](#c675f364-7e23-4cf7-94fa-fabea9a19d7e)
 - **Pasta:** Nenhuma
 - **Formato:** ``Automático``
 
