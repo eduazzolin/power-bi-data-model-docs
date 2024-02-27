@@ -73,9 +73,14 @@ class Model:
             # table power query steps
             # table type
             table_partitions: dict = table['partitions'][0]
-            table_import_mode: str = table_partitions['mode']
-            table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(
-                table_partitions['source']['expression'], str) else table_partitions['source']['expression']
+            try:
+                table_import_mode: str = table_partitions['mode']
+            except:
+                table_import_mode = '---'
+            try:
+                table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(table_partitions['source']['expression'], str) else table_partitions['source']['expression']
+            except:
+                table_power_query_steps = []
             table_type = 'table' if table_partitions['source']['type'] == 'm' else table_partitions['source']['type']
 
             # table items
