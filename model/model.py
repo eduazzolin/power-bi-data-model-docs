@@ -27,14 +27,23 @@ class Model:
         """
         self.path = path
         self.skip_loading = skip_loading
-        self.model_bim_file = self.open_model_bim_file()
-        self.report_json_file = self.open_report_json_file()
-        self.item_metadata_json_file = self.open_item_metadata_json_file()
-        self.tables = self.extract_tables()
-        self.relationships = self.extract_relationships()
-        self.name = self.extract_model_name()
-        self.size = self.extract_model_size()
 
+        if path.endswith('model.bim'):
+            self.model_bim_file = self.open_model_bim_file_specifc()
+            self.report_json_file = None
+            self.item_metadata_json_file = None
+            self.tables = self.extract_tables()
+            self.relationships = self.extract_relationships()
+            self.name = 'Data Model'
+            self.size = 0
+        else:
+            self.model_bim_file = self.open_model_bim_file()
+            self.report_json_file = self.open_report_json_file()
+            self.item_metadata_json_file = self.open_item_metadata_json_file()
+            self.tables = self.extract_tables()
+            self.relationships = self.extract_relationships()
+            self.name = self.extract_model_name()
+            self.size = self.extract_model_size()
     def extract_tables(self) -> list:
         """
         Extract tables from model.bim file
@@ -234,3 +243,14 @@ class Model:
                 file_path = os.path.join(root, file)
                 total += os.path.getsize(file_path)
         return total
+
+    def open_model_bim_file_specifc(self):
+        try:
+            with open(self.path, 'r', encoding='utf-8') as file:
+                model = json.load(file)
+            print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
+            return model
+        except Exception as e:
+            print(f'\033[93mModel.bim not found!\033[0m')
+            raise e
+        return None
