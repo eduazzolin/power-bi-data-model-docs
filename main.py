@@ -273,8 +273,7 @@ class Main:
 
 
 if __name__ == '__main__':
-    # path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    path = r'C:\Users\eduardo\Desktop\model.bim'
+    path = input('Digite o caminho da pasta raiz do modelo de dados: ')
     print(path[:path.find('model.bim')])
     generator = Main(path)
     md = generator.gerar_md()
