@@ -281,8 +281,11 @@ if __name__ == '__main__':
 
     main = Main(path, gerar_interprecacao_ia)
     md = main.gerar_md()
+    print(path[:path.find('model.bim')])
+    generator = Main(path)
+    md = generator.gerar_md()
     try:
-        with open(os.path.join(path, 'Documentação.md'), 'w', encoding='utf-8') as f:
+        with open(os.path.join(path[:path.find('model.bim')], 'Documentação.md'), 'w', encoding='utf-8') as f:
             f.write(md)
         print('\n\nDocumentação.md gerada com sucesso!')
     except Exception as e:
