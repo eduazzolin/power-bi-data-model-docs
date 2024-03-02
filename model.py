@@ -28,11 +28,9 @@ class Model:
 
         if self.model_type == 2:
             self.model_bim_file = self.open_model_bim_file_specifc()
-            self.report_json_file = None
-            self.item_metadata_json_file = None
+            self.name = self.extract_model_name_from_model_bim()
             self.tables = self.extract_tables()
             self.relationships = self.extract_relationships()
-            self.name = 'Data Model'
             self.size = 0
         elif self.model_type == 1:
             self.model_bim_file = self.open_model_bim_file()
@@ -70,7 +68,17 @@ class Model:
             # table import mode
             # table power query steps
             # table type
-            table_partitions: dict = table['partitions'][0]
+            if table.get('refreshPolicy'):
+                table_import_mode = 'atualização incremental'
+                table_power_query_steps = table.get('refreshPolicy').get('sourceExpression')
+                table_type = 'table'
+            elif table.get('partitions'):
+                table_partitions: dict = table.get('partitions')[0]
+                table_import_mode = table_partitions.get('mode')
+                table_type = 'table'
+                table_power_query_steps = table.get('refreshPolicy').get('sourceExpression')
+
+
             try:
                 table_import_mode: str = table_partitions['mode']
             except:
@@ -250,7 +258,7 @@ class Model:
 
     def open_model_bim_file_specifc(self):
         try:
-            with open(self.path, 'r', encoding='utf-8') as file:
+            with open(os.path.join(self.path, 'model.bim'), 'r', encoding='utf-8') as file:
                 model = json.load(file)
             print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
             return model
@@ -259,6 +267,15 @@ class Model:
             raise e
         return None
 
+    def extract_model_name_from_model_bim(self):
+        """
+        Extract model name from model.bim file
+        :return: str
+        """
+        if self.model_bim_file.get('name'):
+            return self.model_bim_file.get('name')
+        else:
+            return 'Data model'
 
 class Table:
     """

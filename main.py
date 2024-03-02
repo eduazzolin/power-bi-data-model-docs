@@ -299,18 +299,24 @@ class Main:
 
 if __name__ == '__main__':
 
-    print(f'Geração de documentação de modelo de dados\n{"-" * 40}\n')
-    model_type = int(input(f'Digite 1 para modelo de dados pbip ou 2 para model.bim: '))
-    gerar_interprecacao_ia = input('Deseja gerar interpretação de medidas com IA? Digite 1 para sim ou 0 para não: ') == '1'
-    openai_key = input('Digite a chave da API do OpenAI: ') if gerar_interprecacao_ia else None
+    # print(f'Geração de documentação de modelo de dados\n{"-" * 40}\n')
+    # model_type = int(input(f'Digite 1 para modelo de dados pbip ou 2 para model.bim: '))
+    # gerar_interprecacao_ia = int(input('Deseja gerar interpretações com IA (beta)?'
+    #                                '\n0. Não'
+    #                                '\n1. Somente medidas'
+    #                                '\n2. Somente colunas calculadas'
+    #                                '\n3. Tudo'
+    #                                '\nEscolha: '))
+    # openai_key = input('Digite a chave da API do OpenAI: ') if gerar_interprecacao_ia != 0 else None
+    #
+    # if model_type == 1:
+    #     path = input('Digite o caminho da pasta raiz do modelo de dados: ')
+    #     model = Model(path, model_type=1)
+    # elif model_type == 2:
+    #     path = input('Digite o caminho da pasta em que está o arquivo model.bim: ')
+    #     model = Model(path, model_type=2)
 
-    if model_type == 1:
-        path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-        model = Model(path, model_type=1)
-    elif model_type == 2:
-        path = input('Digite o caminho da pasta em que está o arquivo model.bim: ')
-        model = Model(path, model_type=2)
-
+    model = Model(path=r'C:\Users\eduaz\Desktop\WORKSPACES\gerador_de_documentacao_pbi\exemplo4', model_type=2, skip_loading=True)
     main = Main(model, gerar_interprecacao_ia)
     documentacao_md = main.gerar_md()
     main.salvar_md(documentacao_md)
