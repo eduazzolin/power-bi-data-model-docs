@@ -14,6 +14,7 @@ class Model:
         Constructor
         :param path: path of the pbip folder
         :param skip_loading: if True, it will not print the loading messages
+        :param model_type: 1 = PBIP FOLDER, 2 = MODEL.BIM FOLDER
         :attr model_bim_file: .Dataset/model.bim file
         :attr report_json_file: .Report/report.json file
         :attr item_metadata_json_file: .Dataset/item.metadata.json file
@@ -68,27 +69,25 @@ class Model:
             # table import mode
             # table power query steps
             # table type
-            if table.get('refreshPolicy'):
-                table_import_mode = 'atualização incremental'
-                table_power_query_steps = table.get('refreshPolicy').get('sourceExpression')
-                table_type = 'table'
-            elif table.get('partitions'):
-                table_partitions: dict = table.get('partitions')[0]
-                table_import_mode = table_partitions.get('mode')
-                table_type = 'table'
-                table_power_query_steps = table.get('refreshPolicy').get('sourceExpression')
-
-
             try:
-                table_import_mode: str = table_partitions['mode']
-            except:
-                table_import_mode = '---'
-            try:
-                table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(
-                    table_partitions['source']['expression'], str) else table_partitions['source']['expression']
-            except:
-                table_power_query_steps = []
-            table_type = 'table' if table_partitions['source']['type'] == 'm' else table_partitions['source']['type']
+                if table.get('refreshPolicy'):
+                    table_import_mode = 'atualização incremental'
+                    table_power_query_steps = [table.get('refreshPolicy').get('sourceExpression')] if isinstance(
+                        table.get('refreshPolicy').get('sourceExpression'), str) else table.get('refreshPolicy').get(
+                        'sourceExpression')
+                    table_type = 'table'
+                elif table.get('partitions'):
+                    table_partitions: dict = table.get('partitions')[0]
+                    table_import_mode = table_partitions.get('mode')
+                    table_type = 'table' if table_partitions.get('source').get('type') == 'm' else table_partitions.get('source').get('type')
+                    table_power_query_steps = [table_partitions['source']['expression']] if isinstance(
+                        table_partitions['source']['expression'], str) else table_partitions['source']['expression']
+            except Exception as e:
+                print(f'Error extracting table: {table_name}')
+                print(e)
+                table_import_mode = '-------'
+                table_power_query_steps = ['-------']
+                table_type = '-------'
 
             # table items
             table_columns: list = []
@@ -282,7 +281,12 @@ class Table:
     Table class to represent a table in a model.
     """
 
-    def __init__(self, table_id: str, name: str, description: list, table_type: str, table_itens: list,
+    def __init__(self,
+                 table_id: str,
+                 name: str,
+                 description: list,
+                 table_type: str,
+                 table_itens: list,
                  import_mode: str,
                  power_query_steps: list):
         """
@@ -434,14 +438,13 @@ class TableItem:
         result += f'Expression: {self.expression}\n'
         return result
 
-    def generate_comment_openai(self):
+    def generate_comment_openai(self, openai_key: str) -> str:
         """
         Method to generate a comment for the table item using OpenAI's GPT-3.5
         :return: string
         """
         from openai import OpenAI
-        with open('model\\openai-key.txt', 'r') as file:
-            client = OpenAI(api_key=file.read())
+        client = OpenAI(api_key=openai_key)
 
         expression = '\n'.join(self.expression)
         completion = client.chat.completions.create(

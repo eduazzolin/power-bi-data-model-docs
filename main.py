@@ -13,13 +13,16 @@ class Main:
     documentation is exported in the same language.
     """
 
-    def __init__(self, model: Model, gerar_interpretacao_ia: bool = False):
+    def __init__(self, model: Model, gerar_interpretacao_ia: bool = False, openai_key: str = None):
         """
         Initializes the class with the path of the pbip data model.
         :param path: str
+        :param gerar_interpretacao_ia: bool
+        :param openai_key: str
         """
         self.model = model
         self.gerar_interpretacao_ia = gerar_interpretacao_ia
+        self.openai_key = openai_key
 
     def gerar_md(self):
         """
@@ -162,7 +165,8 @@ class Main:
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
                     retorno += f'\n<a id="{c.table_item_id}"></a>\n'
                     retorno += f'\n**{c.name}**\n'
-                    retorno += f'- **Interpretação IA:** {c.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
+                    retorno += f'- **Interpretação IA:** {c.generate_comment_openai(self.openai_key)}\n' if self.gerar_interpretacao_ia in (
+                        2, 3) else ''
                     retorno += f'```dax\n'
                     retorno += f'{c.get_expression_cleaned()}\n'
                     retorno += f'```\n'
@@ -239,7 +243,8 @@ class Main:
                 retorno += gerar_md_detalhamento_tabelas_relacionamentos(t) if is_in_relationship else ''
                 retorno += gerar_md_detalhamento_tabelas_query(t) if t.query else ''
                 retorno += gerar_md_detalhamento_tabelas_power_query(t) if t.power_query_steps else ''
-                retorno += gerar_md_detalhamento_tabelas_definicao_colunas_calculadas(t) if has_calculated_columns else ''
+                retorno += gerar_md_detalhamento_tabelas_definicao_colunas_calculadas(
+                    t) if has_calculated_columns else ''
             return retorno
 
         def gerar_md_detalhamento_medidas(self) -> str:
@@ -253,14 +258,14 @@ class Main:
             retorno = f'\n# Detalhamento das medidas\n'
             for t in self.model.tables:
                 for m in [item for item in t.table_itens if item.table_item_type == 'measure']:
-
                     retorno += f'\n<a id="{m.table_item_id}"></a>\n'
                     retorno += f'\n## {m.name}\n'
                     retorno += f'- **Nome:** {m.name}\n'
                     retorno += f'- **Tabela:** [{t.name}](#{t.table_id})\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
-                    retorno += f'- **Interpretação IA:** {m.generate_comment_openai()}\n' if self.gerar_interpretacao_ia else ''
+                    retorno += f'- **Interpretação IA:** {m.generate_comment_openai(self.openai_key)}\n' if self.gerar_interpretacao_ia in (
+                        1, 3) else ''
                     retorno += f'\n```dax\n'
                     retorno += f'{m.get_expression_cleaned()}\n'
                     retorno += f'```\n'
@@ -296,27 +301,31 @@ class Main:
             time.sleep(5)
 
 
-
 if __name__ == '__main__':
 
-    # print(f'Geração de documentação de modelo de dados\n{"-" * 40}\n')
-    # model_type = int(input(f'Digite 1 para modelo de dados pbip ou 2 para model.bim: '))
-    # gerar_interprecacao_ia = int(input('Deseja gerar interpretações com IA (beta)?'
-    #                                '\n0. Não'
-    #                                '\n1. Somente medidas'
-    #                                '\n2. Somente colunas calculadas'
-    #                                '\n3. Tudo'
-    #                                '\nEscolha: '))
-    # openai_key = input('Digite a chave da API do OpenAI: ') if gerar_interprecacao_ia != 0 else None
-    #
-    # if model_type == 1:
-    #     path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    #     model = Model(path, model_type=1)
-    # elif model_type == 2:
-    #     path = input('Digite o caminho da pasta em que está o arquivo model.bim: ')
-    #     model = Model(path, model_type=2)
+    print(f'\nGeração de documentação de modelo de dados\n{"-" * 40}')
 
-    model = Model(path=r'C:\Users\eduaz\Desktop\WORKSPACES\gerador_de_documentacao_pbi\exemplo4', model_type=2, skip_loading=True)
-    main = Main(model, gerar_interprecacao_ia)
+    model_type = int(input(f'\nEscolha o tipo de modelo de dados:'
+                           f'\n1. Modelo de dados pbip'
+                           f'\n2. Arquivo model.bim'
+                           f'\nEscolha: '))
+
+    gerar_interprecacao_ia = int(input('\nDeseja gerar interpretações com IA (beta)?'
+                                       '\n0. Não'
+                                       '\n1. Somente medidas'
+                                       '\n2. Somente colunas calculadas'
+                                       '\n3. Tudo'
+                                       '\nEscolha: '))
+
+    openai_key = input('\nDigite a chave da API do OpenAI: ') if gerar_interprecacao_ia != 0 else None
+
+    if model_type == 1:
+        path = input('\nDigite o caminho da pasta raiz do modelo de dados: ')
+        model = Model(path, model_type=1)
+    elif model_type == 2:
+        path = input('\nDigite o caminho da pasta em que está o arquivo model.bim: ')
+        model = Model(path, model_type=2)
+
+    main = Main(model, gerar_interprecacao_ia, openai_key)
     documentacao_md = main.gerar_md()
     main.salvar_md(documentacao_md)
