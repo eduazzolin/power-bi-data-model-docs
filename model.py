@@ -1,10 +1,7 @@
 import json
 import os
-import sys
 import time
-from .relationship import Relationship
-from .table import Table
-from .table_item import TableItem
+from openai import OpenAI
 
 
 class Model:
@@ -44,6 +41,7 @@ class Model:
             self.relationships = self.extract_relationships()
             self.name = self.extract_model_name()
             self.size = self.extract_model_size()
+
     def extract_tables(self) -> list:
         """
         Extract tables from model.bim file
@@ -68,7 +66,6 @@ class Model:
             table_description = table.get('description', [])
             table_description = [table_description] if isinstance(table_description, str) else table_description
 
-
             # table import mode
             # table power query steps
             # table type
@@ -78,7 +75,8 @@ class Model:
             except:
                 table_import_mode = '---'
             try:
-                table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(table_partitions['source']['expression'], str) else table_partitions['source']['expression']
+                table_power_query_steps: list = [table_partitions['source']['expression']] if isinstance(
+                    table_partitions['source']['expression'], str) else table_partitions['source']['expression']
             except:
                 table_power_query_steps = []
             table_type = 'table' if table_partitions['source']['type'] == 'm' else table_partitions['source']['type']
@@ -259,3 +257,207 @@ class Model:
             print(f'\033[93mModel.bim not found!\033[0m')
             raise e
         return None
+
+
+class Table:
+    """
+    Table class to represent a table in a model.
+    """
+
+    def __init__(self, table_id: str, name: str, description: list, table_type: str, table_itens: list,
+                 import_mode: str,
+                 power_query_steps: list):
+        """
+        Constructor of the class
+        :param table_id: the table id
+        :param name: the table name
+        :param description: the table description
+        :param table_type: the table type, can be 'table' or 'calculated'
+        :param table_itens: list of objects of type TableItem
+        :param import_mode: the import mode of the table, can be 'import' or 'directquery'
+        :param power_query_steps: list of power query steps
+        """
+        self.table_id: str = table_id
+        self.name: str = name
+        self.description: list = description
+        self.table_type: str = table_type
+        self.table_itens: list = table_itens
+        self.import_mode: str = import_mode
+        self.power_query_steps: list = power_query_steps
+        self.query: str = self.format_query()
+
+    def __str__(self):
+        """
+        Method to return a string representation of the table
+        :return: string
+        """
+        result = ''
+        result += f'Name: {self.name}\n'
+        result += f'Description: {" ".join(self.description)}\n'
+        result += f'Type: {self.table_type}\n'
+        result += f'Import Mode: {self.import_mode}\n'
+        result += f'Power Query Steps: {self.power_query_steps}\n'
+        result += f'Query: {self.query}\n'
+        result += f'Items:\n'
+        for item in self.table_itens:
+            result += f'{item}\n'
+        return result
+
+    def format_query(self) -> str:
+        """
+        Method to format the query in the power query steps
+        the query is replaced by a token _CUSTOM_QUERY_ in the steps
+        and the query is returned
+        :return: query string
+        """
+        for i in range(len(self.power_query_steps)):
+            # Google BigQuery
+            if 'NativeQuery' in self.power_query_steps[i]:
+                line = self.power_query_steps[i]
+                prefix: str = line[:line.find('[Data],') + 9]
+                postfix: str = line[line.rfind(', null') - 1:]
+                query: str = line[line.find('[Data],') + 9:line.rfind(', null') - 1]
+                query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
+                self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
+                return query
+
+            # Oracle DB
+            if 'Oracle.Database(' in self.power_query_steps[i] and 'Query="' in self.power_query_steps[i]:
+                line = self.power_query_steps[i]
+                prefix: str = line[:line.find('Query=') + 7]
+                postfix: str = line[len(line) - 3:]
+                query: str = line[line.find('Query=') + 7:len(line) - 3]
+                query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
+                self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
+                return query
+
+
+class Relationship:
+    """
+    Class to represent a relationship between two tables
+    """
+
+    def __init__(self, relationship_id: str, origin_column: str, origin_table: str, origin_cardinality: str,
+                 target_column: str,
+                 target_table: str, target_cardinality: str, is_active: bool, is_both_directions: bool):
+        """
+        Constructor of the class
+        :param relationship_id: id of the relationship
+        :param origin_column: column that filters the target table
+        :param origin_table: table that filters the target table
+        :param origin_cardinality: cardinality of the origin table, can be 'one' or 'many'
+        :param target_column: column that is filtered by the origin table
+        :param target_table: table that is filtered by the origin table
+        :param target_cardinality: cardinality of the target table, can be 'one' or 'many'
+        :param is_active: if the relationship is active
+        :param is_both_directions:
+        """
+        self.relationship_id = relationship_id
+        self.origin_column = origin_column
+        self.origin_table = origin_table
+        self.target_column = target_column
+        self.target_table = target_table
+        self.is_active = is_active
+        self.origin_cardinality = origin_cardinality
+        self.target_cardinality = target_cardinality
+        self.is_both_directions = is_both_directions
+
+    def __str__(self):
+        """
+        Method to return a string representation of the relationship
+        :return: str
+        """
+        origin = f'{self.origin_table}[{self.origin_column}]'
+        target = f'{self.target_table}[{self.target_column}]'
+        cardinality = f'{self.origin_cardinality:4} {" <--> " if self.is_both_directions else " ---> "} {self.target_cardinality:4}'
+        return f'{origin[:50]:50}     {cardinality}     {target}'
+
+
+class TableItem:
+    """
+    TableItem class to represent a column or measure in a table.
+    """
+
+    def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None,
+                 format_string: str = None,
+                 display_folder: str = None, is_hidden: bool = False, expression: list = None):
+        """
+        Constructor of the class
+        :param table_item_id: id of the table item
+        :param name: name of the table item
+        :param table_item_type: type of the table item, can be 'column', 'calculated' or 'measure'
+        :param data_type: type of the data, e.g. 'String', 'Integer', 'date', etc.
+        :param format_string: the format method for measures
+        :param display_folder: the folder where the table item is displayed
+        :param is_hidden: if the table item is hidden
+        :param expression: the definition of the measure or calculated column. It is a list of string lines.
+        """
+        self.table_item_id: str = table_item_id
+        self.name: str = name
+        self.table_item_type: str = table_item_type
+        self.data_type: str = data_type
+        self.format_string: str = format_string
+        self.display_folder: str = display_folder
+        self.is_hidden: bool = is_hidden
+        self.expression: list = expression
+
+    def __str__(self):
+        """
+        Method to return a string representation of the table item
+        :return: string
+        """
+        result = ''
+        result += f'Name: {self.name}\n'
+        result += f'Type: {self.table_item_type}\n'
+        result += f'Data Type: {self.data_type}\n'
+        result += f'Format String: {self.format_string}\n'
+        result += f'Display Folder: {self.display_folder}\n'
+        result += f'Is Hidden: {self.is_hidden}\n'
+        result += f'Expression: {self.expression}\n'
+        return result
+
+    def generate_comment_openai(self):
+        """
+        Method to generate a comment for the table item using OpenAI's GPT-3.5
+        :return: string
+        """
+        with open('model\\openai-key.txt', 'r') as file:
+            client = OpenAI(api_key=file.read())
+
+        expression = '\n'.join(self.expression)
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system",
+                 "content": "Você responde de forma resumida em texto pleno sobre medidas dax e colunas calculadas do Power BI"},
+                {"role": "user",
+                 "content": f"Explique resumidamente a medida '{self.name}': `{expression}`"}
+            ],
+            max_tokens=200
+        )
+
+        print(f'Generating AI comment for table item: {self.name}')
+        return completion.choices[0].message.content
+
+    def get_expression_cleaned(self) -> str:
+        """
+        Returns the expression without blank lines at the
+        start and end.
+        :return: string
+        """
+        if not self.expression:
+            return ''
+
+        result = self.expression.copy()
+
+        i = 0
+        while i < len(result) and result[i] == '':
+            result.pop(i)
+            i += 1
+
+        i = len(result) - 1
+        while i >= 0 and result[i] == '':
+            result.pop(i)
+            i -= 1
+
+        return '\n'.join(result)
