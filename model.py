@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from openai import OpenAI
+
 
 
 class Model:
@@ -9,7 +9,7 @@ class Model:
     Class to extract and store information from a Power BI pbip folder.
     """
 
-    def __init__(self, path: str, skip_loading: bool = False):
+    def __init__(self, path: str, model_type: int, skip_loading: bool = False, ):
         """
         Constructor
         :param path: path of the pbip folder
@@ -24,8 +24,9 @@ class Model:
         """
         self.path = path
         self.skip_loading = skip_loading
+        self.model_type = model_type
 
-        if path.endswith('model.bim'):
+        if self.model_type == 2:
             self.model_bim_file = self.open_model_bim_file_specifc()
             self.report_json_file = None
             self.item_metadata_json_file = None
@@ -33,7 +34,7 @@ class Model:
             self.relationships = self.extract_relationships()
             self.name = 'Data Model'
             self.size = 0
-        else:
+        elif self.model_type == 1:
             self.model_bim_file = self.open_model_bim_file()
             self.report_json_file = self.open_report_json_file()
             self.item_metadata_json_file = self.open_item_metadata_json_file()
@@ -421,6 +422,7 @@ class TableItem:
         Method to generate a comment for the table item using OpenAI's GPT-3.5
         :return: string
         """
+        from openai import OpenAI
         with open('model\\openai-key.txt', 'r') as file:
             client = OpenAI(api_key=file.read())
 

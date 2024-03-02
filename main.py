@@ -1,7 +1,9 @@
 import datetime as dt
 import os
+import subprocess
+import time
 
-from model.model import Model
+from model import Model
 
 
 class Main:
@@ -11,12 +13,12 @@ class Main:
     documentation is exported in the same language.
     """
 
-    def __init__(self, path: str, gerar_interpretacao_ia: bool = False):
+    def __init__(self, model: Model, gerar_interpretacao_ia: bool = False):
         """
         Initializes the class with the path of the pbip data model.
         :param path: str
         """
-        self.model = Model(path)
+        self.model = model
         self.gerar_interpretacao_ia = gerar_interpretacao_ia
 
     def gerar_md(self):
@@ -274,19 +276,41 @@ class Main:
         md += gerar_md_detalhamento_medidas(self)
         return md
 
+    def salvar_md(self, md: str):
+        """
+        Salva a documentação em formato markdown em um arquivo.
+        :param md: str
+        :return: None
+        """
+        timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
+        try:
+            with open(os.path.join(self.model.path, f'Documentação {timestamp}.md'), 'w', encoding='utf-8') as f:
+                f.write(md)
+            try:
+                subprocess.Popen(f'explorer "{self.model.path}"')
+            except:
+                pass
+            print('\n\nDocumentação.md gerada com sucesso!')
+        except Exception as e:
+            print(f'Erro ao gerar documentação: {e}')
+            time.sleep(5)
+
+
 
 if __name__ == '__main__':
-    path = input('Digite o caminho da pasta raiz do modelo de dados: ')
-    gerar_interprecacao_ia = input('Deseja gerar interpretação de medidas com IA? (s/n): ').lower() == 's'
 
-    main = Main(path, gerar_interprecacao_ia)
-    md = main.gerar_md()
-    print(path[:path.find('model.bim')])
-    generator = Main(path)
-    md = generator.gerar_md()
-    try:
-        with open(os.path.join(path[:path.find('model.bim')], 'Documentação.md'), 'w', encoding='utf-8') as f:
-            f.write(md)
-        print('\n\nDocumentação.md gerada com sucesso!')
-    except Exception as e:
-        print(f'Erro ao gerar documentação: {e}')
+    print(f'Geração de documentação de modelo de dados\n{"-" * 40}\n')
+    model_type = int(input(f'Digite 1 para modelo de dados pbip ou 2 para model.bim: '))
+    gerar_interprecacao_ia = input('Deseja gerar interpretação de medidas com IA? Digite 1 para sim ou 0 para não: ') == '1'
+    openai_key = input('Digite a chave da API do OpenAI: ') if gerar_interprecacao_ia else None
+
+    if model_type == 1:
+        path = input('Digite o caminho da pasta raiz do modelo de dados: ')
+        model = Model(path, model_type=1)
+    elif model_type == 2:
+        path = input('Digite o caminho da pasta em que está o arquivo model.bim: ')
+        model = Model(path, model_type=2)
+
+    main = Main(model, gerar_interprecacao_ia)
+    documentacao_md = main.gerar_md()
+    main.salvar_md(documentacao_md)
