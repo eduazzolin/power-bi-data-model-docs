@@ -1,8 +1,8 @@
 # Sales & Returns Sample v201912
-- Data do relatório: 23/02/2024 14:46:40
+- Data do relatório: 03/05/2024 18:29:58
 
 # Resumo do modelo de dados
-- **Tamanho do modelo:** 11.86 MB
+- **Tamanho do modelo:** 11.91 MB
 - **Quantidade de tabelas:** 16
 - **Quantidade de relacionamentos:** 8
 - **Quantidade de colunas:** 68
