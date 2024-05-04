@@ -287,13 +287,13 @@ class Markdown:
         """
         timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
         try:
-            with open(os.path.join(self.model.path, f'Documentação {timestamp}.md'), 'w', encoding='utf-8') as f:
+            with open(os.path.join(self.model.path, f'data_model_documentation_{timestamp}.md'), 'w', encoding='utf-8') as f:
                 f.write(md)
             try:
                 subprocess.Popen(f'explorer "{self.model.path}"')
             except:
                 pass
-            print('\n\nDocumentação.md gerada com sucesso!')
+            print('\n\nDocumentação gerada com sucesso!')
         except Exception as e:
             print(f'Erro ao gerar documentação: {e}')
             time.sleep(5)
