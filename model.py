@@ -3,7 +3,6 @@ import os
 import time
 
 
-
 class Model:
     """
     Class to extract and store information from a Power BI pbip folder.
@@ -79,7 +78,8 @@ class Model:
                 elif table.get('partitions'):
                     table_partitions: dict = table.get('partitions')[0]
                     table_import_mode = table_partitions.get('mode')
-                    table_type = 'table' if table_partitions.get('source').get('type') == 'm' else table_partitions.get('source').get('type')
+                    table_type = 'table' if table_partitions.get('source').get('type') == 'm' else table_partitions.get(
+                        'source').get('type')
                     table_power_query_steps = [table_partitions['source']['expression']] if isinstance(
                         table_partitions['source']['expression'], str) else table_partitions['source']['expression']
             except Exception as e:
@@ -120,6 +120,11 @@ class Model:
         :param table_measures: list to hold measures
         """
         for measure in table['measures']:
+            string_description = measure.get('description', '')
+            if string_description:
+                string_description = ' '.join(string_description) if isinstance(string_description,
+                                                                                list) else string_description
+
             table_measures.append(TableItem(
                 name=measure.get('name'),
                 table_item_id=measure.get('lineageTag'),
@@ -127,6 +132,7 @@ class Model:
                 is_hidden=measure.get('isHidden', False),
                 display_folder=measure.get('displayFolder'),
                 format_string=measure.get('formatString'),
+                description=string_description,
                 expression=[measure.get('expression')] if isinstance(measure.get('expression'),
                                                                      str) else measure.get('expression')
             ))
@@ -276,6 +282,7 @@ class Model:
         else:
             return 'Data model'
 
+
 class Table:
     """
     Table class to represent a table in a model.
@@ -402,7 +409,7 @@ class TableItem:
 
     def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None,
                  format_string: str = None,
-                 display_folder: str = None, is_hidden: bool = False, expression: list = None):
+                 display_folder: str = None, is_hidden: bool = False, expression: list = None, description: str = ''):
         """
         Constructor of the class
         :param table_item_id: id of the table item
@@ -413,6 +420,7 @@ class TableItem:
         :param display_folder: the folder where the table item is displayed
         :param is_hidden: if the table item is hidden
         :param expression: the definition of the measure or calculated column. It is a list of string lines.
+        :param description: the description of the table item
         """
         self.table_item_id: str = table_item_id
         self.name: str = name
@@ -422,6 +430,7 @@ class TableItem:
         self.display_folder: str = display_folder
         self.is_hidden: bool = is_hidden
         self.expression: list = expression
+        self.description: str = description
 
     def __str__(self):
         """
@@ -430,6 +439,7 @@ class TableItem:
         """
         result = ''
         result += f'Name: {self.name}\n'
+        result += f'Description: {self.description}\n'
         result += f'Type: {self.table_item_type}\n'
         result += f'Data Type: {self.data_type}\n'
         result += f'Format String: {self.format_string}\n'

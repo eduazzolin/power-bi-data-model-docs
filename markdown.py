@@ -259,6 +259,8 @@ class Markdown:
                     retorno += f'\n<a id="{m.table_item_id}"></a>\n'
                     retorno += f'\n## {m.name}\n'
                     retorno += f'- **Nome:** {m.name}\n'
+                    if m.description:
+                        retorno += f'- **Descrição:** {m.description}\n'
                     retorno += f'- **Tabela:** [{t.name}](#{t.table_id})\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'

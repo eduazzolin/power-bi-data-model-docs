@@ -30,10 +30,11 @@ class MeasuresTable:
                 row_table = table.name
                 row_display_folder = measure.display_folder
                 row_measure = measure.name
+                row_description = measure.description
                 row_expression = measure.get_expression_cleaned()
                 row_format_string = measure.format_string
-                rows.append([row_table, row_display_folder, row_measure, row_expression, row_format_string])
-        df = pd.DataFrame(rows, columns=['Table', 'Display Folder', 'Measure', 'Expression', 'Format String'])
+                rows.append([row_table, row_display_folder, row_measure, row_description, row_expression, row_format_string])
+        df = pd.DataFrame(rows, columns=['Table', 'Display Folder', 'Measure', 'Description', 'Expression', 'Format String'])
         sorted_df = df.sort_values(by=['Table', 'Display Folder', 'Measure'], ascending=[True, True, True])
         return sorted_df
 
