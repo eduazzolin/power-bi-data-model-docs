@@ -67,7 +67,3 @@ class MeasuresTable:
         path = os.path.join(self.model.path, filename)
         df.to_csv(path, index=False, encoding='utf-8', lineterminator='\n')
         print(f'\nArquivo {filename} gerado com sucesso!')
-        try:
-            subprocess.Popen(f'explorer "{self.model.path}"')
-        except:
-            pass
