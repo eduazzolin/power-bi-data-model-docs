@@ -53,21 +53,9 @@ class Main:
 
     @staticmethod
     def print_title():
-        print("  ____   ____  ___    ")
-        print(" |  _ \\ | __ )|_ _|   ")
-        print(" | |_) ||  _ \\ | |    ")
-        print(" |  __/ | |_) || |    ")
-        print(" |_|    |____/|___|   ")
-        print("  ____     _   _____   _           __  __   ___   ____   _____  _      ")
-        print(" |  _ \\   / \\ |_   _| / \\         |  \\/  | / _ \\ |  _ \\ | ____|| |     ")
-        print(" | | | | / _ \\  | |  / _ \\  _____ | |\\/| || | | || | | ||  _|  | |     ")
-        print(" | |_| |/ ___ \\ | | / ___ \\|_____|| |  | || |_| || |_| || |___ | |___  ")
-        print(" |____//_/   \\_\\|_|/_/   \\_\\      |_|  |_| \\___/ |____/ |_____||_____| ")
-        print("  ____    ___    ____      _____  ___    ___   _             ")
-        print(" |  _ \\  / _ \\  / ___|    |_   _|/ _ \\  / _ \\ | |            ")
-        print(" | | | || | | || |    _____ | | | | | || | | || |            ")
-        print(" | |_| || |_| || |___|_____|| | | |_| || |_| || |___         ")
-        print(" |____/  \\___/  \\____|      |_|  \\___/  \\___/ |_____|        ")
+        print('-' * 40)
+        print('Power BI Data Model Documentation Tool')
+        print('-' * 40)
 
     def main(self):
         '''
@@ -82,10 +70,10 @@ class Main:
             model_type = self.ask_model_type()
             try:
                 if model_type == 1:
-                    path = input('\nDigite o caminho da pasta raiz do modelo de dados: ')
+                    path = input('\nDigite o caminho da pasta raiz do modelo \nde dados: ')
                     model = Model(path, model_type=1)
                 elif model_type == 2:
-                    path = input('\nDigite o caminho da pasta em que está o arquivo model.bim: ')
+                    path = input('\nDigite o caminho da pasta em que está o \narquivo model.bim: ')
                     model = Model(path, model_type=2)
             except FileNotFoundError:
                 print('\nArquivo não encontrado. Verifique o caminho e tente novamente.')
