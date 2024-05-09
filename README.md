@@ -11,13 +11,15 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 2. Run the script `main.py` with the command ``python main.py`` and follow the instructions.
 3. The script will generate the chosen document in the same folder.
 
-![how-to-use](https://github.com/eduazzolin/power-bi-data-model-documentation-tool/assets/114076084/ffb20acb-e39d-4640-aaec-5aa0a406f460)
+![how-to-use](https://github.com/eduazzolin/power-bi-data-model-documentation-tool/assets/114076084/4c27e92c-1146-409c-926a-8112e35a6942)
+
 
 ### Autorun option
 1. You can also run the script without the need to paste the path, by putting the `Model.bim` file in the same folder as the script and running the ``autorun.cmd`` file.
 2. The autorun option will generate the documentation in the same folder as the script.
 
-![autorun](https://github.com/eduazzolin/power-bi-data-model-documentation-tool/assets/114076084/ac79f6c1-892a-4a7a-b97c-7d70d451120b)
+![autorun](https://github.com/eduazzolin/power-bi-data-model-documentation-tool/assets/114076084/67d44d99-ec46-4619-aac7-2f5010b529e9)
+
 
 ## Power BI pbip format
 - The Power BI pbip format is currently a preview feature in Power BI Desktop that can be activated in the preview options. Instead of saving the report in a single .pbix file, it saves it in a folder with the .pbip extension. The folder contains all the information of the report in the form of .json and .bim files. For more information about the pbip format, visit the [official documentation](https://learn.microsoft.com/pt-br/power-bi/developer/projects/projects-overview).
