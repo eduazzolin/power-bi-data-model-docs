@@ -1,5 +1,5 @@
 # Power BI data model documentation tool
-It's a simple tool to generate a markdown documentation of a Power BI data model or a CSV/Excel file listing the measures. It uses Python to extract the data model information from a pbip project or a model.bim file and generates a markdown file as [this example](https://github.com/eduazzolin/power-bi-data-model-documentor/blob/main/example.md).
+It's a simple tool to generate a markdown documentation of a Power BI data model or a CSV/Excel file listing the measures. It uses Python to extract the data model information from a pbip project or a model.bim file and generates a markdown file as [this example](https://github.com/eduazzolin/power-bi-data-model-documentor/blob/main/docs/example.md).
 
 ## Features
 - Generates a markdown file with the data model documentation.
@@ -7,7 +7,7 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 - Supports pbip projects and model.bim files.
 
 ## How to use
-1. Install the required packages by running the command `pip install -r requirements.txt`.
+1. Install the required packages by running the command `pip install -r ./docs/requirements.txt`.
 2. Run the script `main.py` with the command ``python main.py`` and follow the instructions.
 3. The script will generate the chosen document in the same folder.
 
@@ -31,10 +31,10 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 ## Contributing
 Feel free to contribute to this project by opening an issue or a pull request. I'm open to suggestions and improvements. To create new forms of exporting the data model documentation, you just need to use the following classes and methods:
 ```python
-from model.model import Model
+from model.data_model import DataModel
 
 # Create a model object:
-model = Model('path/to/folder', skip_loading=True)
+model = DataModel('path/to/folder', skip_loading=True)
 
 # Your data model object is now ready to be used:
 for table in model.tables:

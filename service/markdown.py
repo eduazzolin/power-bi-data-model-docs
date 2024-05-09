@@ -1,9 +1,8 @@
 import datetime as dt
 import os
-import subprocess
 import time
 
-from model import Model
+from model.data_model import DataModel
 
 
 class Markdown:
@@ -11,10 +10,10 @@ class Markdown:
     Class to generate the documentation in markdown format.
     """
 
-    def __init__(self, model: Model, gerar_interpretacao_ia: bool = False, openai_key: str = None):
+    def __init__(self, model: DataModel, gerar_interpretacao_ia: bool = False, openai_key: str = None):
         """
         Constructor of the class.
-        :param model: Model
+        :param model: DataModel
         :param gerar_interpretacao_ia: bool
         :param openai_key: str
         """

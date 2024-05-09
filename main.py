@@ -3,9 +3,9 @@ import subprocess
 import sys
 import time
 
-from markdown import Markdown
-from measures_table import MeasuresTable
-from model import Model
+from service.markdown import Markdown
+from service.measures_table import MeasuresTable
+from model.data_model import DataModel
 
 
 class Main:
@@ -71,10 +71,10 @@ class Main:
             try:
                 if model_type == 1:
                     path = input('\nDigite o caminho da pasta raiz do modelo \nde dados: ')
-                    model = Model(path, model_type=1)
+                    model = DataModel(path, model_type=1)
                 elif model_type == 2:
                     path = input('\nDigite o caminho da pasta em que está o \narquivo model.bim: ')
-                    model = Model(path, model_type=2)
+                    model = DataModel(path, model_type=2)
             except FileNotFoundError:
                 print('\nArquivo não encontrado. Verifique o caminho e tente novamente.')
 
@@ -102,11 +102,11 @@ class Main:
         path = os.path.dirname(__file__)
         time.sleep(2)
         try:
-            model = Model(path, model_type=2)
+            model = DataModel(path, model_type=2)
             markdown = Markdown(model)
             documentacao_md = markdown.gerar_md()
             markdown.salvar_md(documentacao_md)
-            time.sleep(5)
+            time.sleep(3)
             exit()
         except FileNotFoundError:
             print('\nERRO: Nenhum arquivo model.bim foi encontrado na pasta do script.')

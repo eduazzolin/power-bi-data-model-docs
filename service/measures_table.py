@@ -3,7 +3,7 @@ import subprocess
 
 import pandas as pd
 
-from model import Model
+from model.data_model import DataModel
 
 
 class MeasuresTable:
@@ -11,10 +11,10 @@ class MeasuresTable:
     Class to generate a table file with the measures from the model.
     """
 
-    def __init__(self, model: Model):
+    def __init__(self, model: DataModel):
         """
         Constructor of the class.
-        :param model: Model
+        :param model: DataModel
         """
         self.model = model
 
@@ -33,8 +33,10 @@ class MeasuresTable:
                 row_description = measure.description
                 row_expression = measure.get_expression_cleaned()
                 row_format_string = measure.format_string
-                rows.append([row_table, row_display_folder, row_measure, row_description, row_expression, row_format_string])
-        df = pd.DataFrame(rows, columns=['Table', 'Display Folder', 'Measure', 'Description', 'Expression', 'Format String'])
+                rows.append(
+                    [row_table, row_display_folder, row_measure, row_description, row_expression, row_format_string])
+        df = pd.DataFrame(rows,
+                          columns=['Table', 'Display Folder', 'Measure', 'Description', 'Expression', 'Format String'])
         sorted_df = df.sort_values(by=['Table', 'Display Folder', 'Measure'], ascending=[True, True, True])
         return sorted_df
 
