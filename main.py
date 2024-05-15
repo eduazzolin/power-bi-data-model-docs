@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 
+from service.fields_table import FieldsTable
 from service.markdown import Markdown
 from service.measures_table import MeasuresTable
 from model.data_model import DataModel
@@ -15,6 +16,7 @@ class Main:
         return int(input(f'\nEscolha a função:'
                          f'\n1. Gerar documentação de modelo de dados'
                          f'\n2. Exportar tabela com medidas'
+                         f'\n3. Exportar tabela com campos e uso (beta)'
                          f'\nEscolha: '))
 
     @staticmethod
@@ -38,8 +40,8 @@ class Main:
         return input('\nDigite a chave da API do OpenAI: ')
 
     @staticmethod
-    def ask_measures_table_type():
-        return int(input('\nEscolha o tipo de tabela de medidas:'
+    def ask_export_type():
+        return int(input('\nEscolha o formato de exportação:'
                          '\n1. Arquivo xlsx'
                          '\n2. Arquivo csv'
                          '\nEscolha: '))
@@ -85,13 +87,21 @@ class Main:
             documentacao_md = markdown.gerar_md()
             markdown.salvar_md(documentacao_md)
         elif function == 2:
-            measures_table_type = self.ask_measures_table_type()
-            if measures_table_type == 1:
+            export_type = self.ask_export_type()
+            if export_type == 1:
                 measures_table = MeasuresTable(model)
                 measures_table.save_xlsx()
-            elif measures_table_type == 2:
+            elif export_type == 2:
                 measures_table = MeasuresTable(model)
                 measures_table.save_csv()
+        elif function == 3:
+            export_type = self.ask_export_type()
+            if export_type == 1:
+                fields_table = FieldsTable(model)
+                fields_table.save_xlsx()
+            elif export_type == 2:
+                fields_table = FieldsTable(model)
+                fields_table.save_csv()
 
         self.open_result_folder(path)
 

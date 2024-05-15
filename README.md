@@ -4,6 +4,7 @@ It's a simple tool to generate a markdown documentation of a Power BI data model
 ## Features
 - Generates a markdown file with the data model documentation.
 - Exports a CSV or Excel file with all the measures of the data model.
+- Exports a CSV or Excel file with all the columns and an indicator of its usage in the data model. (beta)
 - Supports pbip projects and model.bim files.
 
 ## How to use

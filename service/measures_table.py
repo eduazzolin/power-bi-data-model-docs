@@ -54,10 +54,6 @@ class MeasuresTable:
             cell_format = workbook.add_format({'text_wrap': True})
             worksheet.set_column('A:Z', cell_format=cell_format)
         print(f'\nArquivo {filename} gerado com sucesso!')
-        try:
-            subprocess.Popen(f'explorer "{self.model.path}"')
-        except:
-            pass
 
     def save_csv(self, filename: str = 'measures_table.csv'):
         """
