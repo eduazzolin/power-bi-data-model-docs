@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-
+import time
 from model.data_model import DataModel
 
 
@@ -26,16 +26,20 @@ class FieldsTable:
         name_only_field = f'[{p_field}]'
         all_table_names = [table.name for table in self.model.tables]
         found = False
+        dramatic_loading_time = 0.005
+
 
         for table in self.model.tables:
             for measure in [item for item in table.table_itens if item.table_item_type == 'measure']:
                 if name_standard in measure.get_expression_cleaned() or name_with_quotation in measure.get_expression_cleaned():
                     found = True
                     print(f'{p_table}.{p_field} found at {table.name}.{measure.name}')
+                    time.sleep(dramatic_loading_time)
             for calculated in [item for item in table.table_itens if item.table_item_type == 'calculated']:
                 if name_standard in calculated.get_expression_cleaned() or name_with_quotation in calculated.get_expression_cleaned():
                     found = True
                     print(f'{p_table}.{p_field} found at {table.name}.{calculated.name}')
+                    time.sleep(dramatic_loading_time)
                 if table.name == p_table and name_only_field in calculated.get_expression_cleaned():
                     """
                     In this section we verify if the field appears in a calculated column of the same table.
@@ -51,14 +55,17 @@ class FieldsTable:
                         expression = expression.replace(name_with_quotation_temp, '')
                     if name_only_field in expression:
                         found = True
+                        time.sleep(dramatic_loading_time)
                         print(f'{p_table}.{p_field} found at {table.name}.{calculated.name}')
 
         for relation in self.model.relationships:
             if p_table == relation.origin_table and p_field == relation.origin_column:
                 found = True
+                time.sleep(dramatic_loading_time)
                 print(f'{p_table}.{p_field} found at RELATIONSHIP {relation.origin_table}|{relation.target_table}')
             if p_table == relation.target_table and p_field == relation.target_column:
                 found = True
+                time.sleep(dramatic_loading_time)
                 print(f'{p_table}.{p_field} found at RELATIONSHIP {relation.origin_table}|{relation.target_table}')
 
         return found
@@ -89,6 +96,6 @@ class FieldsTable:
             df.to_excel(writer, sheet_name='Sheet1', index=False)
             workbook = writer.book
             worksheet = writer.sheets['Sheet1']
-            cell_format = workbook.add_format({'text_wrap': True})
+            cell_format = workbook.add_format({'text_wrap': False})
             worksheet.set_column('A:Z', cell_format=cell_format)
         print(f'\nArquivo {filename} gerado com sucesso!')
