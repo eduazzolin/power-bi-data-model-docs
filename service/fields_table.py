@@ -13,23 +13,46 @@ class FieldsTable:
         """
         self.model = model
 
-    def verify_usage(self, table, field):
+    def verify_usage(self, p_table, p_field):
+        """
+        Verify if a field is used in the model.
+        It's verified both in measures and calculated columns.
+        :param p_table: table name
+        :param p_field: field name
+        :return: bool
+        """
+        name_standard = f'{p_table}[{p_field}]'
+        name_with_quotation = f'\'{p_table}\'[{p_field}]'
+        name_only_field = f'[{p_field}]'
+        all_table_names = [table.name for table in self.model.tables]
+        found = False
 
-        name_1 = f'{table}[{field}]'
-        name_2 = f'\'{table}\'[{field}]'
-
-        declarations = []
         for table in self.model.tables:
             for measure in [item for item in table.table_itens if item.table_item_type == 'measure']:
-                declarations.append(measure.get_expression_cleaned())
+                if name_standard in measure.get_expression_cleaned() or name_with_quotation in measure.get_expression_cleaned():
+                    found = True
+                    print(f'{p_table}.{p_field} found at {table.name}.{measure.name}')
             for calculated in [item for item in table.table_itens if item.table_item_type == 'calculated']:
-                declarations.append(calculated.get_expression_cleaned())
-
-        for declaration in declarations:
-            if name_1 in declaration or name_2 in declaration:
-                return True
-
-        return False
+                if name_standard in calculated.get_expression_cleaned() or name_with_quotation in calculated.get_expression_cleaned():
+                    found = True
+                    print(f'{p_table}.{p_field} found at {table.name}.{calculated.name}')
+                if table.name == p_table and name_only_field in calculated.get_expression_cleaned():
+                    """
+                    In this section we verify if the field appears in a calculated column of the same table.
+                    In this case, we need to verify if the field is used without the name of its table.
+                    To discard cases of fields with the same name in different tables, we rip off all the cases
+                    where the field is used with the name of any table, and then we verify if the field is still present.
+                    """
+                    expression = calculated.get_expression_cleaned()
+                    for table_name in all_table_names:
+                        name_standard_temp = f'{table_name}{name_only_field}'
+                        name_with_quotation_temp = f'\'{table_name}\'{name_only_field}'
+                        expression = expression.replace(name_standard_temp, '')
+                        expression = expression.replace(name_with_quotation_temp, '')
+                    if name_only_field in expression:
+                        found = True
+                        print(f'{p_table}.{p_field} found at {table.name}.{calculated.name}')
+        return found
 
     def generate_data_frame(self):
         rows = []
