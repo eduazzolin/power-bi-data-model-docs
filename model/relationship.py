@@ -37,3 +37,9 @@ class Relationship:
         target = f'{self.target_table}[{self.target_column}]'
         cardinality = f'{self.origin_cardinality:4} {" <--> " if self.is_both_directions else " ---> "} {self.target_cardinality:4}'
         return f'{origin[:50]:50}     {cardinality}     {target}'
+
+    def get_origin(self):
+        return f'{self.origin_table}[{self.origin_column}]'
+
+    def get_target(self):
+        return f'{self.target_table}[{self.target_column}]'

@@ -52,6 +52,15 @@ class FieldsTable:
                     if name_only_field in expression:
                         found = True
                         print(f'{p_table}.{p_field} found at {table.name}.{calculated.name}')
+
+        for relation in self.model.relationships:
+            if p_table == relation.origin_table and p_field == relation.origin_column:
+                found = True
+                print(f'{p_table}.{p_field} found at RELATIONSHIP {relation.origin_table}|{relation.target_table}')
+            if p_table == relation.target_table and p_field == relation.target_column:
+                found = True
+                print(f'{p_table}.{p_field} found at RELATIONSHIP {relation.origin_table}|{relation.target_table}')
+
         return found
 
     def generate_data_frame(self):
