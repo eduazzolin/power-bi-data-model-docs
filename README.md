@@ -1,5 +1,5 @@
 # Power BI data model documentation tool
-It's a simple tool to generate a markdown documentation of a Power BI data model or a CSV/Excel file listing the measures. It uses Python to extract the data model information from a pbip project or a model.bim file and generates a markdown file as [this example](https://github.com/eduazzolin/power-bi-data-model-documentor/blob/main/docs/example.md).
+It's a simple tool to generate documentation of a Power BI data model. It uses Python to extract the data model information from a pbip project or a model.bim file and can generate a markdown doc as [this example](https://github.com/eduazzolin/power-bi-data-model-documentor/blob/main/docs/example.md) and other spreadsheets.
 
 ## Features
 - Generates a markdown file with the data model documentation.
