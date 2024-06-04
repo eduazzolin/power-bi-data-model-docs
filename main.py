@@ -7,7 +7,7 @@ from service.fields_table import FieldsTable
 from service.markdown import Markdown
 from service.measures_table import MeasuresTable
 from model.data_model import DataModel
-
+from service.simplified_markdown import SimplifiedMarkdown
 
 class Main:
 
@@ -16,7 +16,8 @@ class Main:
         return int(input(f'\nEscolha a função:'
                          f'\n1. Gerar documentação de modelo de dados'
                          f'\n2. Exportar tabela com medidas'
-                         f'\n3. Exportar tabela com campos e uso (beta)'
+                         f'\n3. Exportar tabela com campos e uso'
+                         f'\n4. Exportar documentação simpificada'
                          f'\nEscolha: '))
 
     @staticmethod
@@ -65,6 +66,7 @@ class Main:
         It is executed when the script is called without arguments.
         '''
 
+
         function = self.ask_function()
 
         model = None
@@ -102,6 +104,9 @@ class Main:
             elif export_type == 2:
                 fields_table = FieldsTable(model)
                 fields_table.save_csv()
+        elif function == 4:
+            service = SimplifiedMarkdown(model)
+            service.save_md(service.generate_md())
 
         self.open_result_folder(path)
 

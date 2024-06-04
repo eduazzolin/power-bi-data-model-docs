@@ -62,7 +62,6 @@ class Table:
                 postfix: str = line[line.rfind(', null') - 1:]
                 query: str = line[line.find('[Data],') + 9:line.rfind(', null') - 1]
                 query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
-                self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
                 return query
 
             # Oracle DB
