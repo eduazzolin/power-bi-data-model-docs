@@ -270,6 +270,8 @@ class DataModel:
             with open(os.path.join(self.path, 'model.bim'), 'r', encoding='utf-8') as file:
                 model = json.load(file)
             print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
+            if not self.skip_loading:
+                time.sleep(1)
             return model
         except Exception as e:
             print(f'\033[93mModel.bim not found!\033[0m')
