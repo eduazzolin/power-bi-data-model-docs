@@ -118,9 +118,8 @@ class Main:
         time.sleep(2)
         try:
             model = DataModel(path, model_type=2)
-            markdown = Markdown(model)
-            documentacao_md = markdown.gerar_md()
-            markdown.salvar_md(documentacao_md)
+            service = SimplifiedMarkdown(model)
+            service.save_md(service.generate_md())
             time.sleep(3)
             exit()
         except FileNotFoundError:
