@@ -42,7 +42,7 @@ class SimplifiedMarkdown:
         for t in tables:
             colunas = [c for c in t.table_itens if c.table_item_type == 'column']
             colunas.sort(key=lambda x: x.name)
-            result += f'#### {t.name}\n'
+            result += f'### {t.name}\n'
             result += f'```M\n'
             for step in t.power_query_steps:
                 result += f'{step}\n'
@@ -58,7 +58,7 @@ class SimplifiedMarkdown:
         measures = [measure for table in self.model.tables for measure in table.table_itens if measure.table_item_type == 'measure']
         measures.sort(key=lambda x: x.name)
         for m in measures:
-            result += f'#### {m.name}\n'
+            result += f'### {m.name}\n'
             result += f'- **tabela:** {m.display_folder}\n'
             result += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
             result += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
@@ -71,9 +71,10 @@ class SimplifiedMarkdown:
         calculated = [calculated for table in self.model.tables for calculated in table.table_itens if calculated.table_item_type == 'calculated']
         calculated.sort(key=lambda x: x.name)
         for c in calculated:
-            result += f'#### {c.name}\n'
+            result += f'### {c.name}\n'
             result += f'- **tabela:** {c.display_folder}\n'
-            result += f'- **formato:** {c.data_type.upper()}\n'
+            result += f'- **tipo:** {c.data_type.upper()}\n'
+            result += f'- **formato:** ``{c.format_string if c.format_string else "Automático"}``\n'
             result += f'\n```dax\n'
             result += f'{c.get_expression_cleaned()}\n'
             result += f'```\n'
