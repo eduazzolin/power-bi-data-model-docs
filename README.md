@@ -8,8 +8,8 @@ It's a simple tool to generate documentation of a Power BI data model. It uses P
 - Can connect to running Power BI Desktop instances or use a model.bim file.
 
 ## How to use
-1. Install the required packages by running the command `pip install -r requirements.txt`.
-2. Run the script `main.py` with the command ``python main.py`` and follow the instructions.
+1. Download the [latest executable release](https://github.com/eduazzolin/power-bi-data-model-documentation-tool/releases/download/V1/Power-BI-Data-Model-Docs.exe).
+2. Run the executable file and follow the instructions. No installation is required.
 
 ## Contributing
 Feel free to contribute to this project by opening an issue or a pull request. I'm open to suggestions and improvements. To create new forms of exporting the data model documentation, you just need to use the following classes and methods:
