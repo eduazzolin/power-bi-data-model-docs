@@ -5,7 +5,8 @@ class TableItem:
 
     def __init__(self, table_item_id: str, name: str, table_item_type: str = 'column', data_type: str = None,
                  format_string: str = None,
-                 display_folder: str = None, is_hidden: bool = False, expression: list = None, description: str = ''):
+                 display_folder: str = None, is_hidden: bool = False, expression: list = None, description: str = '',
+                 table_name=''):
         """
         Constructor of the class
         :param table_item_id: id of the table item
@@ -17,6 +18,7 @@ class TableItem:
         :param is_hidden: if the table item is hidden
         :param expression: the definition of the measure or calculated column. It is a list of string lines.
         :param description: the description of the table item
+        :param table_name: the name of the table where the table item is located
         """
         self.table_item_id: str = table_item_id
         self.name: str = name
@@ -27,6 +29,7 @@ class TableItem:
         self.is_hidden: bool = is_hidden
         self.expression: list = expression
         self.description: str = description
+        self.table_name: str = table_name
 
     def __str__(self):
         """
@@ -43,29 +46,6 @@ class TableItem:
         result += f'Is Hidden: {self.is_hidden}\n'
         result += f'Expression: {self.expression}\n'
         return result
-
-    def generate_comment_openai(self, openai_key: str) -> str:
-        """
-        Method to generate a comment for the table item using OpenAI's GPT-3.5
-        :return: string
-        """
-        from openai import OpenAI
-        client = OpenAI(api_key=openai_key)
-
-        expression = '\n'.join(self.expression)
-        completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system",
-                 "content": "Você responde de forma resumida em texto pleno sobre medidas dax e colunas calculadas do Power BI"},
-                {"role": "user",
-                 "content": f"Explique resumidamente a medida '{self.name}': `{expression}`"}
-            ],
-            max_tokens=200
-        )
-
-        print(f'Generating AI comment for table item: {self.name}')
-        return completion.choices[0].message.content
 
     def get_expression_cleaned(self) -> str:
         """

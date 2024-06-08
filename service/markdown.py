@@ -10,16 +10,12 @@ class Markdown:
     Class to generate the documentation in markdown format.
     """
 
-    def __init__(self, model: DataModel, gerar_interpretacao_ia: bool = False, openai_key: str = None):
+    def __init__(self, model: DataModel):
         """
         Constructor of the class.
         :param model: DataModel
-        :param gerar_interpretacao_ia: bool
-        :param openai_key: str
         """
         self.model = model
-        self.gerar_interpretacao_ia = gerar_interpretacao_ia
-        self.openai_key = openai_key
 
     def gerar_md(self):
         """
@@ -32,8 +28,7 @@ class Markdown:
             Gera o cabeçalho do markdown, com o nome do modelo e a data do relatório.
             :return: str
             """
-            retorno = f'# {self.model.name}\n'
-            retorno += f'- Data do relatório: {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
+            retorno = f'- Data do relatório: {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
             return retorno
 
         def gerar_md_resumo_modelo_caracteristicas(self) -> str:
@@ -43,7 +38,6 @@ class Markdown:
             :return: str
             """
             retorno = f'\n# Resumo do modelo de dados\n'
-            retorno += f'- **Tamanho do modelo:** {((self.model.size / 1024) / 1024):.2f} MB\n'
             retorno += f'- **Quantidade de tabelas:** {len(self.model.tables)}\n'
             retorno += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'
             retorno += f'- **Quantidade de colunas:** {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])}\n'
@@ -162,8 +156,6 @@ class Markdown:
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
                     retorno += f'\n<a id="{c.table_item_id}"></a>\n'
                     retorno += f'\n**{c.name}**\n'
-                    retorno += f'- **Interpretação IA:** {c.generate_comment_openai(self.openai_key)}\n' if self.gerar_interpretacao_ia in (
-                        2, 3) else ''
                     retorno += f'```dax\n'
                     retorno += f'{c.get_expression_cleaned()}\n'
                     retorno += f'```\n'
@@ -263,8 +255,6 @@ class Markdown:
                     retorno += f'- **Tabela:** [{t.name}](#{t.table_id})\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
-                    retorno += f'- **Interpretação IA:** {m.generate_comment_openai(self.openai_key)}\n' if self.gerar_interpretacao_ia in (
-                        1, 3) else ''
                     retorno += f'\n```dax\n'
                     retorno += f'{m.get_expression_cleaned()}\n'
                     retorno += f'```\n'
@@ -279,18 +269,3 @@ class Markdown:
         md += gerar_md_detalhamento_tabelas(self)
         md += gerar_md_detalhamento_medidas(self)
         return md
-
-    def salvar_md(self, md: str):
-        """
-        Salva a documentação em formato markdown em um arquivo.
-        :param md: str
-        :return: None
-        """
-        timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
-        try:
-            with open(os.path.join(self.model.path, f'data_model_documentation_{timestamp}.md'), 'w', encoding='utf-8') as f:
-                f.write(md)
-            print('\n\nDocumentação gerada com sucesso!')
-        except Exception as e:
-            print(f'Erro ao gerar documentação: {e}')
-            time.sleep(5)

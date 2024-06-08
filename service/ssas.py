@@ -1,9 +1,16 @@
+import json
 import sys
 
+import clr
 import pandas as pd
 
 sys.path.append('./service')
 from pyadomd import Pyadomd
+import os
+
+dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Microsoft.AnalysisServices.Tabular.DLL")
+clr.AddReference(dll_path)
+import Microsoft.AnalysisServices.Tabular as Tabular
 
 
 def list_running_ssas():
@@ -37,3 +44,15 @@ def run_query(con, dax_query):
     df = pd.DataFrame(result, columns=[column[0] for column in cursor.description])
     cursor.close()
     return df
+
+
+def get_model_bim(port_number):
+    server = Tabular.Server()
+    server.Connect(port_number)
+    database = server.Databases[0]
+    script = Tabular.JsonScripter.ScriptCreate(database)
+    json_file = json.loads(script)
+    edited = json_file['create']['database']
+    raw_json = json.dumps(edited, indent=2)
+    return raw_json
+

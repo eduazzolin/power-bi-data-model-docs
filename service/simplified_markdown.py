@@ -51,29 +51,25 @@ class SimplifiedMarkdown:
             result += f'- **modo de importação:** {t.import_mode}\n'
             result += f'- **descrição:** {" ".join(t.description)}\n' if t.description else ''
             result += f'- **colunas:**\n'
-            for c in colunas: result += f'  - **{c.name}** {c.data_type.upper()}\n'
+            for c in colunas: result += f'  - **{c.name}** {c.data_type}\n'
             result += '\n---\n'
-        
+
         result += '\n# medidas\n'
-        measures = [measure for table in self.model.tables for measure in table.table_itens if measure.table_item_type == 'measure']
-        measures.sort(key=lambda x: x.name)
-        for m in measures:
+        for m in self.model.get_all_measures():
             result += f'### {m.name}\n'
-            result += f'- **tabela:** {m.display_folder}\n'
+            result += f'- **tabela:** {m.table}\n'
             result += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
             result += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
             result += f'\n```dax\n'
             result += f'{m.get_expression_cleaned()}\n'
             result += f'```\n'
             result += '\n---\n'
-        
+
         result += '\n # colunas calculadas\n'
-        calculated = [calculated for table in self.model.tables for calculated in table.table_itens if calculated.table_item_type == 'calculated']
-        calculated.sort(key=lambda x: x.name)
-        for c in calculated:
+        for c in self.model.get_all_calculated_columns():
             result += f'### {c.name}\n'
-            result += f'- **tabela:** {c.display_folder}\n'
-            result += f'- **tipo:** {c.data_type.upper()}\n'
+            result += f'- **tabela:** {c.table}\n'
+            result += f'- **tipo:** {c.data_type}\n'
             result += f'- **formato:** ``{c.format_string if c.format_string else "Automático"}``\n'
             result += f'\n```dax\n'
             result += f'{c.get_expression_cleaned()}\n'
@@ -81,14 +77,3 @@ class SimplifiedMarkdown:
             result += '\n---\n'
 
         return result
-
-    def save_md(self, md):
-        timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
-        try:
-            with open(os.path.join(self.model.path, f'data_model_documentation {timestamp}.md'), 'w',
-                      encoding='utf-8') as f:
-                f.write(md)
-            print('\n\nDocumentação gerada com sucesso!')
-        except Exception as e:
-            print(f'Erro ao gerar documentação: {e}')
-            time.sleep(5)

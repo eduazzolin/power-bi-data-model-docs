@@ -1,5 +1,4 @@
 import json
-import os
 import time
 
 from model.relationship import Relationship
@@ -12,132 +11,28 @@ class DataModel:
     Class to extract and store information from a Power BI pbip folder.
     """
 
-    def __init__(self, path, model_type, skip_loading: bool = False, ):
+    def __init__(self, path, skip_loading: bool = False):
         """
         Constructor
         :param path: path of the model.bim or ssas connection
         :param skip_loading: if True, it will not print the loading messages
-        :param model_type: 1 = MODEL.BIM, 2 = SSAS
         :attr model_bim_file: .Dataset/model.bim file
-        :attr report_json_file: .Report/report.json file
         :attr item_metadata_json_file: .Dataset/item.metadata.json file
         :attr tables: list of tables
         :attr relationships: list of relationships
-        :attr size: model size in bytes
+        :attr DELAY: delay between prints
         """
         self.path = path
         self.skip_loading = skip_loading
-        self.model_type = model_type
+        self.DELAY = 0.001
 
-        if self.model_type == 1:
-            self.model_bim_file = self.open_model_bim_file_specifc()
-            self.tables = self.extract_tables()
-            self.relationships = self.extract_relationships()
-        elif self.model_type == 2:
-            self.ssas_raw_data = self.extract_ssas_raw_data()
-            self.tables = self.extract_tables_ssas()
-            self.relationships = self.extract_relationships()
+        if path.startswith('localhost'):
+            self.model_bim = self.open_model_bim_ssas()
+        else:
+            self.model_bim = self.open_model_bim_file()
 
-    def extract_ssas_raw_data(self):
-        from service.ssas import connect_ssas, run_query, close_connection
-        con = connect_ssas(self.path)
-        ssas_tables = run_query(con, 'select * from $SYSTEM.TMSCHEMA_TABLES')
-        ssas_columns = run_query(con, 'select * from $SYSTEM.TMSCHEMA_COLUMNS')
-        ssas_measures = run_query(con, 'select * from $SYSTEM.TMSCHEMA_MEASURES')
-        ssas_measures_display_folders = run_query(con, 'select * from $SYSTEM.MDSCHEMA_MEASURES')
-        ssas_relationships = run_query(con, 'select * from $SYSTEM.TMSCHEMA_RELATIONSHIPS')
-        ssas_partitions = run_query(con, 'select * from $SYSTEM.TMSCHEMA_PARTITIONS')
-        close_connection(con)
-
-        ssas_measures_display_folders.to_csv('ssas_measures_display_folders.csv', index=False)
-
-        return {
-            'tables': ssas_tables,
-            'columns': ssas_columns,
-            'measures': ssas_measures,
-            'relationships': ssas_relationships,
-            'partitions': ssas_partitions,
-            'measures_display_folders': ssas_measures_display_folders
-        }
-
-
-    def extract_tables_ssas(self):
-        tables = []
-        for idx, table in self.ssas_raw_data['tables'].iterrows():
-            table_name = table['Name']
-            if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
-                continue
-
-            table_id = table['LineageTag']
-            table_ssas_id = table['ID']
-            table_description = table['Description']
-            table_type = "Table" if table['SystemFlags'] == 0 else "Calculated Table"
-
-            table_power_query_steps = self.ssas_raw_data['partitions']
-            mask = table_power_query_steps['TableID'] == table_ssas_id
-            table_power_query_steps = table_power_query_steps[mask]
-            table_power_query_steps = table_power_query_steps['QueryDefinition']
-            table_power_query_steps = table_power_query_steps.str.split('\n').explode().tolist()
-
-
-            table_columns = []
-            table_measures = []
-            for idx, column in self.ssas_raw_data['columns'].iterrows():
-                if column['TableID'] == table_ssas_id:
-                    if column['Expression'] is not None:
-                        expression = column['Expression'].split('\n')
-                        table_columns = [TableItem(
-                            table_item_id=column['LineageTag'],
-                            name=column['ExplicitName'],
-                            table_item_type='calculated',
-                            format_string=column['FormatString'],
-                            is_hidden=column['IsHidden'],
-                            description=column['Description'],
-                            expression=expression
-                        )]
-                    else:
-                        table_columns = [TableItem(
-                            table_item_id=column['LineageTag'],
-                            name=column['ExplicitName'],
-                            table_item_type='column',
-                            format_string=column['FormatString'],
-                            is_hidden=column['IsHidden'],
-                            description=column['Description']
-                        )]
-
-            for idx, measure in self.ssas_raw_data['measures'].iterrows():
-                if measure['TableID'] == table_ssas_id:
-                    display_folder = ""
-                    for idx, measure_display_folder in self.ssas_raw_data['measures_display_folders'].iterrows():
-                        if measure_display_folder['MEASURE_NAME'] == measure['Name']:
-                            display_folder = measure_display_folder['MEASURE_DISPLAY_FOLDER']
-                    expression = measure['Expression'].split('\n')
-                    table_measures = [TableItem(
-                        table_item_id=measure['LineageTag'],
-                        name=measure['Name'],
-                        table_item_type='measure',
-                        format_string=measure['FormatString'],
-                        is_hidden=measure['IsHidden'],
-                        description=measure['Description'],
-                        display_folder=display_folder,
-                        expression=expression
-                    )]
-
-            table_itens = table_columns + table_measures
-            if table_itens:
-                table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
-
-            tables.append(Table(
-                table_id=table_id,
-                name=table_name,
-                description=table_description,
-                table_itens=table_itens,
-                table_type=table_type,
-                power_query_steps=table_power_query_steps,
-                import_mode="Indisponível"
-            ))
-        return sorted(tables, key=lambda x: x.name)
-
+        self.tables = self.extract_tables()
+        self.relationships = self.extract_relationships()
 
     def extract_tables(self) -> list:
         """
@@ -145,7 +40,7 @@ class DataModel:
         :return: list of tables
         """
         tables = []
-        for table in self.model_bim_file['model']['tables']:
+        for table in self.model_bim['model']['tables']:
 
             # table name
             table_name: str = table['name']
@@ -154,7 +49,7 @@ class DataModel:
 
             if not self.skip_loading:
                 print(f'Extracting table: {table_name}')
-                time.sleep(0.01)
+                time.sleep(self.DELAY)
 
             # table id
             table_id = table.get('lineageTag', None)
@@ -223,6 +118,10 @@ class DataModel:
                 string_description = ' '.join(string_description) if isinstance(string_description,
                                                                                 list) else string_description
 
+            if not self.skip_loading:
+                print(f'Extracting measure: {measure.get("name")}')
+                time.sleep(self.DELAY)
+
             table_measures.append(TableItem(
                 name=measure.get('name'),
                 table_item_id=measure.get('lineageTag'),
@@ -242,6 +141,11 @@ class DataModel:
         :param table_columns: list to hold columns
         """
         for column in table['columns']:
+
+            if not self.skip_loading:
+                print(f'Extracting column: {column.get("name")}')
+                time.sleep(self.DELAY)
+
             table_columns.append(TableItem(
                 table_item_id=column.get('lineageTag'),
                 name=column.get('name'),
@@ -259,8 +163,8 @@ class DataModel:
         :return: list of relationships objects
         """
         relationships = []
-        if 'relationships' in self.model_bim_file['model']:
-            for relation in self.model_bim_file['model']['relationships']:
+        if 'relationships' in self.model_bim['model']:
+            for relation in self.model_bim['model']['relationships']:
                 if relation.get('toTable', None).startswith('LocalDateTable_'):
                     continue
                 if relation.get('fromTable', None).startswith('DateTableTemplate_'):
@@ -268,7 +172,7 @@ class DataModel:
 
                 if not self.skip_loading:
                     print(f'Extracting relationship: {relation.get("fromTable", "")} -> {relation.get("toTable", "")}')
-                    time.sleep(0.01)
+                    time.sleep(self.DELAY)
 
                 relationships.append(Relationship(
                     relationship_id=relation.get('name', None),
@@ -283,102 +187,38 @@ class DataModel:
                 ))
         return sorted(relationships, key=lambda x: x.origin_table)
 
-    def open_model_bim_file(self) -> dict:
-        """
-        Open model.bim file
-        :return: the file in dict format
-        """
-        try:
-            model_folder = [os.path.join(self.path, f, 'model.bim') for f in os.listdir(self.path) if
-                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
-            with open(model_folder[0], 'r', encoding='utf-8') as file:
-                model = json.load(file)
-            print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
-            return model
-        except Exception as e:
-            print(f'\033[93mModel.bim not found!\033[0m')
-            raise e
-        return None
+    def open_model_bim_file(self):
+        with open(self.path, 'r', encoding='utf-8') as file:
+            model = json.load(file)
+        return model
 
-    def open_report_json_file(self) -> dict:
-        """
-        Open report.json file
-        :return: the file in dict format
-        """
-        try:
-            report_folder = [os.path.join(self.path, f, 'report.json') for f in os.listdir(self.path) if
-                             os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Report')]
-            with open(report_folder[0], 'r', encoding='utf-8') as file:
-                file = json.load(file)
-            print(f'\033[92mReport.json loaded!\033[0m' if not self.skip_loading else '')
-            return file
-        except Exception as e:
-            print(f'\033[93mReport file not found!\033[0m')
-            raise e
-        return None
+    def open_model_bim_ssas(self):
+        from service.ssas import get_model_bim
+        _model_bim = get_model_bim(self.path)
+        return json.loads(_model_bim)
 
-    def open_item_metadata_json_file(self) -> dict:
+    def get_all_measures(self):
         """
-        Open item.metadata.json file
-        :return: the file in dict format
+        Get all measures from the model
+        :return: list of measures
         """
-        try:
-            model_folder = [os.path.join(self.path, f, 'item.metadata.json') for f in os.listdir(self.path) if
-                            os.path.isdir(os.path.join(self.path, f)) if f.endswith('.Dataset')]
-            with open(model_folder[0], 'r', encoding='utf-8') as file:
-                model = json.load(file)
-            print(f'\033[92mitem.metadata.json loaded!\033[0m' if not self.skip_loading else '')
-            return model
-        except Exception as e:
-            print(f'\033[93mitem.metadata.json not found!\033[0m')
-            raise e
-        return None
+        measures = []
+        for table in self.tables:
+            for measure in table.table_itens:
+                if measure.table_item_type == 'measure':
+                    measure.table = table.name
+                    measures.append(measure)
+        return sorted(measures, key=lambda x: x.name)
 
-    def extract_model_name(self) -> str:
+    def get_all_calculated_columns(self):
         """
-        Extract model name from item.metadata.json file
-        :return: string name
+        Get all calculated columns from the model
+        :return: list of calculated columns
         """
-
-        if self.item_metadata_json_file:
-            if not self.skip_loading:
-                print(f'Extracting model name: {self.item_metadata_json_file.get("displayName", "Model")}')
-                time.sleep(0.01)
-            return self.item_metadata_json_file.get('displayName', 'Model')
-        pass
-
-    def extract_model_size(self) -> int:
-        """
-        Calculate model size in bytes
-        :return: int size
-        """
-        total = 0
-        for root, dirs, files in os.walk(self.path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                total += os.path.getsize(file_path)
-        return total
-
-    def open_model_bim_file_specifc(self):
-        try:
-            with open(os.path.join(self.path, 'model.bim'), 'r', encoding='utf-8') as file:
-                model = json.load(file)
-            print(f'\033[92mModel.bim loaded!\033[0m' if not self.skip_loading else '')
-            if not self.skip_loading:
-                time.sleep(1)
-            return model
-        except Exception as e:
-            print(f'\033[93mModel.bim not found!\033[0m')
-            raise e
-        return None
-
-    def extract_model_name_from_model_bim(self):
-        """
-        Extract model name from model.bim file
-        :return: str
-        """
-        if self.model_bim_file.get('name'):
-            return self.model_bim_file.get('name')
-        else:
-            return 'Data model'
-
+        calculated = []
+        for table in self.tables:
+            for column in table.table_itens:
+                if column.table_item_type == 'calculated':
+                    column.table = table.name
+                    calculated.append(column)
+        return sorted(calculated, key=lambda x: x.name)

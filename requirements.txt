@@ -1,0 +1,5 @@
+pyadomd==0.1.1
+pythonnet==3.0.3
+psutil
+pandas
+xlsxwriter

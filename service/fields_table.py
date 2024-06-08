@@ -1,7 +1,7 @@
-import os
+import time
 
 import pandas as pd
-import time
+
 from model.data_model import DataModel
 
 
@@ -83,19 +83,3 @@ class FieldsTable:
         sorted_df = df.sort_values(by=['Table', 'Column'], ascending=[True, True])
         return sorted_df
 
-    def save_csv(self, filename: str = 'fields_table.csv'):
-        df = self.generate_data_frame()
-        path = os.path.join(self.model.path, filename)
-        df.to_csv(path, index=False, encoding='utf-8', lineterminator='\n')
-        print(f'\nArquivo {filename} gerado com sucesso!')
-
-    def save_xlsx(self, filename: str = 'fields_table.xlsx'):
-        df = self.generate_data_frame()
-        path = os.path.join(self.model.path, filename)
-        with pd.ExcelWriter(path, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name='Sheet1', index=False)
-            workbook = writer.book
-            worksheet = writer.sheets['Sheet1']
-            cell_format = workbook.add_format({'text_wrap': False})
-            worksheet.set_column('A:Z', cell_format=cell_format)
-        print(f'\nArquivo {filename} gerado com sucesso!')

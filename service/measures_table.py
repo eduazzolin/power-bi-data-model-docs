@@ -1,6 +1,3 @@
-import os
-import subprocess
-
 import pandas as pd
 
 from model.data_model import DataModel
@@ -39,29 +36,3 @@ class MeasuresTable:
                           columns=['Table', 'Display Folder', 'Measure', 'Description', 'Expression', 'Format String'])
         sorted_df = df.sort_values(by=['Table', 'Display Folder', 'Measure'], ascending=[True, True, True])
         return sorted_df
-
-    def save_xlsx(self, filename: str = 'measures_table.xlsx'):
-        """
-        Method to save the data frame to a xlsx file.
-        :param filename: custom filename
-        """
-        df = self.generate_data_frame()
-        path = os.path.join(self.model.path, filename)
-        with pd.ExcelWriter(path, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name='Sheet1', index=False)
-            workbook = writer.book
-            worksheet = writer.sheets['Sheet1']
-            cell_format = workbook.add_format({'text_wrap': True})
-            worksheet.set_column('A:Z', cell_format=cell_format)
-        print(f'\nArquivo {filename} gerado com sucesso!')
-
-    def save_csv(self, filename: str = 'measures_table.csv'):
-        """
-        Method to save the data frame to a csv file.
-        :param filename: custom filename
-        :return:
-        """
-        df = self.generate_data_frame()
-        path = os.path.join(self.model.path, filename)
-        df.to_csv(path, index=False, encoding='utf-8', lineterminator='\n')
-        print(f'\nArquivo {filename} gerado com sucesso!')
