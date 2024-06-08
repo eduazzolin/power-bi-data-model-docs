@@ -12,38 +12,132 @@ class DataModel:
     Class to extract and store information from a Power BI pbip folder.
     """
 
-    def __init__(self, path: str, model_type: int, skip_loading: bool = False, ):
+    def __init__(self, path, model_type, skip_loading: bool = False, ):
         """
         Constructor
-        :param path: path of the pbip folder
+        :param path: path of the model.bim or ssas connection
         :param skip_loading: if True, it will not print the loading messages
-        :param model_type: 1 = PBIP FOLDER, 2 = MODEL.BIM FOLDER
+        :param model_type: 1 = MODEL.BIM, 2 = SSAS
         :attr model_bim_file: .Dataset/model.bim file
         :attr report_json_file: .Report/report.json file
         :attr item_metadata_json_file: .Dataset/item.metadata.json file
         :attr tables: list of tables
         :attr relationships: list of relationships
-        :attr name: model name
         :attr size: model size in bytes
         """
         self.path = path
         self.skip_loading = skip_loading
         self.model_type = model_type
 
-        if self.model_type == 2:
+        if self.model_type == 1:
             self.model_bim_file = self.open_model_bim_file_specifc()
-            self.name = self.extract_model_name_from_model_bim()
             self.tables = self.extract_tables()
             self.relationships = self.extract_relationships()
-            self.size = 0
-        elif self.model_type == 1:
-            self.model_bim_file = self.open_model_bim_file()
-            self.report_json_file = self.open_report_json_file()
-            self.item_metadata_json_file = self.open_item_metadata_json_file()
-            self.tables = self.extract_tables()
+        elif self.model_type == 2:
+            self.ssas_raw_data = self.extract_ssas_raw_data()
+            self.tables = self.extract_tables_ssas()
             self.relationships = self.extract_relationships()
-            self.name = self.extract_model_name()
-            self.size = self.extract_model_size()
+
+    def extract_ssas_raw_data(self):
+        from service.ssas import connect_ssas, run_query, close_connection
+        con = connect_ssas(self.path)
+        ssas_tables = run_query(con, 'select * from $SYSTEM.TMSCHEMA_TABLES')
+        ssas_columns = run_query(con, 'select * from $SYSTEM.TMSCHEMA_COLUMNS')
+        ssas_measures = run_query(con, 'select * from $SYSTEM.TMSCHEMA_MEASURES')
+        ssas_measures_display_folders = run_query(con, 'select * from $SYSTEM.MDSCHEMA_MEASURES')
+        ssas_relationships = run_query(con, 'select * from $SYSTEM.TMSCHEMA_RELATIONSHIPS')
+        ssas_partitions = run_query(con, 'select * from $SYSTEM.TMSCHEMA_PARTITIONS')
+        close_connection(con)
+
+        ssas_measures_display_folders.to_csv('ssas_measures_display_folders.csv', index=False)
+
+        return {
+            'tables': ssas_tables,
+            'columns': ssas_columns,
+            'measures': ssas_measures,
+            'relationships': ssas_relationships,
+            'partitions': ssas_partitions,
+            'measures_display_folders': ssas_measures_display_folders
+        }
+
+
+    def extract_tables_ssas(self):
+        tables = []
+        for idx, table in self.ssas_raw_data['tables'].iterrows():
+            table_name = table['Name']
+            if table_name.startswith('LocalDateTable_') or table_name.startswith('DateTableTemplate_'):
+                continue
+
+            table_id = table['LineageTag']
+            table_ssas_id = table['ID']
+            table_description = table['Description']
+            table_type = "Table" if table['SystemFlags'] == 0 else "Calculated Table"
+
+            table_power_query_steps = self.ssas_raw_data['partitions']
+            mask = table_power_query_steps['TableID'] == table_ssas_id
+            table_power_query_steps = table_power_query_steps[mask]
+            table_power_query_steps = table_power_query_steps['QueryDefinition']
+            table_power_query_steps = table_power_query_steps.str.split('\n').explode().tolist()
+
+
+            table_columns = []
+            table_measures = []
+            for idx, column in self.ssas_raw_data['columns'].iterrows():
+                if column['TableID'] == table_ssas_id:
+                    if column['Expression'] is not None:
+                        expression = column['Expression'].split('\n')
+                        table_columns = [TableItem(
+                            table_item_id=column['LineageTag'],
+                            name=column['ExplicitName'],
+                            table_item_type='calculated',
+                            format_string=column['FormatString'],
+                            is_hidden=column['IsHidden'],
+                            description=column['Description'],
+                            expression=expression
+                        )]
+                    else:
+                        table_columns = [TableItem(
+                            table_item_id=column['LineageTag'],
+                            name=column['ExplicitName'],
+                            table_item_type='column',
+                            format_string=column['FormatString'],
+                            is_hidden=column['IsHidden'],
+                            description=column['Description']
+                        )]
+
+            for idx, measure in self.ssas_raw_data['measures'].iterrows():
+                if measure['TableID'] == table_ssas_id:
+                    display_folder = ""
+                    for idx, measure_display_folder in self.ssas_raw_data['measures_display_folders'].iterrows():
+                        if measure_display_folder['MEASURE_NAME'] == measure['Name']:
+                            display_folder = measure_display_folder['MEASURE_DISPLAY_FOLDER']
+                    expression = measure['Expression'].split('\n')
+                    table_measures = [TableItem(
+                        table_item_id=measure['LineageTag'],
+                        name=measure['Name'],
+                        table_item_type='measure',
+                        format_string=measure['FormatString'],
+                        is_hidden=measure['IsHidden'],
+                        description=measure['Description'],
+                        display_folder=display_folder,
+                        expression=expression
+                    )]
+
+            table_itens = table_columns + table_measures
+            if table_itens:
+                table_itens = sorted(table_itens, key=lambda x: (x.name, x.table_item_type))
+
+            tables.append(Table(
+                table_id=table_id,
+                name=table_name,
+                description=table_description,
+                table_itens=table_itens,
+                table_type=table_type,
+                power_query_steps=table_power_query_steps,
+                import_mode="Indisponível"
+            ))
+        return sorted(tables, key=lambda x: x.name)
+
 
     def extract_tables(self) -> list:
         """
@@ -287,3 +381,4 @@ class DataModel:
             return self.model_bim_file.get('name')
         else:
             return 'Data model'
+

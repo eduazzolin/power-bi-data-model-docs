@@ -1,13 +1,13 @@
 import os
 import subprocess
-import sys
 import time
 
+from model.data_model import DataModel
 from service.fields_table import FieldsTable
 from service.markdown import Markdown
 from service.measures_table import MeasuresTable
-from model.data_model import DataModel
 from service.simplified_markdown import SimplifiedMarkdown
+
 
 class Main:
 
@@ -65,7 +65,6 @@ class Main:
         Main function to generate the documentation of the data model.
         It is executed when the script is called without arguments.
         '''
-
 
         function = self.ask_function()
 
@@ -128,10 +127,13 @@ class Main:
 
 
 if __name__ == '__main__':
-    self = Main()
-    self.print_title()
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'autorun':
-            self.autorun()
-    else:
-        self.main()
+    from service.ssas import list_running_ssas
+    model = DataModel(list_running_ssas()[0], skip_loading=True, model_type=2)
+
+# self = Main()
+# self.print_title()
+# if len(sys.argv) > 1:
+#     if sys.argv[1] == 'autorun':
+#         self.autorun()
+# else:
+#     self.main()

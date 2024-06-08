@@ -32,5 +32,8 @@ def close_connection(con):
 
 
 def run_query(con, dax_query):
-    result = con.cursor().execute(dax_query)
-    return pd.DataFrame(result.fetchall())
+    cursor = con.cursor().execute(dax_query)
+    result = cursor.fetchall()
+    df = pd.DataFrame(result, columns=[column[0] for column in cursor.description])
+    cursor.close()
+    return df
