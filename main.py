@@ -8,6 +8,7 @@ from service.simplified_markdown import SimplifiedMarkdown
 from service.ssas import list_running_ssas
 from service.system import save_md, save_xlsx, save_csv
 from service.comparison import Comparison
+from service.html import HTML
 
 
 class Main:
@@ -15,8 +16,8 @@ class Main:
     @staticmethod
     def ask_function():
         return int(input(f'\nEscolha a função:'
-                         f'\n1. Gerar documentação de modelo de dados'
-                         f'\n2. Exportar documentação simpificada'
+                         f'\n1. Exportar documentação de modelo de dados em HTML'
+                         f'\n2. Exportar documentação simpificada em markdown'
                          f'\n3. Exportar tabela com medidas'
                          f'\n4. Exportar tabela com campos e uso'
                          f'\n5. Comparar dois modelos de dados'
@@ -80,14 +81,16 @@ class Main:
 
         if function == 1:
             # Generate full documentation
-            service = Markdown(model)
-            md = service.gerar_md()
-            save_md(md, model.path, 'data_model_doc', open_folder=True)
+            service = HTML(model)
+            md = service.gerar_html()
+            save_md(md, model.path, 'data_model_doc.HTML', open_folder=True, silent=True)
+
         elif function == 2:
             # Export simplified documentation
             service = SimplifiedMarkdown(model)
             md = service.generate_md()
             save_md(md, model.path, 'data_model_simpl_doc', open_folder=True)
+
         elif function == 3:
             # Export measures table
             service = MeasuresTable(model)
@@ -97,6 +100,7 @@ class Main:
                 save_xlsx(data_frame, model.path, 'measures_table', True)
             elif export_type == 2:
                 save_csv(data_frame, model.path, 'measures_table', True)
+
         elif function == 4:
             # Export fields table
             service = FieldsTable(model)
@@ -106,6 +110,7 @@ class Main:
                 save_xlsx(data_frame, model.path, 'fields_table', True)
             elif export_type == 2:
                 save_csv(data_frame, model.path, 'fields_table', True)
+
         elif function == 5:
             print('-' * 40)
             print("\nEscolha o segundo modelo de dados:")

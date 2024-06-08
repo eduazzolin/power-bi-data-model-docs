@@ -222,3 +222,4 @@ class DataModel:
                     column.table = table.name
                     calculated.append(column)
         return sorted(calculated, key=lambda x: x.name)
+

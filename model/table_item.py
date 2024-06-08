@@ -47,7 +47,7 @@ class TableItem:
         result += f'Expression: {self.expression}\n'
         return result
 
-    def get_expression_cleaned(self) -> str:
+    def get_expression_cleaned(self, html=False) -> str:
         """
         Returns the expression without blank lines at the
         start and end.
@@ -68,4 +68,11 @@ class TableItem:
             result.pop(i)
             i -= 1
 
-        return '\n'.join(result)
+        text = '\n'.join(result)
+        if html:
+           text = (text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace('"', "&quot;")
+                .replace("'", "&#39;"))
+        return text
