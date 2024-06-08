@@ -7,6 +7,7 @@ from service.measures_table import MeasuresTable
 from service.simplified_markdown import SimplifiedMarkdown
 from service.ssas import list_running_ssas
 from service.system import save_md, save_xlsx, save_csv
+from service.comparison import Comparison
 
 
 class Main:
@@ -18,27 +19,35 @@ class Main:
                          f'\n2. Exportar documentação simpificada'
                          f'\n3. Exportar tabela com medidas'
                          f'\n4. Exportar tabela com campos e uso'
-                         f'\nEscolha: '))
+                         f'\n5. Comparar dois modelos de dados'
+                         f'\n\nEscolha: '))
 
     @staticmethod
-    def ask_path():
-        instances = list_running_ssas()
-        print(f'\nA qual modelo deseja conectar?'
-              f'\n1. Buscar arquivo model.bim')
-        for i, instance in enumerate(instances):
-            print(f'{i + 2}. MODELO RODANDO: {instance}')
+    def ask_model():
+        model = None
+        while model is None:
+            try:
+                instances = list_running_ssas()
+                print(f'\nA qual modelo deseja conectar?'
+                      f'\n1. Buscar arquivo model.bim')
+                for i, instance in enumerate(instances):
+                    print(f'{i + 2}. MODELO RODANDO: {instance}')
 
-        escolha = int(input('\nEscolha: '))
+                escolha = int(input('\nEscolha: '))
 
-        if escolha == 1:
-            import tkinter as tk
-            from tkinter import filedialog
-            root = tk.Tk()
-            root.withdraw()
-            file_path = filedialog.askopenfilename(filetypes=[("BIM files", "*.bim")])
-            return file_path
-        else:
-            return instances[escolha - 2]
+                if escolha == 1:
+                    import tkinter as tk
+                    from tkinter import filedialog
+                    root = tk.Tk()
+                    root.withdraw()
+                    file_path = filedialog.askopenfilename(filetypes=[("BIM files", "*.bim")])
+                    model = DataModel(path=file_path)
+                else:
+                    model = DataModel(instances[escolha - 2])
+            except Exception as e:
+                print(f'\nERRO: {e}')
+
+        return model
 
     @staticmethod
     def ask_export_type():
@@ -62,13 +71,12 @@ class Main:
         # Asking wich function the user wants to execute
         function = self.ask_function()
 
-        model = None
-        while model is None:
-            try:
-                path = self.ask_path()
-                model = DataModel(path=path)
-            except Exception as e:
-                print(f'\nERRO: {e}')
+        if function == 5:
+            print('-' * 40)
+            print("\nEscolha o primeiro modelo de dados:")
+
+        # Asking for the path of the data model
+        model = self.ask_model()
 
         if function == 1:
             # Generate full documentation
@@ -98,6 +106,14 @@ class Main:
                 save_xlsx(data_frame, model.path, 'fields_table', True)
             elif export_type == 2:
                 save_csv(data_frame, model.path, 'fields_table', True)
+        elif function == 5:
+            print('-' * 40)
+            print("\nEscolha o segundo modelo de dados:")
+            model1 = model
+            model2 = self.ask_model()
+            service = Comparison(model1, model2).compare()
+
+
 
 
 if __name__ == '__main__':

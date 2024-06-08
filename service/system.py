@@ -5,19 +5,22 @@ import time
 import pandas as pd
 
 
-def save_md(md: str, path: str, prefix: str, open_folder: bool = False):
+def save_md(md: str, path: str, prefix: str, open_folder: bool = False, silent: bool = False):
     """
     Method to save the markdown file.
     :param md: str
     :param path: str
     :param prefix: str
+    :param open_folder: bool
+    :param silent: bool
     """
-    full_path, path = generate_final_path(path, prefix, 'md')
+    full_path, path = generate_final_path(path, prefix, 'md', silent)
 
     try:
         with open(full_path, 'w', encoding='utf-8') as f:
             f.write(md)
-        print('\n\nDocumentação gerada com sucesso!\nCaminho: ' + full_path)
+        if not silent:
+            print('\n\nDocumentação gerada com sucesso!\nCaminho: ' + full_path)
         if open_folder:
             try:
                 os.startfile(path)
@@ -28,13 +31,13 @@ def save_md(md: str, path: str, prefix: str, open_folder: bool = False):
         time.sleep(5)
 
 
-def generate_final_path(path, prefix, format):
+def generate_final_path(path, prefix, format, silent=False):
     if path.startswith('localhost'):
         path = os.getcwd()
     if path.upper().endswith('MODEL.BIM'):
         path = path[:-9]
     timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
-    file_name = f'{prefix} {timestamp}.{format}'
+    file_name = f'{prefix}{(" " + timestamp) if not silent else ""}.{format}'
     full_path = os.path.join(path, file_name)
     return full_path, path
 
