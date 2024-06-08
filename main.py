@@ -103,4 +103,5 @@ class Main:
 if __name__ == '__main__':
     executable = Main()
     executable.print_title()
-    executable.run()
+    while True:
+        executable.run()

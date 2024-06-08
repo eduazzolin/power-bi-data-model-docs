@@ -8,8 +8,13 @@ sys.path.append('./service')
 from pyadomd import Pyadomd
 import os
 
-dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Microsoft.AnalysisServices.Tabular.DLL")
-clr.AddReference(dll_path)
+dll_name = "Microsoft.AnalysisServices.Tabular.DLL"
+
+try:
+    clr.AddReference(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), dll_name))
+except:
+    clr.AddReference(os.path.join(os.path.dirname(os.path.abspath(__file__)), dll_name))
+
 import Microsoft.AnalysisServices.Tabular as Tabular
 
 
@@ -55,4 +60,3 @@ def get_model_bim(port_number):
     edited = json_file['create']['database']
     raw_json = json.dumps(edited, indent=2)
     return raw_json
-
