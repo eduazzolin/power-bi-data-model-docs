@@ -3,10 +3,10 @@ import sys
 
 import clr
 import pandas as pd
+import os
 
 sys.path.append('./service')
 from pyadomd import Pyadomd
-import os
 
 dll_name = "Microsoft.AnalysisServices.Tabular.DLL"
 
@@ -52,6 +52,8 @@ def run_query(con, dax_query):
 
 
 def get_model_bim(port_number):
+    # https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular.database?view=analysisservices-dotnet
+    # https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular?view=analysisservices-dotnet
     server = Tabular.Server()
     server.Connect(port_number)
     database = server.Databases[0]
