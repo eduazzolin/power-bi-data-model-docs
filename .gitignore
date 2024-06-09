@@ -154,3 +154,5 @@ cython_debug/
 
 .idea/
 /model/openai-key.txt
+
+model.bim
