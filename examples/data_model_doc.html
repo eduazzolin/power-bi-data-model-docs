@@ -1,0 +1,2512 @@
+
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="container pb-5">
+        
+        
+
+<div class="row pt-4">
+    <div class="col-12">
+        <h2>Documentação de modelo de dados</h2>
+        <p>08/06/2024 22:20:06</p>
+    </div>
+    <div class="col-lg-6">
+        <p>Quantidade de tabelas: 16 <br>
+            Quantidade de relacionamentos: 8 <br>
+            Quantidade de colunas: 68 <br>
+            Quantidade de colunas calculadas: 4<br>
+            Quantidade de medidas: 58 </p>
+    </div>
+</div>
+            
+<div class="row pt-4">
+    <div class="col-12">
+        <h3>Tabelas</h3>
+        <div class="accordion" id="accordionExample">
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button " type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                        % Return Rate
+                    </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> % Return Rate</li>
+                            <li><strong>Tipo:</strong> <code>calculated</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+GENERATESERIES(0, 60, 1)
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Medida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#db190b46-face-4bb4-ad12-fef64850d74b">% Return Rate Value</a></td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                        Age
+                    </button>
+                </h2>
+                <div id="collapse2" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Age</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;dc8rDsAgEIThqxA0AnZZHmchCER1k7amty+gaMKYEZ/6pxTtRJs+6jkVWfUe7bp1Nd0D8Ag8Ac97JwvcdSc3XVYn4AzcAxfg4y+F4fzricAT8Lx3tsDHX549vPYwAWfgHrhsvH4=&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Age = _t, #&quot;Age Bucket&quot; = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Age&quot;, Int64.Type}, {&quot;Age Bucket&quot;, type text}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Age</td><td>int64</td></tr>
+                            
+                                        <tr><td>Age Bucket</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna Calculada</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#a14126f5-acd6-4d04-b1d2-0bcc3cd1d5a7">Coluna</a></td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                        Analysis DAX
+                    </button>
+                </h2>
+                <div id="collapse3" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Analysis DAX</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;i44FAA==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Column1&quot;, type text}}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Changed Type&quot;,{&quot;Column1&quot;})
+in
+    #&quot;Removed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Medida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#476b56d5-ccb7-4f18-a60a-d1ed841caaf7">Last 2 Months Net Sales</a></td></tr>
+                            
+                                        <tr><td><a href="#81e36c3f-3f30-4970-ac53-6009af8b216b">Last 2 Months Returns</a></td></tr>
+                            
+                                        <tr><td><a href="#cd2e7756-eb39-41a6-a73c-36aecb7b43c8">Net Sales</a></td></tr>
+                            
+                                        <tr><td><a href="#b71875ff-9152-49a3-9651-654f7beb05e9">Net Sales PM</a></td></tr>
+                            
+                                        <tr><td><a href="#ea94c27a-07f9-4dcb-9c51-33ecf46a07b2">Net Sales Variance</a></td></tr>
+                            
+                                        <tr><td><a href="#2263b9a4-5117-4e64-a425-7236388fc050">Net Sales Variance %</a></td></tr>
+                            
+                                        <tr><td><a href="#aa35df95-aff7-4d3d-a722-1955ce6aee72">Profit Difference</a></td></tr>
+                            
+                                        <tr><td><a href="#c3645989-c086-47ba-af31-e12ac4d4d52c">Return Rate</a></td></tr>
+                            
+                                        <tr><td><a href="#09023869-ae68-4a3a-9d35-a6becc131965">Returns</a></td></tr>
+                            
+                                        <tr><td><a href="#eccc0c03-68f2-488a-9858-acaa5ec1d949">Returns PM</a></td></tr>
+                            
+                                        <tr><td><a href="#5751baf5-17f8-4fae-849d-1f17457f0d15">Returns Variance</a></td></tr>
+                            
+                                        <tr><td><a href="#936690a6-4116-4d5b-93b7-6c64656a625a">Returns Variance %</a></td></tr>
+                            
+                                        <tr><td><a href="#ee417d6a-8fd1-4caf-a61b-fc8b79f72aa0">Total Return Rate</a></td></tr>
+                            
+                                        <tr><td><a href="#56a36fdf-16d1-46a9-b22d-63f6f074374d">Units Returned</a></td></tr>
+                            
+                                        <tr><td><a href="#6b4eb375-20c9-4c6b-ab5a-d750c863bfb8">Units Returned PM</a></td></tr>
+                            
+                                        <tr><td><a href="#c0856a37-73e9-41a6-99f1-297c427cb949">Units Returned Variance %</a></td></tr>
+                            
+                                        <tr><td><a href="#4f6b44ec-7552-484e-bd67-124e67a7c385">Units Sold</a></td></tr>
+                            
+                                        <tr><td><a href="#d51c6348-be52-401c-a2c7-677e67d72580">Units Sold PM</a></td></tr>
+                            
+                                        <tr><td><a href="#7ce11e74-aa12-487e-a6af-cbbd11542942">Units Sold Variance %</a></td></tr>
+                            
+                                        <tr><td><a href="#89f3d61f-24b1-4b8a-a8b8-846c36501d89">WIF Adjusted Net Sales</a></td></tr>
+                            
+                                        <tr><td><a href="#a0a4e80c-7645-44df-88d3-be04f39594dd">WIF Adjusted Sales</a></td></tr>
+                            
+                                        <tr><td><a href="#4da2584d-d264-4f58-afb1-d6c7d29b9324">WIF Adjusted Units Returned</a></td></tr>
+                            
+                                        <tr><td><a href="#a19bf6bc-3767-4b5f-b56d-9a6658a817af">WIF Forecast</a></td></tr>
+                            
+                                        <tr><td><a href="#74cedb53-7f30-40dc-929a-93609a0a53f8">WIF Price per Unit</a></td></tr>
+                            
+                                        <tr><td><a href="#b524dc1e-e1ba-4267-91d2-c57ef6ffa1b8">WIF Profit</a></td></tr>
+                            
+                                        <tr><td><a href="#99a97246-6fb3-4d03-b0d9-7814afa5562d">WIF Profit Difference</a></td></tr>
+                            
+                                        <tr><td><a href="#9aea99a5-0f7a-421f-847b-e81ae3188e19">WIF Sales</a></td></tr>
+                            
+                                        <tr><td><a href="#5fe6697f-11ee-4ae5-92b2-6bed10f4326e">WIF Same</a></td></tr>
+                            
+                                        <tr><td><a href="#6706b1b0-20a7-43a0-b08c-f6df7eba75ea">WIF Total Forecast</a></td></tr>
+                            
+                                        <tr><td><a href="#1bed2507-7783-49f6-9a2a-61eb07a646ab">WIF Total Profit</a></td></tr>
+                            
+                                        <tr><td><a href="#66092a0d-befe-4048-8c0f-9828990a5333">WIF Units Returned</a></td></tr>
+                            
+                                        <tr><td><a href="#9d462e15-7dd7-4344-bca7-a938a314eb8b">WIF Units Returned Average</a></td></tr>
+                            
+                                        <tr><td><a href="#95f5e193-f587-47d6-aa98-be16ec2cf701">WIF Units Returned Difference</a></td></tr>
+                            
+                                        <tr><td><a href="#978a4e31-2673-45a2-be8b-86bdd31dfd8d">WIF Units Returned_1</a></td></tr>
+                            
+                                        <tr><td><a href="#b365a446-2b19-472e-bab1-6dd79ad89b11">WIF Units Returned_2</a></td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                        Associated Product
+                    </button>
+                </h2>
+                <div id="collapse4" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Associated Product</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;ldRZb4JAEAfw78KzcZi9t2/W2Naj1mIPj/igqIgUKohH/fTdpgn7urwQQvILs7P/mfncQ6/h7crycLwDiNNlFN82RfPvZXPcLcOkGX6n5nukCQNUSoB4jMOo1zxkkbdozD3iyhFQM2iX/tvqqdLUVVNQVEvo58ktsJy51y4oJ9CN8mTUrzh3/zvVgkEsHtYdrLhwP7pA8wjWpwvfV1y6Fy+F1JAEcRG0K65qNN7nAkL6Lrv23rT72SWa1p1n3UnxVXH069w7UdDJsvQSW18jdspHCS013OYd651zR4Ci0kB7sdrb5qNz8gggckh/Xgq/a3mN5CkU8OEPR9uV5c7JQ2AoKezOvfZAW+8cPQKEMwW3oxy2fOtrZA8JkTC+5odka71z+CgwxXzI0uHs+WS9c/rM6FAzeVxdp/xml45z+ogZPVSw+jy2cmm9c/oIKKIF3HOcFtx65/SZ/jGN8DoWk/hgfY29h8rUv+7sB1lqfZ3Fx83anZTlfhD9+8Uv&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [ProductID = _t, #&quot;Product Image&quot; = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;ProductID&quot;, Int64.Type}, {&quot;Product Image&quot;, type text}}),
+    #&quot;Merged Queries&quot; = Table.NestedJoin(#&quot;Changed Type&quot;, {&quot;ProductID&quot;}, Product, {&quot;ProductID&quot;}, &quot;Product&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Product&quot; = Table.ExpandTableColumn(#&quot;Merged Queries&quot;, &quot;Product&quot;, {&quot;Product&quot;}, {&quot;Product.1&quot;}),
+    #&quot;Renamed Columns&quot; = Table.RenameColumns(#&quot;Expanded Product&quot;,{{&quot;Product.1&quot;, &quot;Product&quot;}})
+in
+    #&quot;Renamed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Associated Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[RightItemSetId]</td></tr>
+                            
+                                    <tr><td><em>(Desativado) Associated Product[Product]</em></td><td><em>one</em></td><td> <--> </td><td><em>one</em></td><td><em>Product[Product]</em></td></tr>
+                            
+                                    <tr><td>Associated Product[Product]</td><td>one</td><td> ---> </td><td>many</td><td>Customer[Product]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Product</td><td>string</td></tr>
+                            
+                                        <tr><td>Product Image</td><td>string</td></tr>
+                            
+                                        <tr><td>ProductID</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna Calculada</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#fb119aef-7041-49d7-9430-941c9c672041">Segmented by</a></td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                        Association
+                    </button>
+                </h2>
+                <div id="collapse5" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Association</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Excel.Workbook(File.Contents(&quot;C:\Users\mimyersm\Dropbox\Data-27-09-2019.xlsx&quot;), null, true),
+    Association_Sheet = Source{[Item=&quot;Association&quot;,Kind=&quot;Sheet&quot;]}[Data],
+    #&quot;Promoted Headers&quot; = Table.PromoteHeaders(Association_Sheet, [PromoteAllScalars=true]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(#&quot;Promoted Headers&quot;,{{&quot;RuleID&quot;, Int64.Type}, {&quot;LeftItemSetId&quot;, Int64.Type}, {&quot;RightItemSetId&quot;, Int64.Type}, {&quot;Probability&quot;, type number}, {&quot;Importance&quot;, type number}, {&quot;Support&quot;, Int64.Type}}),
+    #&quot;Inserted Merged Column&quot; = Table.AddColumn(#&quot;Changed Type&quot;, &quot;Merged&quot;, each Text.Combine({Text.From([LeftItemSetId], &quot;en-CA&quot;), Text.From([RightItemSetId], &quot;en-CA&quot;)}, &quot;&quot;), type text),
+    #&quot;Removed Duplicates&quot; = Table.Distinct(#&quot;Inserted Merged Column&quot;, {&quot;Merged&quot;}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Removed Duplicates&quot;,{&quot;Merged&quot;})
+in
+    #&quot;Removed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Associated Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[RightItemSetId]</td></tr>
+                            
+                                    <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[LeftItemSetId]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Importance</td><td>double</td></tr>
+                            
+                                        <tr><td>LeftItemSetId</td><td>int64</td></tr>
+                            
+                                        <tr><td>Probability</td><td>double</td></tr>
+                            
+                                        <tr><td>RightItemSetId</td><td>int64</td></tr>
+                            
+                                        <tr><td>RuleID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Support</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                        Calendar
+                    </button>
+                </h2>
+                <div id="collapse6" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Calendar</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;fZSxisMwDIZfJWQuqSQ7dtztlg6FPkHpkIMbrxyFG+7tq4vcwD9I4IQUvg/kfk5ut5H4qEuI28ByItI1rNPwPY2HkfW6rI/+xOP9oHzxeQFeNp6Tzyfg08YL+XwGPhtffX4Gfrb5dR5x+KLX+euz76TY/OTzFfhqfPX5BfjF5s8+34Bv+/zJ60V6u67P/tfqz/cOXIPR4H0PriFoyL4L10hoWOfEgZHRsNKkU2XP+E/98fPsh4StNefAKGhYbeHAqGhYb1kCY0HDitN81OUYbdv5Xz+8bM1ZfEMIDOnNW2AwGtZcSmAIGtZcj61+DBxje7V/H/2lEmtOLTAyGtacS2DMaFhzSYFR0LDmiQKjoqHN7y8=&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Date = _t, Week = _t, #&quot;Month Name&quot; = _t, MonthSort = _t, #&quot;Week of Year&quot; = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Date&quot;, type datetime}, {&quot;Week&quot;, Int64.Type}, {&quot;Month Name&quot;, type text}, {&quot;MonthSort&quot;, Int64.Type}, {&quot;Week of Year&quot;, Int64.Type}}),
+    #&quot;Renamed Columns&quot; = Table.RenameColumns(#&quot;Changed Type&quot;,{{&quot;Month Name&quot;, &quot;Month&quot;}}),
+    #&quot;Changed Type1&quot; = Table.TransformColumnTypes(#&quot;Renamed Columns&quot;,{{&quot;Date&quot;, type date}}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Changed Type1&quot;,{&quot;Week of Year&quot;})
+in
+    #&quot;Removed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Calendar[Date]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[Date]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Date</td><td>dateTime</td></tr>
+                            
+                                        <tr><td>Month</td><td>string</td></tr>
+                            
+                                        <tr><td>MonthSort</td><td>int64</td></tr>
+                            
+                                        <tr><td>Week</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna Calculada</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#b95bebd9-1156-475f-9561-268b1c226fa9">Empty</a></td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                        Customer
+                    </button>
+                </h2>
+                <div id="collapse7" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Customer</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Excel.Workbook(File.Contents(&quot;C:\Users\mimyersm\Desktop\Sales &amp; Marketing Datas.xlsx&quot;), null, true),
+    Data_Sheet = Source{[Item=&quot;Data&quot;,Kind=&quot;Sheet&quot;]}[Data],
+    #&quot;Promoted Headers&quot; = Table.PromoteHeaders(Data_Sheet, [PromoteAllScalars=true]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(#&quot;Promoted Headers&quot;,{{&quot;ID&quot;, Int64.Type}, {&quot;ProductID&quot;, Int64.Type}, {&quot;StoreID&quot;, Int64.Type}, {&quot;Unit&quot;, Int64.Type}, {&quot;Week&quot;, Int64.Type}, {&quot;Gender&quot;, type text}, {&quot;Age&quot;, Int64.Type}, {&quot;Status&quot;, type text}}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Changed Type&quot;,{&quot;Status&quot;}),
+    #&quot;Merged Queries&quot; = Table.NestedJoin(#&quot;Removed Columns&quot;, {&quot;ProductID&quot;}, Product, {&quot;ProductID&quot;}, &quot;Product&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Product&quot; = Table.ExpandTableColumn(#&quot;Merged Queries&quot;, &quot;Product&quot;, {&quot;Product&quot;, &quot;Category&quot;, &quot;Segment&quot;, &quot;Price&quot;, &quot;Price Range&quot;}, {&quot;Product.1&quot;, &quot;Category&quot;, &quot;Segment&quot;, &quot;Price&quot;, &quot;Price Range&quot;}),
+    #&quot;Renamed Columns&quot; = Table.RenameColumns(#&quot;Expanded Product&quot;,{{&quot;Product.1&quot;, &quot;Product&quot;}}),
+    #&quot;Removed Columns1&quot; = Table.RemoveColumns(#&quot;Renamed Columns&quot;,{&quot;ProductID&quot;}),
+    #&quot;Replaced Value&quot; = Table.ReplaceValue(#&quot;Removed Columns1&quot;,&quot;M&quot;,&quot;Male&quot;,Replacer.ReplaceText,{&quot;Gender&quot;}),
+    #&quot;Replaced Value1&quot; = Table.ReplaceValue(#&quot;Replaced Value&quot;,&quot;F&quot;,&quot;Female&quot;,Replacer.ReplaceText,{&quot;Gender&quot;}),
+    #&quot;Merged Queries1&quot; = Table.NestedJoin(#&quot;Replaced Value1&quot;, {&quot;StoreID&quot;}, Store, {&quot;StoreID&quot;}, &quot;Store&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Store&quot; = Table.ExpandTableColumn(#&quot;Merged Queries1&quot;, &quot;Store&quot;, {&quot;Store&quot;, &quot;Type&quot;}, {&quot;Store.1&quot;, &quot;Type&quot;}),
+    #&quot;Renamed Columns1&quot; = Table.RenameColumns(#&quot;Expanded Store&quot;,{{&quot;Store.1&quot;, &quot;Store&quot;}}),
+    #&quot;Merged Queries2&quot; = Table.NestedJoin(#&quot;Renamed Columns1&quot;, {&quot;ID&quot;}, #&quot;Issues and Promotions&quot;, {&quot;ID&quot;}, &quot;Issues and Promotions&quot;, JoinKind.LeftOuter),
+    #&quot;Removed Columns2&quot; = Table.RemoveColumns(#&quot;Merged Queries2&quot;,{&quot;StoreID&quot;}),
+    #&quot;Expanded Issues and Promotions&quot; = Table.ExpandTableColumn(#&quot;Removed Columns2&quot;, &quot;Issues and Promotions&quot;, {&quot;Issue&quot;, &quot;Promotion&quot;}, {&quot;Issue&quot;, &quot;Promotion&quot;}),
+    #&quot;Removed Columns3&quot; = Table.RemoveColumns(#&quot;Expanded Issues and Promotions&quot;,{&quot;Week&quot;}),
+    #&quot;Merged Queries3&quot; = Table.NestedJoin(#&quot;Removed Columns3&quot;, {&quot;ID&quot;}, Sales, {&quot;ID&quot;}, &quot;Sales&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Sales&quot; = Table.ExpandTableColumn(#&quot;Merged Queries3&quot;, &quot;Sales&quot;, {&quot;Amount&quot;}, {&quot;Amount&quot;}),
+    #&quot;Merged Queries4&quot; = Table.NestedJoin(#&quot;Expanded Sales&quot;, {&quot;Age&quot;}, Age, {&quot;Age&quot;}, &quot;Age.1&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Age.1&quot; = Table.ExpandTableColumn(#&quot;Merged Queries4&quot;, &quot;Age.1&quot;, {&quot;Age Bucket&quot;}, {&quot;Age Bucket&quot;}),
+    #&quot;Removed Columns4&quot; = Table.RemoveColumns(#&quot;Expanded Age.1&quot;,{&quot;Age&quot;}),
+    #&quot;Renamed Columns2&quot; = Table.RenameColumns(#&quot;Removed Columns4&quot;,{{&quot;Age Bucket&quot;, &quot;Age&quot;}}),
+    #&quot;Removed Columns5&quot; = Table.RemoveColumns(#&quot;Renamed Columns2&quot;,{&quot;Price&quot;})
+in
+    #&quot;Removed Columns5&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Associated Product[Product]</td><td>one</td><td> ---> </td><td>many</td><td>Customer[Product]</td></tr>
+                            
+                                    <tr><td>Sales[ID]</td><td>one</td><td> <--> </td><td>one</td><td>Customer[ID]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Age</td><td>string</td></tr>
+                            
+                                        <tr><td>Amount</td><td>int64</td></tr>
+                            
+                                        <tr><td>Category</td><td>string</td></tr>
+                            
+                                        <tr><td>Gender</td><td>string</td></tr>
+                            
+                                        <tr><td>ID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Issue</td><td>string</td></tr>
+                            
+                                        <tr><td>Price Range</td><td>string</td></tr>
+                            
+                                        <tr><td>Product</td><td>string</td></tr>
+                            
+                                        <tr><td>Promotion</td><td>string</td></tr>
+                            
+                                        <tr><td>Segment</td><td>string</td></tr>
+                            
+                                        <tr><td>Store</td><td>string</td></tr>
+                            
+                                        <tr><td>Type</td><td>string</td></tr>
+                            
+                                        <tr><td>Unit</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
+                        Design DAX
+                    </button>
+                </h2>
+                <div id="collapse8" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Design DAX</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;i44FAA==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Column1&quot;, type text}}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Changed Type&quot;,{&quot;Column1&quot;})
+in
+    #&quot;Removed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Medida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#0bbec620-3993-42f9-8ab8-4788bbd28c8d">Association</a></td></tr>
+                            
+                                        <tr><td><a href="#bd8f047a-5191-4ae1-8285-2171f92cc87e">Lift Label</a></td></tr>
+                            
+                                        <tr><td><a href="#accde1a4-a2a2-443a-86ca-6eaab82bfdfa">Net Sales Indicator</a></td></tr>
+                            
+                                        <tr><td><a href="#2c2aba58-11b5-46fe-b7eb-cbe0c0104c4e">Net Sales Label</a></td></tr>
+                            
+                                        <tr><td><a href="#367f6c9d-55d0-47b9-8e30-c89c0cc7395c">Product Returns Other</a></td></tr>
+                            
+                                        <tr><td><a href="#b4563709-dec3-4d36-ae79-b62dfb1b7cdc">Product Returns Top 3</a></td></tr>
+                            
+                                        <tr><td><a href="#a7e1c109-6b22-4917-a399-0ef8894e5905">Product Sales Other</a></td></tr>
+                            
+                                        <tr><td><a href="#77e6397d-9393-4f69-bda9-967d1450c25f">Product Sales Top 3</a></td></tr>
+                            
+                                        <tr><td><a href="#bd89d675-790d-483d-9345-482d5ebe0793">Product Top N</a></td></tr>
+                            
+                                        <tr><td><a href="#8d4c4464-d0f4-4d19-a792-f2f87a611f1c">ProductR Top N</a></td></tr>
+                            
+                                        <tr><td><a href="#348fd79f-f753-46c2-916a-b4cebce661e9">Profit Indicator</a></td></tr>
+                            
+                                        <tr><td><a href="#aa96d238-fd5d-47d1-912c-7ec33c7eaf7f">Returns Indicator</a></td></tr>
+                            
+                                        <tr><td><a href="#0f1aad1b-3133-47ba-ad15-0647e4ff2edc">Returns Sales Top 3</a></td></tr>
+                            
+                                        <tr><td><a href="#19dbac15-d8d6-4f41-9c64-edae27b890ed">Store Returns Other</a></td></tr>
+                            
+                                        <tr><td><a href="#3eab07c9-cb2c-499c-98cb-dfb2d5ff6020">Store Sales Other</a></td></tr>
+                            
+                                        <tr><td><a href="#bf92dbc2-b1be-43f3-98dd-c4b3ed64bbc9">Store Sales Top 3</a></td></tr>
+                            
+                                        <tr><td><a href="#f92389cb-2c3a-4d75-8bd2-8e9dd803ed67">Store Top N</a></td></tr>
+                            
+                                        <tr><td><a href="#271ce902-3d46-40e1-bda4-a5de9668ee00">StoreR Top N</a></td></tr>
+                            
+                                        <tr><td><a href="#a92707dc-7269-4c1a-84c8-594209bc9176">Units Returned Indicator</a></td></tr>
+                            
+                                        <tr><td><a href="#1288eecb-9cb6-40f6-8a7a-6059323bb594">Units Sold Indicator</a></td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse9" aria-expanded="false" aria-controls="collapse9">
+                        Details
+                    </button>
+                </h2>
+                <div id="collapse9" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Details</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;lVXbcpswEP0VDc/OxMF2mjzKgBtNsWEwzmXSPChY2JrIKCNEU/ep39JP65dUK18mDYEQZjxjpLO7hz1npft7By98Esy8wOk5Z+YXxUGCUxLNcGjeXOehV4Ngs3eXEs8iBhYRhzidRMnUhvScOLoJEjQmyA/m39IoNkvD93Bo/yTsWSqNrjl7QWZ51JpzGo1JCFwuOqScykcu2DHzpQ1ZkNPFreXec0J8Fy1S+LJ+be+Qy5NFyUvNCo1CupWVBvhZDe5FYZTAltuYacozJUuZa5NTSFUCetCIvuKrNRTXipa25rAGHSd45pPZV9gddSgb5TnPOBUoVnJZZdoyOP9MYChX0kZ9qUWRWRokE7wzykVjUlLoimv+gwGsrsix64JRhXyqKfJN9xV/rDSXBehclyq4Nb49mNSta3NsqXw5SSVgmkXyqBBIS4SzQ71miaa84JtqY8jy7Ana4tY1MszAoHhPrlkmz/S6PIkF1blUG8A2K5MwIx9bGkMaX2ZbAO8EsdM5J3M7cz1nEuB0kQRz9L3q991z5OEYm/khKQkA4l68F3Qo4ituWjGVS5DKvfwQqtdKVqs1UO23gVMphebPgDtrw+2fv7//IJ/ltBIwBQO3Y8j+CIjpCugPBm1h17ysjLmvGF0yBehhxyL7T0Ep+2nJjT4Z94bkeVv4zZpqRHLAvav1AYcLKra/bL5WeV/RIUWmGC3Zqc92fyC4VfBXwRNeLA05phjSa17+N67Ivue52SygQcNWY0y40EyZbhRAYNhqjrGUTxuqnmC5qyUMs2dBt2jOBMu0GZ+d7hDQag9zCC85fI7xyMTMJtWaFysAdfWJPcfsoQ+Yzi7hWthOtPribZkxtTfL8GOTaJ5ZZFebwE2oKdyDfKdQZ4tIxbLdLTYyDnj4Bw==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [#&quot;Design Factor&quot; = _t, DFSort = _t, Topic = _t, TSort = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;DFSort&quot;, Int64.Type}, {&quot;TSort&quot;, Int64.Type}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>DFSort</td><td>int64</td></tr>
+                            
+                                        <tr><td>Design Factor</td><td>string</td></tr>
+                            
+                                        <tr><td>TSort</td><td>int64</td></tr>
+                            
+                                        <tr><td>Topic</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Medida</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#3a13ef24-a51d-44ee-b493-0f98326de4a7">Info Tooltip</a></td></tr>
+                            
+                                        <tr><td><a href="#cd21eec8-425f-4973-9f6a-118edfe2e7ec">Info Tooltip 2</a></td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse10" aria-expanded="false" aria-controls="collapse10">
+                        Issues and Promotions
+                    </button>
+                </h2>
+                <div id="collapse10" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Issues and Promotions</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Excel.Workbook(File.Contents(&quot;C:\Users\mimyersm\Desktop\Sales &amp; Marketing Datas.xlsx&quot;), null, true),
+    #&quot;Issues and Promotions_Sheet&quot; = Source{[Item=&quot;Issues and Promotions&quot;,Kind=&quot;Sheet&quot;]}[Data],
+    #&quot;Promoted Headers&quot; = Table.PromoteHeaders(#&quot;Issues and Promotions_Sheet&quot;, [PromoteAllScalars=true]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(#&quot;Promoted Headers&quot;,{{&quot;ID&quot;, Int64.Type}, {&quot;Issue&quot;, type text}, {&quot;Promotion&quot;, type text}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>ID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Issue</td><td>string</td></tr>
+                            
+                                        <tr><td>Promotion</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse11" aria-expanded="false" aria-controls="collapse11">
+                        Product
+                    </button>
+                </h2>
+                <div id="collapse11" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Product</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;xZlbU+JKEMe/imXt4+72ZC65nDcuwopCooAG9+xDhAEiIYFcUPj0ZwZxq04lW0UrWz4AIanBmV/9u/vf7c+f57XxWGbZ+ddzQ73c6TQcyzNmisONWzlR75Z6zfN8lf0DEC6DWbiT6Xd9IbN5MF58HydLdX/mUAoWowxYNiw6/vdVPDt2oQFUWAReLo3gKsYtdJgwwZ/vltdzzEIOnBEL/IF3wdhhoSDq7QsnZ9/Ovljk/NfXn+cXL2MZqbu0ik4nmEj1wY/HYwtHwLZ2PSEWZrMMTGFaENV/pCmSq6C2BfWXvvTu/g6eeRDPNAVWRaixDeLD5ZH7tZlgMBzE1m0NuV/DsYBGuS8SHFqHCg43IrBb0V8g5Mayl+RvMikB6qofjvNAXdnHq8jkFoPH0ct6scKJwbbVUZ+ajfVmizuqyYgNu2S6uUFFZxUjRx/034IQJn8zKvIoSRYa4ClExMHi1IaUR/MFSkRaC5Y6Z+HW2r1PA8Ttkoi85FmmXhLGuXpkVjFy00MYmsfLyDFsGN8+bYtnzJYpCFOR6sh2R2ZISIQbcPGUT9rso5BsUlKRVzxGYTaX6aFilRgNinRdJGH2lq2OPC5jnMHWn8otxXEyDdsBLtru3MGFqQpvBnGcLy47H+YkSpz68yCVb2KyTwaKgU2YBSzcxA83uPMawrCg77aKtvg0UGY5dfcX25VG4JwmKdnENGBN89YcuVnTsQU0zHbH739eUhIlPHdhFiYaAal0jsk2iM7qUSEP7ulYo2PZHLxCNC9RQaOslUFM6BGzNTaQ6Ywp2V4NZ+mPD9d/XhbRfZJqC21U2+t3QVKZm5ocwsFktOkiUxJ1YDhdT3yUizwpI6ucuf2662simsDhWqeddipljPPXDoXu3fXDCCUB1XyYjgkX7qB3E2AjzITheOI9LnE8qVrXMNPM7f1ZOco5NtNwo6VhVJprrG50ATZMWBRB3LlGNlmOcpzS9xcP409LQey3cRwrUHtEo2C53Nd7o9JcvyewtEvuxh5HBRYHw1H9Wf3+ub1rfR4gWgKko+nM7V1oIOLD0UWJJSATt5NZjuw7uLBgSu3WGIn1b8bX3lSf1S81G+2aX797UZBPk3R5oDSSUZQ8HzqTow0jERBNRlFjgDutan0NWDQv2WSDOy5XfQtMdhub2Mi/yGyYssud9/hnv3gVhLsg0i2qUWmr8T2+Y6jt+q77coXqshgY2lGncbJ20Xn6ZFFW0eMrzcTxax6q9NPYOZEe93ACV9vuHUF5RbWQKgkVsr99Qg2YTjonomYpD7VURO2HjJVe+l39hgGMKvcfDBcDnuLCxXIEgel4MWNPn9ZvUFKCtE9AtdUqe3tcykg6wXffMzGiWhtcsvkFcrq6b1qWs8hxZ0g92Q6DxOsOot0HUxIry2kgg72caKWr9op0Fb01bkfGDVXNOrhZcIezjoqsYakS1WNOiCptChCxTaiNBs0WsiZWaKnsjPp5qhjpZ5WTa+RcXzWvVBnAWer7HirWmFqoSv99XTYbyBIuVDGD0ZXkg9GH+fCygpJvTd280kpn/b6+TOUHrhJL4+l6fT3F7dlRUZbZtV0fNdA9aV/GWDlrv1qfPb7KXNSTSYzGxJWPJAS2de/+DlXG9XhWh2pv+Zgh/wtiOdyB2XAtQ2T/UspG1Pk/pl//AQ==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Product = _t, ProductID = _t, Category = _t, CategoryID = _t, Segment = _t, SegmentID = _t, #&quot;Product Image&quot; = _t, #&quot;Category Image&quot; = _t, #&quot;Segement Color&quot; = _t, #&quot;Segment image&quot; = _t, Price = _t, #&quot;Price Range&quot; = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Product&quot;, type text}, {&quot;ProductID&quot;, Int64.Type}, {&quot;Category&quot;, type text}, {&quot;CategoryID&quot;, Int64.Type}, {&quot;Segment&quot;, type text}, {&quot;SegmentID&quot;, Int64.Type}, {&quot;Product Image&quot;, type text}, {&quot;Category Image&quot;, type text}, {&quot;Segement Color&quot;, type text}, {&quot;Segment image&quot;, type text}, {&quot;Price&quot;, Int64.Type}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td><em>(Desativado) Associated Product[Product]</em></td><td><em>one</em></td><td> <--> </td><td><em>one</em></td><td><em>Product[Product]</em></td></tr>
+                            
+                                    <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[ProductID]</td></tr>
+                            
+                                    <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[LeftItemSetId]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Category</td><td>string</td></tr>
+                            
+                                        <tr><td>Category Image</td><td>string</td></tr>
+                            
+                                        <tr><td>CategoryID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Price</td><td>int64</td></tr>
+                            
+                                        <tr><td>Price Range</td><td>string</td></tr>
+                            
+                                        <tr><td>Product</td><td>string</td></tr>
+                            
+                                        <tr><td>Product Image</td><td>string</td></tr>
+                            
+                                        <tr><td>ProductID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Segement Color</td><td>string</td></tr>
+                            
+                                        <tr><td>Segment</td><td>string</td></tr>
+                            
+                                        <tr><td>Segment image</td><td>string</td></tr>
+                            
+                                        <tr><td>SegmentID</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse12" aria-expanded="false" aria-controls="collapse12">
+                        STable
+                    </button>
+                </h2>
+                <div id="collapse12" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> STable</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;i45Wci4tKkrNK1HwSy1RCE7MSS1W0lEyVIrViVZyrSgpSlQIKMpPyywBChopxcYCAA==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Metric = _t, Sort = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Metric&quot;, type text}, {&quot;Sort&quot;, Int64.Type}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Metric</td><td>string</td></tr>
+                            
+                                        <tr><td>Sort</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse13" aria-expanded="false" aria-controls="collapse13">
+                        Sales
+                    </button>
+                </h2>
+                <div id="collapse13" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Sales</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Excel.Workbook(File.Contents(&quot;C:\Users\mimyersm\Desktop\Sales &amp; Marketing Datas.xlsx&quot;), null, true),
+    Data_Sheet = Source{[Item=&quot;Data&quot;,Kind=&quot;Sheet&quot;]}[Data],
+    #&quot;Promoted Headers&quot; = Table.PromoteHeaders(Data_Sheet, [PromoteAllScalars=true]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(#&quot;Promoted Headers&quot;,{{&quot;ID&quot;, Int64.Type}, {&quot;ProductID&quot;, Int64.Type}, {&quot;StoreID&quot;, Int64.Type}, {&quot;Unit&quot;, Int64.Type}, {&quot;Week&quot;, Int64.Type}, {&quot;Gender&quot;, type text}, {&quot;Age&quot;, Int64.Type}, {&quot;Status&quot;, type text}}),
+    #&quot;Replaced Value&quot; = Table.ReplaceValue(#&quot;Changed Type&quot;,1,2,Replacer.ReplaceValue,{&quot;Week&quot;}),
+    #&quot;Merged Queries&quot; = Table.NestedJoin(#&quot;Replaced Value&quot;, {&quot;ProductID&quot;}, Product, {&quot;ProductID&quot;}, &quot;Product&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Product&quot; = Table.ExpandTableColumn(#&quot;Merged Queries&quot;, &quot;Product&quot;, {&quot;Price&quot;}, {&quot;Price&quot;}),
+    #&quot;Inserted Multiplication&quot; = Table.AddColumn(#&quot;Expanded Product&quot;, &quot;Multiplication&quot;, each [Price] * [Unit], Int64.Type),
+    #&quot;Renamed Columns&quot; = Table.RenameColumns(#&quot;Inserted Multiplication&quot;,{{&quot;Multiplication&quot;, &quot;Amount&quot;}}),
+    #&quot;Removed Columns&quot; = Table.RemoveColumns(#&quot;Renamed Columns&quot;,{&quot;Price&quot;}),
+    #&quot;Merged Queries1&quot; = Table.NestedJoin(#&quot;Removed Columns&quot;, {&quot;Week&quot;}, Calendar, {&quot;Week&quot;}, &quot;Calendar&quot;, JoinKind.LeftOuter),
+    #&quot;Expanded Calendar&quot; = Table.ExpandTableColumn(#&quot;Merged Queries1&quot;, &quot;Calendar&quot;, {&quot;Date&quot;}, {&quot;Date&quot;}),
+    #&quot;Removed Columns1&quot; = Table.RemoveColumns(#&quot;Expanded Calendar&quot;,{&quot;Week&quot;, &quot;Gender&quot;, &quot;Age&quot;})
+in
+    #&quot;Removed Columns1&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Calendar[Date]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[Date]</td></tr>
+                            
+                                    <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[ProductID]</td></tr>
+                            
+                                    <tr><td>Sales[ID]</td><td>one</td><td> <--> </td><td>one</td><td>Customer[ID]</td></tr>
+                            
+                                    <tr><td>Store[StoreID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[StoreID]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Amount</td><td>int64</td></tr>
+                            
+                                        <tr><td>Date</td><td>dateTime</td></tr>
+                            
+                                        <tr><td>ID</td><td>int64</td></tr>
+                            
+                                        <tr><td>ProductID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Status</td><td>string</td></tr>
+                            
+                                        <tr><td>StoreID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Unit</td><td>int64</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse14" aria-expanded="false" aria-controls="collapse14">
+                        Store
+                    </button>
+                </h2>
+                <div id="collapse14" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Store</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;bZLNasNADITfxec0SPsjrY5paaFQSkohl5DDus3B4NjUsUsfv6tk7VKyJ8sLn0Yz0n5fYbWqNnUdz+n7+DMehy62qbwLvGZ21tv043At5MlKqqvDal8Zhdrma2oKFIrx2tWZNaBxxs2UtrqPQx1vIRJvxWQpH4TCDCn9HtvvqTSgMyySKUT6k/KpeIonVXru/jECQYAzA44uo14YSsXLsS/JMFp3RYJFNn5GtM8udpvh/HlsS6D3EK4gpwBhAfXxNY7TUMrCWnA5dnZgYHGlVrexLdmiQCZkW2yQabGFoFQzTKdbqQBANsfOQF4WKVR+259KlJcgIVMklI5kofT1bWrq0rYCIVieY0z7Ws4J1e1D3439uS9Ys4HAzJxmunA67q75GPuhKWXCHn3eG4ulfFSHXw==&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [ManufacturerID = _t, Manufacturer = _t, Type = _t, Longitude = _t, Latitude = _t, image = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;ManufacturerID&quot;, Int64.Type}, {&quot;Manufacturer&quot;, type text}, {&quot;Type&quot;, type text}, {&quot;Longitude&quot;, type number}, {&quot;Latitude&quot;, type number}, {&quot;image&quot;, type text}}),
+    #&quot;Renamed Columns&quot; = Table.RenameColumns(#&quot;Changed Type&quot;,{{&quot;ManufacturerID&quot;, &quot;StoreID&quot;}, {&quot;Manufacturer&quot;, &quot;Store&quot;}})
+in
+    #&quot;Renamed Columns&quot;
+                            </code>
+                        </pre>
+                    
+                        <h5>Relacionamentos</h5>
+                            <table class="table table-bordered table-hover table-striped small">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        
+                                    <tr><td>Store[StoreID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[StoreID]</td></tr>
+                            
+                                </tbody>
+                            </table>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>Latitude</td><td>double</td></tr>
+                            
+                                        <tr><td>Longitude</td><td>double</td></tr>
+                            
+                                        <tr><td>Store</td><td>string</td></tr>
+                            
+                                        <tr><td>StoreID</td><td>int64</td></tr>
+                            
+                                        <tr><td>Type</td><td>string</td></tr>
+                            
+                                        <tr><td>image</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse15" aria-expanded="false" aria-controls="collapse15">
+                        Tooltip Info
+                    </button>
+                </h2>
+                <div id="collapse15" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Tooltip Info</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;pZJBT8IwGIb/SrMz8o2Wjs0bARLloEjkYAiHbpRtGWtnW8Dx651pQnBoCnprmqd93u/Nt1x6T9wgzbZcozuUMMNTqWoUK86KtTwIr+NlxlT6HiAvWZofuep+HbjOWFJ0E1k292mEMQQhjeCt3i/iXTfNN62H5zxUpeVSb9X5HkAbqfjt9j6QHgngMRTJ/Nlpl5a7tBe8RrnYbHdcJFzpa+09oNj3Ybpm40XltG8tZ+1zbnZK/K/6PlAa+MDHU1nE7uEt19a3ikfXywc4CEHF0xf24ZZbri3/Y+8YaN8PIA9mRZa5d85y526kmtIbvzjtwF6jQ8YMuvjr1xAECKGQPZTvi6Mzg7DcTxlu1GKIKA5hXkyS4at7dstZ70weuBpW1dU9E8DRIIJ1PZqQkXtGyzWu1Sc=&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [nombre = _t, URL = _t, DLINK = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;nombre&quot;, type text}, {&quot;URL&quot;, type text}, {&quot;DLINK&quot;, type text}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>DLINK</td><td>string</td></tr>
+                            
+                                        <tr><td>URL</td><td>string</td></tr>
+                            
+                                        <tr><td>nombre</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna Calculada</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td><a href="#26a850f3-d918-47ee-8b9b-7fb3c3b1a11e">Empty</a></td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse16" aria-expanded="false" aria-controls="collapse16">
+                        Tooltip Info2
+                    </button>
+                </h2>
+                <div id="collapse16" class="accordion-collapse collapse ">
+                    <div class="accordion-body">
+                        <h5>Descrição</h5>
+                        <ul>
+                            <li><strong>Nome:</strong> Tooltip Info2</li>
+                            <li><strong>Tipo:</strong> <code>table</code></li>
+                            <li><strong>Modo de importação:</strong> <code>import</code></li>
+                        </ul>
+                    
+                        <h5>Power Query</h5>
+                        <pre class="border rounded ps-3 m-3">
+                            <code>
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(&quot;i45W8kstUQhOzEktVtBVCIwpNTAwMnNU0lHKKCkpKLbS18/MTUxPLc5ITM7WS87P1c/UL8gPKC8IzyhIR1OUWZVapIeuOjfd0shE39zU0kAfoksvPTNNKVYnWikotaS0KI9oS3PDvXLyAlOJttRI38LM1EgfogtiaSwA&quot;, BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type text) meta [Serialized.Text = true]) in type table [Nombre = _t, URL = _t, DLINK = _t]),
+    #&quot;Changed Type&quot; = Table.TransformColumnTypes(Source,{{&quot;Nombre&quot;, type text}, {&quot;URL&quot;, type text}, {&quot;DLINK&quot;, type text}})
+in
+    #&quot;Changed Type&quot;
+                            </code>
+                        </pre>
+                    
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>Itens</h5>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <table class="table table-bordered table-hover table-striped small">
+                                    <thead>
+                                        <tr>
+                                            <th>Coluna</th>
+                                            <th>Tipo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            
+                                        <tr><td>DLINK</td><td>string</td></tr>
+                            
+                                        <tr><td>Nombre</td><td>string</td></tr>
+                            
+                                        <tr><td>URL</td><td>string</td></tr>
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<div class="row pt-4">
+    <div class="col-12">
+        <h3>Relacionamentos</h3>
+        <table class="table table-bordered table-hover table-striped small">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr><td>Associated Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[RightItemSetId]</td></tr>
+                    
+                <tr><td><em>(Desativado) Associated Product[Product]</em></td><td><em>one</em></td><td> <--> </td><td><em>one</em></td><td><em>Product[Product]</em></td></tr>
+                    
+                <tr><td>Associated Product[Product]</td><td>one</td><td> ---> </td><td>many</td><td>Customer[Product]</td></tr>
+                    
+                <tr><td>Calendar[Date]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[Date]</td></tr>
+                    
+                <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[ProductID]</td></tr>
+                    
+                <tr><td>Product[ProductID]</td><td>one</td><td> ---> </td><td>many</td><td>Association[LeftItemSetId]</td></tr>
+                    
+                <tr><td>Sales[ID]</td><td>one</td><td> <--> </td><td>one</td><td>Customer[ID]</td></tr>
+                    
+                <tr><td>Store[StoreID]</td><td>one</td><td> ---> </td><td>many</td><td>Sales[StoreID]</td></tr>
+                    
+            </tbody>
+        </table>
+    </div>
+</div>
+            
+<div class="row pt-4">
+    <div class="col-12">
+        <h3>Medidas</h3>
+    </div>
+            
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="db190b46-face-4bb4-ad12-fef64850d74b"></a>  
+            <h5 class="mb-2">% Return Rate Value</h5>
+            <strong>Tabela:</strong> % Return Rate
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+SELECTEDVALUE(&#39;% Return Rate&#39;[% Return Rate])/100
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="0bbec620-3993-42f9-8ab8-4788bbd28c8d"></a>  
+            <h5 class="mb-2">Association</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+VALUE(CONCATENATE([Product Top N],(SUM(Association[Importance]))))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="3a13ef24-a51d-44ee-b493-0f98326de4a7"></a>  
+            <h5 class="mb-2">Info Tooltip</h5>
+            <strong>Tabela:</strong> Details
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+&quot;https://imagizer.imageshack.com/img923/4052/lLHy3U.gif&quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="cd21eec8-425f-4973-9f6a-118edfe2e7ec"></a>  
+            <h5 class="mb-2">Info Tooltip 2</h5>
+            <strong>Tabela:</strong> Details
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+&quot;https://imagizer.imageshack.com/img921/2483/uMs9ZQ.gif&quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="476b56d5-ccb7-4f18-a60a-d1ed841caaf7"></a>  
+            <h5 class="mb-2">Last 2 Months Net Sales</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[Net Sales]+[Net Sales PM]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="81e36c3f-3f30-4970-ac53-6009af8b216b"></a>  
+            <h5 class="mb-2">Last 2 Months Returns</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[Returns]+[Returns PM]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="bd8f047a-5191-4ae1-8285-2171f92cc87e"></a>  
+            <h5 class="mb-2">Lift Label</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(FORMAT(SUM(Association[Importance]),&quot;0.0&quot;),&quot;x&quot;)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="cd2e7756-eb39-41a6-a73c-36aecb7b43c8"></a>  
+            <h5 class="mb-2">Net Sales</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE(SUM(Sales[Amount]),Sales[Status]=&quot;Sold&quot;)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="accde1a4-a2a2-443a-86ca-6eaab82bfdfa"></a>  
+            <h5 class="mb-2">Net Sales Indicator</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(IF([Net Sales Variance %]&lt;=0,&quot;&quot;,&quot;+&quot;),FORMAT([Net Sales Variance %],&quot;0.0%&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="2c2aba58-11b5-46fe-b7eb-cbe0c0104c4e"></a>  
+            <h5 class="mb-2">Net Sales Label</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(&quot;&quot;,FORMAT([Net Sales],&quot;$0,000&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="b71875ff-9152-49a3-9651-654f7beb05e9"></a>  
+            <h5 class="mb-2">Net Sales PM</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Net Sales],PREVIOUSMONTH(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="ea94c27a-07f9-4dcb-9c51-33ecf46a07b2"></a>  
+            <h5 class="mb-2">Net Sales Variance</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[Net Sales]-[Net Sales PM]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="2263b9a4-5117-4e64-a425-7236388fc050"></a>  
+            <h5 class="mb-2">Net Sales Variance %</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0.0%;-0.0%;0.0%</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([Net Sales],[Net Sales PM],0)-1
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="367f6c9d-55d0-47b9-8e30-c89c0cc7395c"></a>  
+            <h5 class="mb-2">Product Returns Other</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0.###############;(\$#,0.###############);\$#,0.###############</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([ProductR Top N]&gt;3,[Returns],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="b4563709-dec3-4d36-ae79-b62dfb1b7cdc"></a>  
+            <h5 class="mb-2">Product Returns Top 3</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([ProductR Top N]&lt;4,[Returns],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="a7e1c109-6b22-4917-a399-0ef8894e5905"></a>  
+            <h5 class="mb-2">Product Sales Other</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([Product Top N]&gt;3,[Net Sales],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="77e6397d-9393-4f69-bda9-967d1450c25f"></a>  
+            <h5 class="mb-2">Product Sales Top 3</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([Product Top N]&lt;4,[Net Sales],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="bd89d675-790d-483d-9345-482d5ebe0793"></a>  
+            <h5 class="mb-2">Product Top N</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+SWITCH(
+    TRUE(),
+    ISINSCOPE(&#39;Product&#39;[Product]),
+    RANKX(ALL(&#39;Product&#39;[Product]),[Net Sales],,DESC),
+    ISINSCOPE(&#39;Product&#39;[Segment]),
+    RANKX(ALL(&#39;Product&#39;[Segment]),[Net Sales],,DESC),
+    RANKX(ALL(&#39;Product&#39;[Category]),[Net Sales],,DESC)
+)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="8d4c4464-d0f4-4d19-a792-f2f87a611f1c"></a>  
+            <h5 class="mb-2">ProductR Top N</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+SWITCH(
+    TRUE(),
+    ISINSCOPE(&#39;Product&#39;[Product]),
+    RANKX(ALL(&#39;Product&#39;[Product]),[Returns],,DESC),
+    ISINSCOPE(&#39;Product&#39;[Segment]),
+    RANKX(ALL(&#39;Product&#39;[Segment]),[Returns],,DESC),
+    RANKX(ALL(&#39;Product&#39;[Category]),[Returns],,DESC)
+)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="aa35df95-aff7-4d3d-a722-1955ce6aee72"></a>  
+            <h5 class="mb-2">Profit Difference</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([WIF Adjusted Sales],[Net Sales],0)-1
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="348fd79f-f753-46c2-916a-b4cebce661e9"></a>  
+            <h5 class="mb-2">Profit Indicator</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(IF([WIF Profit Difference]&lt;=0,&quot;&quot;,&quot;+&quot;),FORMAT([WIF Profit Difference],&quot;0.0%&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="c3645989-c086-47ba-af31-e12ac4d4d52c"></a>  
+            <h5 class="mb-2">Return Rate</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0%;-0%;0%</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE((ROUND(((DIVIDE([Returns],SUM(Sales[Amount]),0))*100),0)),100,0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="09023869-ae68-4a3a-9d35-a6becc131965"></a>  
+            <h5 class="mb-2">Returns</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE(SUM(Sales[Amount]),Sales[Status]=&quot;Returned&quot;)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="aa96d238-fd5d-47d1-912c-7ec33c7eaf7f"></a>  
+            <h5 class="mb-2">Returns Indicator</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(IF([Returns Variance %]&lt;=0,&quot;&quot;,&quot;+&quot;),FORMAT([Returns Variance %],&quot;0.0%&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="eccc0c03-68f2-488a-9858-acaa5ec1d949"></a>  
+            <h5 class="mb-2">Returns PM</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Returns],PREVIOUSMONTH(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="0f1aad1b-3133-47ba-ad15-0647e4ff2edc"></a>  
+            <h5 class="mb-2">Returns Sales Top 3</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([StoreR Top N]&lt;4,[Returns],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="5751baf5-17f8-4fae-849d-1f17457f0d15"></a>  
+            <h5 class="mb-2">Returns Variance</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[Returns]-[Returns PM]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="936690a6-4116-4d5b-93b7-6c64656a625a"></a>  
+            <h5 class="mb-2">Returns Variance %</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0.0%;-0.0%;0.0%</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+(DIVIDE([Returns],[Returns PM],0)-1)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="19dbac15-d8d6-4f41-9c64-edae27b890ed"></a>  
+            <h5 class="mb-2">Store Returns Other</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([StoreR Top N]&gt;3,[Returns],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="3eab07c9-cb2c-499c-98cb-dfb2d5ff6020"></a>  
+            <h5 class="mb-2">Store Sales Other</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([Store Top N]&gt;3,[Net Sales],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="bf92dbc2-b1be-43f3-98dd-c4b3ed64bbc9"></a>  
+            <h5 class="mb-2">Store Sales Top 3</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([Store Top N]&lt;4,[Net Sales],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="f92389cb-2c3a-4d75-8bd2-8e9dd803ed67"></a>  
+            <h5 class="mb-2">Store Top N</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+RANKX(ALL(&#39;Store&#39;[Store]),[Net Sales],,DESC)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="271ce902-3d46-40e1-bda4-a5de9668ee00"></a>  
+            <h5 class="mb-2">StoreR Top N</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+RANKX(ALL(&#39;Store&#39;[Store]),[Returns],,DESC)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="ee417d6a-8fd1-4caf-a61b-fc8b79f72aa0"></a>  
+            <h5 class="mb-2">Total Return Rate</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0%;-0%;0%</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Return Rate],ALL(&#39;Calendar&#39;[Date].[Month]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="56a36fdf-16d1-46a9-b22d-63f6f074374d"></a>  
+            <h5 class="mb-2">Units Returned</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE(SUM(Sales[Unit]),Sales[Status]=&quot;Returned&quot;)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="a92707dc-7269-4c1a-84c8-594209bc9176"></a>  
+            <h5 class="mb-2">Units Returned Indicator</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(IF([Returns Variance %]&lt;=0,&quot;&quot;,&quot;+&quot;),FORMAT([Returns Variance %],&quot;0.0%&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="6b4eb375-20c9-4c6b-ab5a-d750c863bfb8"></a>  
+            <h5 class="mb-2">Units Returned PM</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Units Returned],PREVIOUSMONTH(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="c0856a37-73e9-41a6-99f1-297c427cb949"></a>  
+            <h5 class="mb-2">Units Returned Variance %</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([Units Returned],[Units Returned PM],0)-1
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="4f6b44ec-7552-484e-bd67-124e67a7c385"></a>  
+            <h5 class="mb-2">Units Sold</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE(SUM(Sales[Unit]),Sales[Status]=&quot;Sold&quot;)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="1288eecb-9cb6-40f6-8a7a-6059323bb594"></a>  
+            <h5 class="mb-2">Units Sold Indicator</h5>
+            <strong>Tabela:</strong> Design DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CONCATENATE(IF([Units Sold Variance %]&lt;=0,&quot;&quot;,&quot;+&quot;),FORMAT([Units Sold Variance %],&quot;0.0%&quot;))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="d51c6348-be52-401c-a2c7-677e67d72580"></a>  
+            <h5 class="mb-2">Units Sold PM</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Units Sold],PREVIOUSMONTH(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="7ce11e74-aa12-487e-a6af-cbbd11542942"></a>  
+            <h5 class="mb-2">Units Sold Variance %</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([Units Sold],[Units Sold PM],0)-1
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="89f3d61f-24b1-4b8a-a8b8-846c36501d89"></a>  
+            <h5 class="mb-2">WIF Adjusted Net Sales</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+(SUM(Sales[Unit])*[WIF Price per Unit])-DIVIDE((SUM(Sales[Unit])*&#39;% Return Rate&#39;[% Return Rate Value]),1,0)*[WIF Price per Unit]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="a0a4e80c-7645-44df-88d3-be04f39594dd"></a>  
+            <h5 class="mb-2">WIF Adjusted Sales</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[WIF Units Returned_1]*[WIF Price per Unit]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="4da2584d-d264-4f58-afb1-d6c7d29b9324"></a>  
+            <h5 class="mb-2">WIF Adjusted Units Returned</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE((SUM(Sales[Unit])*&#39;% Return Rate&#39;[% Return Rate Value]),1,0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="a19bf6bc-3767-4b5f-b56d-9a6658a817af"></a>  
+            <h5 class="mb-2">WIF Forecast</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[Net Sales]+[WIF Profit]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="74cedb53-7f30-40dc-929a-93609a0a53f8"></a>  
+            <h5 class="mb-2">WIF Price per Unit</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([Net Sales],[Units Sold],0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="b524dc1e-e1ba-4267-91d2-c57ef6ffa1b8"></a>  
+            <h5 class="mb-2">WIF Profit</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([WIF Same]=0,0,IF(ROUNDDOWN([WIF Adjusted Net Sales]-[Net Sales],0)&lt;0,0,ROUNDDOWN([WIF Adjusted Net Sales]-[Net Sales],0)))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="99a97246-6fb3-4d03-b0d9-7814afa5562d"></a>  
+            <h5 class="mb-2">WIF Profit Difference</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0.0%;-0.0%;0.0%</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([WIF Forecast],[Net Sales],0)-1
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="9aea99a5-0f7a-421f-847b-e81ae3188e19"></a>  
+            <h5 class="mb-2">WIF Sales</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Net Sales],ALL(&#39;Calendar&#39;[Date].[Month]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="5fe6697f-11ee-4ae5-92b2-6bed10f4326e"></a>  
+            <h5 class="mb-2">WIF Same</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([% Return Rate Value]&gt;=CALCULATE([Return Rate],ALL(Store[Type]),ALL(Store[Store])),0,1)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="6706b1b0-20a7-43a0-b08c-f6df7eba75ea"></a>  
+            <h5 class="mb-2">WIF Total Forecast</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([WIF Forecast],ALL(&#39;Calendar&#39;[Date].[Month]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="1bed2507-7783-49f6-9a2a-61eb07a646ab"></a>  
+            <h5 class="mb-2">WIF Total Profit</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>\$#,0;-\$#,0;\$#,0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([WIF Profit],ALL(&#39;Calendar&#39;[Date].[Month]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="66092a0d-befe-4048-8c0f-9828990a5333"></a>  
+            <h5 class="mb-2">WIF Units Returned</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+IF([Units Returned]-[WIF Units Returned Average]&lt;0,0,[Units Returned]-[WIF Units Returned Average])
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="9d462e15-7dd7-4344-bca7-a938a314eb8b"></a>  
+            <h5 class="mb-2">WIF Units Returned Average</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+DIVIDE([WIF Units Returned Difference],CALCULATE(DISTINCTCOUNT(&#39;Calendar&#39;[Date]), ALL(&#39;Calendar&#39;)),0)
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="95f5e193-f587-47d6-aa98-be16ec2cf701"></a>  
+            <h5 class="mb-2">WIF Units Returned Difference</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+[WIF Units Returned_1]-[WIF Units Returned_2]
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="978a4e31-2673-45a2-be8b-86bdd31dfd8d"></a>  
+            <h5 class="mb-2">WIF Units Returned_1</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>0</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([Units Returned], ALLSELECTED(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4 ">
+            <a id="b365a446-2b19-472e-bab1-6dd79ad89b11"></a>  
+            <h5 class="mb-2">WIF Units Returned_2</h5>
+            <strong>Tabela:</strong> Analysis DAX
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+CALCULATE([WIF Adjusted Units Returned], ALLSELECTED(&#39;Calendar&#39;[Date]))
+                </code>
+            </pre>
+        </div>
+    </div>
+                
+</div>
+            
+<div class="row pt-4">
+    <div class="col-12">
+        <h3>Colunas Calculadas</h3>
+    </div>
+                        
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4">
+            <a id="a14126f5-acd6-4d04-b1d2-0bcc3cd1d5a7"></a>  
+            <h5 class="mb-2">Coluna</h5>
+            <strong>Tabela:</strong> Age
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Tipo:</strong> string
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+    &quot;6546&quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                            
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4">
+            <a id="b95bebd9-1156-475f-9561-268b1c226fa9"></a>  
+            <h5 class="mb-2">Empty</h5>
+            <strong>Tabela:</strong> Calendar
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Tipo:</strong> string
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+    &quot;&quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                            
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4">
+            <a id="26a850f3-d918-47ee-8b9b-7fb3c3b1a11e"></a>  
+            <h5 class="mb-2">Empty</h5>
+            <strong>Tabela:</strong> Tooltip Info
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Tipo:</strong> string
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+    &quot; &quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                            
+    <div class="row border rounded p-2 ms-2 my-2">
+        <div class="col-md-4">
+            <a id="fb119aef-7041-49d7-9430-941c9c672041"></a>  
+            <h5 class="mb-2">Segmented by</h5>
+            <strong>Tabela:</strong> Associated Product
+            <br><strong>Pasta:</strong> Nenhuma
+            <br><strong>Tipo:</strong> string
+            <br><strong>Formato:</strong> <code>None</code>
+        </div>
+        <div class="col-md-8">
+            <pre class="border rounded p-2">
+                <code>
+    &quot;#ffffff&quot;
+                </code>
+            </pre>
+        </div>
+    </div>
+                            
+</div>
+            
+
+
+        </container>
+    </body>
+</html>'

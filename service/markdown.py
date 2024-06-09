@@ -7,7 +7,8 @@ from model.data_model import DataModel
 
 class Markdown:
     """
-    Class to generate the documentation in markdown format.
+    Class to generate the complete documentation in markdown format.
+    Currently deactivated
     """
 
     def __init__(self, model: DataModel):

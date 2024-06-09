@@ -19,6 +19,10 @@ import Microsoft.AnalysisServices.Tabular as Tabular
 
 
 def list_running_ssas():
+    """
+    Search for running SSAS instances and return a list of instances.
+    :return: list of string like 'localhost:port_number'
+    """
     import psutil
     instances = []
     tcp_connections = psutil.net_connections(kind='tcp')
@@ -33,6 +37,11 @@ def list_running_ssas():
 
 
 def connect_ssas(port_number):
+    """
+    Connect to a SSAS instance using the port number
+    :param port_number: like 'localhost:port_number'
+    :return: connection object
+    """
     connection_string = f'Provider=MSOLAP;Data Source={port_number};'
     con = Pyadomd(connection_string)
     con.open()
@@ -40,10 +49,20 @@ def connect_ssas(port_number):
 
 
 def close_connection(con):
+    """
+    Close the connection to the SSAS instance
+    :param con: connection object
+    """
     con.close()
 
 
 def run_query(con, dax_query):
+    """
+    Run a DAX query and return the result as a DataFrame
+    :param con: connection object
+    :param dax_query: string with the DAX query
+    :return: Pandas DataFrame
+    """
     cursor = con.cursor().execute(dax_query)
     result = cursor.fetchall()
     df = pd.DataFrame(result, columns=[column[0] for column in cursor.description])
@@ -52,8 +71,13 @@ def run_query(con, dax_query):
 
 
 def get_model_bim(port_number):
-    # https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular.database?view=analysisservices-dotnet
-    # https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular?view=analysisservices-dotnet
+    """
+    Get the model.bim file from a SSAS instance
+    https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular.database?view=analysisservices-dotnet
+    https://learn.microsoft.com/pt-br/dotnet/api/microsoft.analysisservices.tabular?view=analysisservices-dotnet
+    :param port_number: like 'localhost:port_number'
+    :return: json string with the model.bim file
+    """
     server = Tabular.Server()
     server.Connect(port_number)
     database = server.Databases[0]

@@ -159,7 +159,7 @@ class DataModel:
 
     def extract_relationships(self):
         """
-        Extract relationships from model.bim file
+        Extract relationships from the model
         :return: list of relationships objects
         """
         relationships = []
@@ -188,11 +188,19 @@ class DataModel:
         return sorted(relationships, key=lambda x: x.origin_table)
 
     def open_model_bim_file(self):
+        """
+        Open model.bim file from file system
+        :return: json model
+        """
         with open(self.path, 'r', encoding='utf-8') as file:
             model = json.load(file)
         return model
 
     def open_model_bim_ssas(self):
+        """
+        Open model.bim file from SSAS connection
+        :return: json model
+        """
         from service.ssas import get_model_bim
         _model_bim = get_model_bim(self.path)
         return json.loads(_model_bim)

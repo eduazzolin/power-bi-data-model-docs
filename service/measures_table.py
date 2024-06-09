@@ -5,7 +5,7 @@ from model.data_model import DataModel
 
 class MeasuresTable:
     """
-    Class to generate a table file with the measures from the model.
+    Service class to generate a table file with the measures from the model.
     """
 
     def __init__(self, model: DataModel):
@@ -20,7 +20,6 @@ class MeasuresTable:
         Method to generate the data frame with the measures.
         :return: Pandas.DataFrame
         """
-
         rows = []
         for table in self.model.tables:
             for measure in [item for item in table.table_itens if item.table_item_type == 'measure']:

@@ -5,16 +5,17 @@ import time
 import pandas as pd
 
 
-def save_md(md: str, path: str, prefix: str, open_folder: bool = False, silent: bool = False):
+def save(md: str, path: str, prefix: str, format='md', open_folder: bool = False, silent: bool = False):
     """
     Method to save the markdown file.
     :param md: str
     :param path: str
     :param prefix: str
+    :param format: str
     :param open_folder: bool
     :param silent: bool
     """
-    full_path, path = generate_final_path(path, prefix, 'md', silent)
+    full_path, path = generate_final_path(path, prefix, format, silent)
 
     try:
         with open(full_path, 'w', encoding='utf-8') as f:
@@ -32,6 +33,14 @@ def save_md(md: str, path: str, prefix: str, open_folder: bool = False, silent: 
 
 
 def generate_final_path(path, prefix, format, silent=False):
+    """
+    Method to generate the final path of the file.
+    :param path: location of the file
+    :param prefix: name like 'documentation'
+    :param format: ending of the file like 'md'
+    :param silent: bool, if True, won't include the timestamp in the file name and won't print the success message
+    :return: str with the path and name of the file and str with the path of the file
+    """
     if path.startswith('localhost'):
         path = os.getcwd()
     if path.upper().endswith('MODEL.BIM'):
@@ -43,6 +52,14 @@ def generate_final_path(path, prefix, format, silent=False):
 
 
 def save_csv(df: pd.DataFrame, path: str, prefix: str, open_folder: bool = False):
+    """
+    save a DataFrame as a csv file
+    :param df: Pandas.DataFrame
+    :param path: path to save the file
+    :param prefix: name of the file
+    :param open_folder: if True, open the folder after saving the file
+    :return: None
+    """
     full_path, path = generate_final_path(path, prefix, 'csv')
     try:
         df.to_csv(full_path, index=False, encoding='utf-8', lineterminator='\n')
@@ -58,6 +75,14 @@ def save_csv(df: pd.DataFrame, path: str, prefix: str, open_folder: bool = False
 
 
 def save_xlsx(df: pd.DataFrame, path: str, prefix: str, open_folder: bool = False):
+    """
+    Save a DataFrame as a xlsx file
+    :param df: Pandas.DataFrame
+    :param path: path to save the file
+    :param prefix: name of the file
+    :param open_folder: if True, open the folder after saving the file
+    :return: None
+    """
     full_path, path = generate_final_path(path, prefix, 'xlsx')
     try:
         with pd.ExcelWriter(full_path, engine='xlsxwriter') as writer:

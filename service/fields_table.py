@@ -6,6 +6,10 @@ from model.data_model import DataModel
 
 
 class FieldsTable:
+    """
+    Service class to generate a table with all fields in the model and verify if they are used in the model.
+    """
+
     def __init__(self, model: DataModel):
         """
         Constructor of the class.

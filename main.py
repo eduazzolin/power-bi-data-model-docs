@@ -6,7 +6,7 @@ from service.markdown import Markdown
 from service.measures_table import MeasuresTable
 from service.simplified_markdown import SimplifiedMarkdown
 from service.ssas import list_running_ssas
-from service.system import save_md, save_xlsx, save_csv
+from service.system import save, save_xlsx, save_csv
 from service.comparison import Comparison
 from service.html import HTML
 
@@ -82,14 +82,14 @@ class Main:
         if function == 1:
             # Generate full documentation
             service = HTML(model)
-            md = service.gerar_html()
-            save_md(md, model.path, 'data_model_doc.HTML', open_folder=True, silent=True)
+            html = service.gerar_html()
+            save(html, model.path, format='html', prefix='data_model_doc', open_folder=True)
 
         elif function == 2:
             # Export simplified documentation
             service = SimplifiedMarkdown(model)
             md = service.generate_md()
-            save_md(md, model.path, 'data_model_simpl_doc', open_folder=True)
+            save(md, model.path, 'data_model_simpl_doc', open_folder=True)
 
         elif function == 3:
             # Export measures table

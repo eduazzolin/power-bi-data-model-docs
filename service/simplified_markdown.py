@@ -6,6 +6,10 @@ from model.data_model import DataModel
 
 
 class SimplifiedMarkdown:
+    """
+    Service class to generate a simplified markdown file with the model information.
+    """
+
     def __init__(self, model: DataModel):
         """
         Constructor of the class.
@@ -13,7 +17,11 @@ class SimplifiedMarkdown:
         """
         self.model = model
 
-    def generate_md(self):
+    def generate_md(self) -> str:
+        """
+        Method to generate the markdown file.
+        :return: str
+        """
         result = '# Resumo\n'
         result += f'- **Data do relatório:** {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
         result += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'

@@ -1,0 +1,69 @@
+Table,Column,Data Type,Is Used
+Age,Age,int64,False
+Age,Age Bucket,string,False
+Associated Product,Product,string,True
+Associated Product,Product Image,string,False
+Associated Product,ProductID,int64,True
+Association,Importance,double,True
+Association,LeftItemSetId,int64,True
+Association,Probability,double,False
+Association,RightItemSetId,int64,True
+Association,RuleID,int64,False
+Association,Support,int64,False
+Calendar,Date,dateTime,True
+Calendar,Month,string,False
+Calendar,MonthSort,int64,False
+Calendar,Week,int64,False
+Customer,Age,string,False
+Customer,Amount,int64,False
+Customer,Category,string,False
+Customer,Gender,string,False
+Customer,ID,int64,True
+Customer,Issue,string,False
+Customer,Price Range,string,False
+Customer,Product,string,True
+Customer,Promotion,string,False
+Customer,Segment,string,False
+Customer,Store,string,False
+Customer,Type,string,False
+Customer,Unit,int64,False
+Details,DFSort,int64,False
+Details,Design Factor,string,False
+Details,TSort,int64,False
+Details,Topic,string,False
+Issues and Promotions,ID,int64,False
+Issues and Promotions,Issue,string,False
+Issues and Promotions,Promotion,string,False
+Product,Category,string,True
+Product,Category Image,string,False
+Product,CategoryID,int64,False
+Product,Price,int64,False
+Product,Price Range,string,False
+Product,Product,string,True
+Product,Product Image,string,False
+Product,ProductID,int64,True
+Product,Segement Color,string,False
+Product,Segment,string,True
+Product,Segment image,string,False
+Product,SegmentID,int64,False
+STable,Metric,string,False
+STable,Sort,int64,False
+Sales,Amount,int64,True
+Sales,Date,dateTime,True
+Sales,ID,int64,True
+Sales,ProductID,int64,True
+Sales,Status,string,True
+Sales,StoreID,int64,True
+Sales,Unit,int64,True
+Store,Latitude,double,False
+Store,Longitude,double,False
+Store,Store,string,True
+Store,StoreID,int64,True
+Store,Type,string,True
+Store,image,string,False
+Tooltip Info,DLINK,string,False
+Tooltip Info,URL,string,False
+Tooltip Info,nombre,string,False
+Tooltip Info2,DLINK,string,False
+Tooltip Info2,Nombre,string,False
+Tooltip Info2,URL,string,False
