@@ -64,12 +64,12 @@ class HTML:
                 retorno += f'''
             <div class="accordion-item">
                 <h2 class="accordion-header">
-                    <button class="accordion-button {"" if count == 1 else "collapsed"}" type="button" data-bs-toggle="collapse" 
-                        data-bs-target="#collapse{count}" aria-expanded="{"true" if count == 1 else "false"}" aria-controls="collapse{count}">
+                    <button class="accordion-button collapsed type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse{count}" aria-expanded="false" aria-controls="collapse{count}">
                         {t.name}
                     </button>
                 </h2>
-                <div id="collapse{count}" class="accordion-collapse collapse {"" if count > 1 else "show"}">
+                <div id="collapse{count}" class="accordion-collapse collapse">
                     <div class="accordion-body">
                         <h5>Descrição</h5>
                         <ul>
