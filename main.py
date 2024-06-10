@@ -1,14 +1,13 @@
-import subprocess
+import requests
 
 from model.data_model import DataModel
+from service.comparison import Comparison
 from service.fields_table import FieldsTable
-from service.markdown import Markdown
+from service.html import HTML
 from service.measures_table import MeasuresTable
 from service.simplified_markdown import SimplifiedMarkdown
 from service.ssas import list_running_ssas
 from service.system import save, save_xlsx, save_csv
-from service.comparison import Comparison
-from service.html import HTML
 
 
 class Main:
@@ -62,6 +61,19 @@ class Main:
         print('-' * 40)
         print('Power BI Data Model Documentation Tool')
         print('-' * 40)
+
+    @staticmethod
+    def check_upodate(version: float):
+        try:
+            url = f"https://api.github.com/repos/eduazzolin/power-bi-data-model-docs/releases/latest"
+            response = requests.get(url)
+            if response.status_code == 200:
+                latest_release = response.json()
+                latest_release = float(latest_release['tag_name'])
+                if latest_release > version:
+                    print(f'Nova versão disponível: {latest_release}')
+        except Exception as e:
+            print(f'Erro ao verificar atualização: {e}')
 
     def run(self):
         '''
@@ -119,10 +131,9 @@ class Main:
             service = Comparison(model1, model2).compare()
 
 
-
-
 if __name__ == '__main__':
     executable = Main()
+    latest_version = executable.check_upodate(1)
     executable.print_title()
     while True:
         executable.run()
