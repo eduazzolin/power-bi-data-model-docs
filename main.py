@@ -137,4 +137,4 @@ if __name__ == '__main__':
     executable.print_title()
     while True:
         executable.run()
-        latest_version = executable.check_upodate(0.1)
+        latest_version = executable.check_upodate(1)
