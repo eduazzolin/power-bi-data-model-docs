@@ -71,7 +71,8 @@ class Main:
                 latest_release = response.json()
                 latest_release = float(latest_release['tag_name'])
                 if latest_release > version:
-                    print(f'Nova versão disponível: {latest_release}')
+                    print(f'\nNova versão disponível: {latest_release}')
+                    print(f'Veja em: https://github.com/eduazzolin/power-bi-data-model-docs')
         except Exception as e:
             print(f'Erro ao verificar atualização: {e}')
 
@@ -133,7 +134,7 @@ class Main:
 
 if __name__ == '__main__':
     executable = Main()
-    latest_version = executable.check_upodate(1)
     executable.print_title()
     while True:
         executable.run()
+        latest_version = executable.check_upodate(0.1)
