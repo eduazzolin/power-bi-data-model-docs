@@ -1,3 +1,6 @@
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from tkinter import ttk
 import requests
 
 from model.data_model import DataModel
@@ -10,131 +13,170 @@ from service.ssas import list_running_ssas
 from service.system import save, save_xlsx, save_csv
 
 
-class Main:
+class MainApp(tk.Tk):
 
-    @staticmethod
-    def ask_function():
-        return int(input(f'\nEscolha a função:'
-                         f'\n1. Exportar documentação de modelo de dados em HTML'
-                         f'\n2. Exportar documentação simpificada em markdown'
-                         f'\n3. Exportar tabela com medidas'
-                         f'\n4. Exportar tabela com campos e uso'
-                         f'\n5. Comparar dois modelos de dados'
-                         f'\n\nEscolha: '))
+    def __init__(self):
+        super().__init__()
+        self.title("Power BI Data Model Documentation Tool")
+        self.geometry("500x400")
+        self.version = 1.0  # Defina a versão atual do seu aplicativo aqui
+        self.create_widgets()
 
-    @staticmethod
-    def ask_model():
+    def create_widgets(self):
+        # Create and place widgets in the main window
+        self.label = tk.Label(self, text="Escolha a função:", font=("Arial", 14))
+        self.label.pack(pady=10)
+
+        self.function_var = tk.StringVar()
+        self.function_combobox = ttk.Combobox(self, textvariable=self.function_var, font=("Arial", 12), width=40, state="readonly")
+        self.function_combobox['values'] = ('Exportar documentação de modelo de dados em HTML',
+                                            'Exportar documentação simplificada em markdown',
+                                            'Exportar tabela com medidas',
+                                            'Exportar tabela com campos e uso',
+                                            'Comparar dois modelos de dados')
+        self.function_combobox.pack(pady=10)
+
+        self.run_button = tk.Button(self, text="Executar", command=self.run_function, font=("Arial", 14), width=15, bg="lightgray")
+        self.run_button.pack(pady=20)
+
+        self.update_button = tk.Button(self, text="Verificar atualização", command=self.check_update, font=("Arial", 10))
+        self.update_button.pack(side=tk.BOTTOM, pady=10)
+
+    def ask_model(self):
         model = None
         while model is None:
             try:
                 instances = list_running_ssas()
-                print(f'\nA qual modelo deseja conectar?'
-                      f'\n1. Buscar arquivo model.bim')
-                for i, instance in enumerate(instances):
-                    print(f'{i + 2}. MODELO RODANDO: {instance}')
+                escolha = messagebox.askquestion('Modelo', 'Buscar arquivo model.bim?')
 
-                escolha = int(input('\nEscolha: '))
-
-                if escolha == 1:
-                    import tkinter as tk
-                    from tkinter import filedialog
-                    root = tk.Tk()
-                    root.withdraw()
+                if escolha == 'yes':
                     file_path = filedialog.askopenfilename(filetypes=[("BIM files", "*.bim")])
-                    model = DataModel(path=file_path)
+                    if file_path:
+                        model = DataModel(path=file_path)
                 else:
-                    model = DataModel(instances[escolha - 2])
-            except Exception as e:
-                print(f'\nERRO: {e}')
+                    # Create a new window for selecting running instances
+                    select_window = tk.Toplevel(self)
+                    select_window.title("Selecione o modelo rodando")
 
+                    label = tk.Label(select_window, text="Escolha o modelo rodando:")
+                    label.pack(pady=10)
+
+                    instance_var = tk.StringVar()
+                    instance_combobox = ttk.Combobox(select_window, textvariable=instance_var, state="readonly")
+                    instance_combobox['values'] = instances
+                    instance_combobox.pack(pady=10)
+
+                    def confirm_selection():
+                        nonlocal model
+                        selected_instance = instance_var.get()
+                        if selected_instance:
+                            model = DataModel(selected_instance)
+                        select_window.destroy()
+
+                    confirm_button = tk.Button(select_window, text="Confirmar", command=confirm_selection)
+                    confirm_button.pack(pady=20)
+
+                    self.wait_window(select_window)
+
+            except Exception as e:
+                messagebox.showerror('Erro', f'ERRO: {e}')
+                return None
+        
         return model
 
-    @staticmethod
-    def ask_export_type():
-        return int(input('\nEscolha o formato de exportação:'
-                         '\n1. Arquivo xlsx'
-                         '\n2. Arquivo csv'
-                         '\nEscolha: '))
+    def ask_export_type(self):
+        export_type = None
+        export_window = tk.Toplevel(self)
+        export_window.title("Escolha o formato de exportação")
 
-    @staticmethod
-    def print_title():
-        print('-' * 40)
-        print('Power BI Data Model Documentation Tool')
-        print('-' * 40)
+        label = tk.Label(export_window, text="Escolha o formato de exportação:")
+        label.pack(pady=10)
 
-    @staticmethod
-    def check_upodate(version: float):
+        export_var = tk.StringVar()
+        xlsx_button = tk.Radiobutton(export_window, text="Arquivo xlsx", variable=export_var, value="xlsx")
+        xlsx_button.pack(pady=5)
+        csv_button = tk.Radiobutton(export_window, text="Arquivo csv", variable=export_var, value="csv")
+        csv_button.pack(pady=5)
+
+        def confirm_export_type():
+            nonlocal export_type
+            export_type = export_var.get()
+            export_window.destroy()
+
+        confirm_button = tk.Button(export_window, text="Confirmar", command=confirm_export_type)
+        confirm_button.pack(pady=20)
+
+        self.wait_window(export_window)
+        
+        return export_type
+
+    def run_function(self):
+        function = self.function_var.get()
+        
+        if function:
+            try:
+                function_index = self.function_combobox['values'].index(function) + 1
+                if function_index == 5:
+                    model1 = self.ask_model()
+                    if not model1:
+                        return
+                    model2 = self.ask_model()
+                    if not model2:
+                        return
+                    service = Comparison(model1, model2)
+                    service.compare()
+                else:
+                    model = self.ask_model()
+                    if not model:
+                        return
+                    
+                    if function_index == 1:
+                        service = HTML(model)
+                        html = service.gerar_html()
+                        save(html, model.path, format='html', prefix='data_model_doc', open_folder=True)
+                    elif function_index == 2:
+                        service = SimplifiedMarkdown(model)
+                        md = service.generate_md()
+                        save(md, model.path, 'data_model_simpl_doc', open_folder=True)
+                    elif function_index == 3:
+                        service = MeasuresTable(model)
+                        data_frame = service.generate_data_frame()
+                        export_type = self.ask_export_type()
+                        if not export_type:
+                            return
+                        if export_type == 'xlsx':
+                            save_xlsx(data_frame, model.path, 'measures_table', True)
+                        elif export_type == 'csv':
+                            save_csv(data_frame, model.path, 'measures_table', True)
+                    elif function_index == 4:
+                        service = FieldsTable(model)
+                        data_frame = service.generate_data_frame()
+                        export_type = self.ask_export_type()
+                        if not export_type:
+                            return
+                        if export_type == 'xlsx':
+                            save_xlsx(data_frame, model.path, 'fields_table', True)
+                        elif export_type == 'csv':
+                            save_csv(data_frame, model.path, 'fields_table', True)
+            except Exception as e:
+                messagebox.showerror('Erro', f'ERRO: {e}')
+
+    def check_update(self):
         try:
+            version = self.version
             url = f"https://api.github.com/repos/eduazzolin/power-bi-data-model-docs/releases/latest"
             response = requests.get(url)
             if response.status_code == 200:
                 latest_release = response.json()
                 latest_release = float(latest_release['tag_name'])
                 if latest_release > version:
-                    print(f'\nNova versão disponível: {latest_release}')
-                    print(f'Veja em: https://github.com/eduazzolin/power-bi-data-model-docs')
+                    messagebox.showinfo('Atualização disponível', f'Nova versão disponível: {latest_release}\nVeja em: {url}')
+                else:
+                    messagebox.showinfo('Atualização', 'Você já está utilizando a versão mais recente.')
         except Exception as e:
-            print(f'Erro ao verificar atualização: {e}')
-
-    def run(self):
-        '''
-        Main function to generate the documentation of the data model.
-        It is executed when the script is called without arguments.
-        '''
-
-        # Asking wich function the user wants to execute
-        function = self.ask_function()
-
-        if function == 5:
-            print('-' * 40)
-            print("\nEscolha o primeiro modelo de dados:")
-
-        # Asking for the path of the data model
-        model = self.ask_model()
-
-        if function == 1:
-            # Generate full documentation
-            service = HTML(model)
-            html = service.gerar_html()
-            save(html, model.path, format='html', prefix='data_model_doc', open_folder=True)
-
-        elif function == 2:
-            # Export simplified documentation
-            service = SimplifiedMarkdown(model)
-            md = service.generate_md()
-            save(md, model.path, 'data_model_simpl_doc', open_folder=True)
-
-        elif function == 3:
-            # Export measures table
-            service = MeasuresTable(model)
-            data_frame = service.generate_data_frame()
-            export_type = self.ask_export_type()
-            if export_type == 1:
-                save_xlsx(data_frame, model.path, 'measures_table', True)
-            elif export_type == 2:
-                save_csv(data_frame, model.path, 'measures_table', True)
-
-        elif function == 4:
-            # Export fields table
-            service = FieldsTable(model)
-            data_frame = service.generate_data_frame()
-            export_type = self.ask_export_type()
-            if export_type == 1:
-                save_xlsx(data_frame, model.path, 'fields_table', True)
-            elif export_type == 2:
-                save_csv(data_frame, model.path, 'fields_table', True)
-
-        elif function == 5:
-            print('-' * 40)
-            print("\nEscolha o segundo modelo de dados:")
-            model1 = model
-            model2 = self.ask_model()
-            service = Comparison(model1, model2).compare()
+            messagebox.showerror('Erro', f'Erro ao verificar atualização: {e}')
 
 
 if __name__ == '__main__':
-    executable = Main()
-    executable.print_title()
-    while True:
-        executable.run()
-        latest_version = executable.check_upodate(1)
+    app = MainApp()
+    app.mainloop()
