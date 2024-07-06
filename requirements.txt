@@ -4,3 +4,4 @@ psutil
 pandas
 xlsxwriter
 requests
+htmlmin

@@ -4,6 +4,7 @@ import time
 from model.relationship import Relationship
 from model.table import Table
 from model.table_item import TableItem
+from model.expression import Expression
 
 
 class DataModel:
@@ -20,6 +21,7 @@ class DataModel:
         :attr item_metadata_json_file: .Dataset/item.metadata.json file
         :attr tables: list of tables
         :attr relationships: list of relationships
+        :attr expressions: list of expressions
         :attr DELAY: delay between prints
         """
         self.path = path
@@ -33,6 +35,27 @@ class DataModel:
 
         self.tables = self.extract_tables()
         self.relationships = self.extract_relationships()
+        self.expressions = self.extract_expressions()
+
+    def extract_expressions(self) -> list:
+        """
+        Extract expressions from model.bim file
+        :return: list of expressions
+        """
+        return  sorted  ([Expression(
+                                    expression_id = expression.get('lineageTag', None),
+                                    name  = expression.get('name', None),
+                                    description = expression.get('description', []),
+                                    annotations = expression.get('annotations', []),
+                                    kind = expression.get('kind', None),
+                                    expression = expression.get('expression', []),
+                                    query_group = expression.get('queryGroup', None),
+                                    )
+                         for expression in self.model_bim['model']['expressions']
+                         ]
+                        ,key=lambda e: e.name
+                        )
+
 
     def extract_tables(self) -> list:
         """
@@ -204,6 +227,7 @@ class DataModel:
         from service.ssas import get_model_bim
         _model_bim = get_model_bim(self.path)
         return json.loads(_model_bim)
+
 
     def get_all_measures(self):
         """

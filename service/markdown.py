@@ -40,6 +40,7 @@ class Markdown:
             """
             retorno = f'\n# Resumo do modelo de dados\n'
             retorno += f'- **Quantidade de tabelas:** {len(self.model.tables)}\n'
+            retorno += f'- **Quantidade de expressions:** {len(self.model.expressions)}\n'
             retorno += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'
             retorno += f'- **Quantidade de colunas:** {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])}\n'
             retorno += f'- **Quantidade de colunas calculadas:** {sum([len([c for c in table.table_itens if c.table_item_type == "calculated"]) for table in self.model.tables])}\n'
@@ -57,6 +58,18 @@ class Markdown:
             for t in self.model.tables:
                 retorno += f'{str(count)}. [{t.name}](#{t.table_id})\n'
                 count += 1
+            return retorno
+
+        def gerar_md_resumo_modelo_expressions(self) -> str:
+            """
+            Gera uma lista com as expressions do modelo de dados.
+            A lista contém também o link para a descrição detalhada de cada tabela.
+            :return: srt
+            """
+            retorno = f'\n## Expressions\n'
+            for ix, e in enumerate(self.model.expressions,1):
+                retorno += f'{str(ix)}. [{e.name}](#{e.expression_id})\n'
+
             return retorno
 
         def gerar_md_resumo_modelo_relacionamentos(self) -> str:
@@ -90,6 +103,34 @@ class Markdown:
                 for m in [item for item in t.table_itens if item.table_item_type == 'measure']:
                     retorno += f'{str(count)}. [{m.name}](#{m.table_item_id})\n'
                     count += 1
+            return retorno
+
+        def gerar_md_detalhamento_expressions(self) -> str:
+
+            retorno = f'\n## Expressions\n'
+
+            def singleExpression (e):
+                result = f'\n<a id="{e.expression_id}"></a>\n'
+                result += f'### {e.name}\n'
+                if e.description:
+                    result += f'- **descrição:** {" ".join(e.description)}\n'
+                result += f'- **Query Group:** {e.query_group}\n'
+                result += f'- **Result Type:** {e.result_type}\n'
+                if e.navigation_step_name:
+                    result += f'- **Navigation Step Name:** {e.navigation_step_name}\n'
+                result += f'- **Kind:** {e.kind}\n'
+                if e.annotations:
+                    result += '- **Annotations:**\n'
+                    for k, v in e.annotations.items():
+                        result +=f'    *{k}* : {v}\n'
+                result += f'\n```{e.kind.upper()}=\n'
+                result += '\n'.join(e.expression)
+                result += '\n```\n---\n'
+                return result
+
+            for e in self.model.expressions:
+                retorno += singleExpression(e)
+
             return retorno
 
         def gerar_md_detalhamento_tabelas(self) -> str:
@@ -157,7 +198,7 @@ class Markdown:
                 for c in [item for item in t.table_itens if item.table_item_type == 'calculated']:
                     retorno += f'\n<a id="{c.table_item_id}"></a>\n'
                     retorno += f'\n**{c.name}**\n'
-                    retorno += f'```dax\n'
+                    retorno += f'```dax=\n'
                     retorno += f'{c.get_expression_cleaned()}\n'
                     retorno += f'```\n'
                 return retorno
@@ -210,14 +251,14 @@ class Markdown:
 
             def gerar_md_detalhamento_tabelas_query(t) -> str:
                 retorno = f'\n### Query:\n'
-                retorno += f'```sql\n'
+                retorno += f'```sql=\n'
                 retorno += f'{t.query}\n'
                 retorno += f'```\n'
                 return retorno
 
             def gerar_md_detalhamento_tabelas_power_query(t) -> str:
                 retorno = f'\n### Definição no PowerQuery:\n'
-                retorno += f'```M\n'
+                retorno += f'```M=\n'
                 for step in t.power_query_steps:
                     retorno += f'{step}\n'
                 retorno += f'```\n'
@@ -256,7 +297,7 @@ class Markdown:
                     retorno += f'- **Tabela:** [{t.name}](#{t.table_id})\n'
                     retorno += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
                     retorno += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
-                    retorno += f'\n```dax\n'
+                    retorno += f'\n```dax=\n'
                     retorno += f'{m.get_expression_cleaned()}\n'
                     retorno += f'```\n'
             return retorno
@@ -265,8 +306,10 @@ class Markdown:
         md += gerar_md_cabecalho(self)
         md += gerar_md_resumo_modelo_caracteristicas(self)
         md += gerar_md_resumo_modelo_tabelas(self)
+        md += gerar_md_resumo_modelo_expressions(self)
         md += gerar_md_resumo_modelo_relacionamentos(self)
         md += gerar_md_resumo_modelo_medidas(self)
         md += gerar_md_detalhamento_tabelas(self)
+        md += gerar_md_detalhamento_expressions(self)
         md += gerar_md_detalhamento_medidas(self)
         return md
