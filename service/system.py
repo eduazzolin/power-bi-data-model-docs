@@ -43,8 +43,8 @@ def generate_final_path(path, prefix, format, silent=False):
     """
     if path.startswith('localhost'):
         path = os.getcwd()
-    if path.upper().endswith('MODEL.BIM'):
-        path = path[:-9]
+    else:
+        path = os.path.dirname(path)
     timestamp = dt.datetime.now().strftime('%Y%m%d%H%M%S')
     file_name = f'{prefix}{(" " + timestamp) if not silent else ""}.{format}'
     full_path = os.path.join(path, file_name)
