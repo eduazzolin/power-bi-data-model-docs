@@ -71,5 +71,4 @@ class Table:
                 postfix: str = line[len(line) - 3:]
                 query: str = line[line.find('Query=') + 7:len(line) - 3]
                 query = query.replace('#(lf)', '\n').replace('#(tab)', '    ')
-                self.power_query_steps[i] = f'{prefix}  _CUSTOM_QUERY_  {postfix}'
                 return query
