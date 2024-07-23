@@ -41,4 +41,4 @@ class Comparison:
         time.sleep(1)
 
         # abrir o vscode para comparar os arquivos
-        os.system(f'code --diff {path_hidden_folder}/model1.md {path_hidden_folder}/model2.md')
+        os.system(f'code --diff "{path_hidden_folder}/model1.md" "{path_hidden_folder}/model2.md"')
