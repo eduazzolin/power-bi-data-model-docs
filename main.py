@@ -231,7 +231,7 @@ class MainApp(tk.Tk):
                     messagebox.showinfo('Atualização disponível',
                                         f'Nova versão disponível: {latest_release}\nClique em OK para abrir no navegador.')
                     # oppens the browser with the release page
-                    os.system(f'start {'https://github.com/eduazzolin/power-bi-data-model-docs'}')
+                    os.system('start https://github.com/eduazzolin/power-bi-data-model-docs')
                 else:
                     messagebox.showinfo('Atualização', 'Você já está utilizando a versão mais recente.')
         except Exception as e:
