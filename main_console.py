@@ -6,7 +6,7 @@ from service.fields_table import FieldsTable
 from service.html import HTML
 from service.measures_table import MeasuresTable
 from service.simplified_markdown import SimplifiedMarkdown
-from service.ssas import list_running_ssas
+from service.ssas import list_running_valid_ssas
 from service.system import save, save_xlsx, save_csv
 
 
@@ -27,7 +27,7 @@ class Main:
         model = None
         while model is None:
             try:
-                instances = list_running_ssas()
+                instances = list_running_valid_ssas()
                 print(f'\nA qual modelo deseja conectar?'
                       f'\n1. Buscar arquivo model.bim')
                 for i, instance in enumerate(instances):

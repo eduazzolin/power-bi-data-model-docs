@@ -1,5 +1,6 @@
 import json
 import sys
+import model.data_model as dm
 
 import clr
 import pandas as pd
@@ -35,6 +36,21 @@ def list_running_ssas():
                     break
     return instances
 
+def list_running_valid_ssas():
+    """
+    Search for running SSAS instances and return a list of instances that can be connected,
+    excluding reports without a data model.
+    :return: list of string like 'localhost:port_number'
+    """
+    instances = list_running_ssas()
+    valid_instances = []
+    for instance in instances:
+        try:
+            dm.DataModel(instance, skip_loading=True)
+            valid_instances.append(instance)
+        except:
+            pass
+    return valid_instances
 
 def connect_ssas(port_number):
     """
