@@ -38,7 +38,6 @@ class Comparison:
         save(md2, path_hidden_folder, 'model2', open_folder=False, silent=True)
 
         print('\nAbrindo Visual Studio Code')
-        time.sleep(1)
 
         # abrir o vscode para comparar os arquivos
         os.system(f'code --diff "{path_hidden_folder}/model1.md" "{path_hidden_folder}/model2.md"')

@@ -4,6 +4,7 @@ from tkinter import filedialog, messagebox
 from tkinter import ttk
 
 import requests
+import winsound
 
 from model.data_model import DataModel
 from service.comparison import Comparison
@@ -211,6 +212,10 @@ class MainApp(tk.Tk):
                 elif function_index == 5:
                     service = Comparison(model, model2)
                     service.compare()
+
+
+                # Tocar o som do Windows de sucesso (SystemAsterisk)
+                winsound.MessageBeep(winsound.MB_ICONASTERISK)
 
             except Exception as e:
                 messagebox.showerror('Erro', f'ERRO: {e}')
