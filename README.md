@@ -8,6 +8,7 @@ It's a simple tool to generate documentation of a Power BI data model. It uses P
 - Generates a CSV or Excel file with all the columns and an indicator of its usage in the data model. (beta)
 - Can compare two data models.
 - Can connect to running Power BI Desktop instances or use a model.bim file.
+![image](https://github.com/user-attachments/assets/74dc4173-7ebd-481f-b6a0-0ff5731f7124)
 
 ## How to use
 1. Download the [latest executable release](https://github.com/eduazzolin/power-bi-data-model-docs/releases/download/1.0/Power-BI-Data-Model-Docs.exe).
