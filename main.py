@@ -22,7 +22,11 @@ class MainApp(tk.Tk):
         super().__init__()
         self.title("Power BI Data Model Documentation Tool")
         self.geometry("550x500")
-        self.version = 1.0
+        self.version = 1.1
+        try:
+            self.iconbitmap('docs/ico.ico')
+        except:
+            self.iconbitmap(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ico.ico'))
         self.create_widgets()
 
     def open_file_dialog(self):
@@ -243,7 +247,7 @@ class MainApp(tk.Tk):
                     messagebox.showinfo('Atualização disponível',
                                         f'Nova versão disponível: {latest_release}\nClique em OK para abrir no navegador.')
                     # oppens the browser with the release page
-                    os.system('start https://github.com/eduazzolin/power-bi-data-model-docs')
+                    os.system('start https://github.com/eduazzolin/power-bi-data-model-docs/releases')
                 else:
                     messagebox.showinfo('Atualização', 'Você já está utilizando a versão mais recente.')
         except Exception as e:
