@@ -2,6 +2,11 @@ import datetime as dt
 
 from model.data_model import DataModel
 
+try:
+    from htmlmin import minify
+except ImportError:
+    def minify (theHTML, *args, **kwargs):
+        return theHTML
 
 class HTML:
     """
@@ -15,7 +20,7 @@ class HTML:
         """
         self.model = model
 
-    def gerar_html(self) -> str:
+    def gerar_html(self, minifyHTML : bool = True) -> str:
         """
         Gera a documentação em formato HTML com Bootstrap.
         :return: string com a documentação.
@@ -30,6 +35,7 @@ class HTML:
     </div>
     <div class="col-lg-6">
         <p>Quantidade de tabelas: {len(self.model.tables)} <br>
+            Quantidade de expressions: {len(self.model.expressions)} <br>
             Quantidade de relacionamentos: {len(self.model.relationships)} <br>
             Quantidade de colunas: {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])} <br>
             Quantidade de colunas calculadas: {sum([len([c for c in table.table_itens if c.table_item_type == "calculated"]) for table in self.model.tables])}<br>
@@ -38,6 +44,69 @@ class HTML:
 </div>
             '''
             return retorno
+
+        def gerar_html_detalhamento_expressions(self) -> str:
+            def doSingleExpression (count, e):
+                expression_block = '\n'.join(e.expression)
+                result = ""
+                result += f'''
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse{count}" aria-expanded="false" aria-controls="collapse{count}">
+                        {e.name}
+                    </button>
+                </h2>
+                <div id="collapse{count}" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <h5>Description</h5>
+                        <ul>
+                            <li><strong>Name:</strong> {e.name}</li>
+                            '''
+                if e.description:
+                    result += f'''<li><strong>Description:</strong>{' '.join(e.description)}</li>
+                            '''
+                result +=   f'''<li><strong>Kind</strong> <code>{e.kind}</code></li>
+                            <li><strong>Result Type:</strong> <code>{e.result_type}</code></li>
+                            <li><strong>Query Group</strong> <code>{e.query_group}</code></li>
+                            '''
+                if e.navigation_step_name:
+                    result += f'''<li><strong>Navigation Step Name</strong> <code>{e.navigation_step_name}</code></li>
+                            '''
+                if e.annotations:
+                    for k, v in e.annotations.items():
+                        result +=f'''
+                            <li><strong>{k}</strong> <code>{v}</code></li>
+                            '''
+                result += f'''</ul>
+                        <h5>Expression</h5>
+                        <pre class="border rounded ps-3 m-3"><code>{expression_block}
+</code></pre>
+                    </div>
+                </div>
+            </div>
+                        '''
+                return result
+
+
+            retorno = '''
+<div class="row pt-4">
+    <div class="col-12">
+        <h3>Expressions</h3>
+        <div class="accordion" id="accordionExample">
+            '''
+
+            for count, e in enumerate(self.model.expressions,1):
+                retorno += doSingleExpression(count,e)
+
+            retorno += '''
+        </div>
+    </div>
+</div>
+'''
+            return '\n'.join([q for q in [l.rstrip() for l in retorno.split('\n')] if q])
+
+
 
         def gerar_html_detalhamento_tabelas(self) -> str:
             count = 1
@@ -64,7 +133,7 @@ class HTML:
                 retorno += f'''
             <div class="accordion-item">
                 <h2 class="accordion-header">
-                    <button class="accordion-button collapsed type="button" data-bs-toggle="collapse" 
+                    <button class="accordion-button collapsed type="button" data-bs-toggle="collapse"
                         data-bs-target="#collapse{count}" aria-expanded="false" aria-controls="collapse{count}">
                         {t.name}
                     </button>
@@ -79,7 +148,7 @@ class HTML:
                         </ul>
                 '''
                 if query:
-                    retorno += f'''    
+                    retorno += f'''
                         <h5>Power Query</h5>
                         <pre class="border rounded ps-3 m-3">
                             <code>
@@ -259,7 +328,7 @@ class HTML:
                 retorno += f'''
     <div class="row border rounded p-2 ms-2 my-2">
         <div class="col-md-4 ">
-            <a id="{m.table_item_id}"></a>  
+            <a id="{m.table_item_id}"></a>
             <h5 class="mb-2">{m.name}</h5>
             <strong>Tabela:</strong> {m.table}
             <br><strong>Pasta:</strong> {m.display_folder if m.display_folder else "Nenhuma"}
@@ -291,7 +360,7 @@ class HTML:
                 retorno += f'''
     <div class="row border rounded p-2 ms-2 my-2">
         <div class="col-md-4">
-            <a id="{m.table_item_id}"></a>  
+            <a id="{m.table_item_id}"></a>
             <h5 class="mb-2">{m.name}</h5>
             <strong>Tabela:</strong> {m.table}
             <br><strong>Pasta:</strong> {m.display_folder if m.display_folder else "Nenhuma"}
@@ -314,7 +383,7 @@ class HTML:
             return retorno
 
         def envelopar_html(html: str) -> str:
-            return f'''
+            outHTML = '''
 <html>
     <head>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -325,19 +394,24 @@ class HTML:
     </head>
     <body>
         <div class="container pb-5">
-        
-        
+        '''
+            outHTML += f'''
 {html}
-
-
+'''
+            outHTML += '''
         </container>
     </body>
 </html>'
 '''
+            if minifyHTML:
+                return minify(outHTML, remove_empty_space=True)
+            else:
+                return outHTML
 
         html = ''
         html += gerar_html_cabecalho(self)
         html += gerar_html_detalhamento_tabelas(self)
+        html += gerar_html_detalhamento_expressions(self)
         html += gerar_html_resumo_modelo_relacionamentos(self)
         html += gerar_html_resumo_modelo_medidas(self)
         html += gerar_html_detalhamento_colunas_calculadas(self)

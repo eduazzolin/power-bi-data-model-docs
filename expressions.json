@@ -1,0 +1,2229 @@
+[
+    {
+      "name": "getMetadataTable",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": [
+        "(thisTable as text) as table => ",
+        "let",
+        "    //thisTable = \"CourseCode_CourseName\",",
+        "    tableData = Record.Field(Table.SingleRow(Table.SelectRows(MetadataTables,each [Item] = thisTable)),\"Data\"),",
+        "",
+        "  columnRenames = List.Transform(Table.ColumnNames(tableData)",
+        "                                ,(col) => {col, Text.Select(col,{\"a\"..\"z\",\"A\"..\"Z\"})}",
+        "                                ),",
+        "  renamesActual = List.RemoveNulls(List.Transform(columnRenames",
+        "                                                 ,(spec) => if spec{0} = spec{1} then null else spec",
+        "                                                 )",
+        "                                  ),",
+        "  rename = if List.Count(renamesActual) = 0 then tableData",
+        "           else",
+        "            List.Accumulate(renamesActual",
+        "                          ,tableData",
+        "                          ,(_table, _rename) => try Table.RenameColumns(_table,{_rename}) otherwise _table",
+        "                          ),",
+        "  columns = Table.ColumnNames(rename),",
+        "  TrimText= Table.TransformColumns(rename, {}, each try Text.Trim(_) otherwise _),",
+        "  addTrue = Table.AddColumn(TrimText, \"isActualMetadata\", each \"1\",type text),",
+        "  colsToText = convertColumnTypes(addTrue)",
+        "in",
+        "  colsToText"
+      ],
+      "kind": "m",
+      "lineageTag": "70e4e312-4c0c-4211-b1cd-155adc229807",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getLastRefreshTable",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (extraTable as table,optional thisSource as text, optional thisType as text) as table => ",
+        "let",
+        "    Source = DateTimeZone.RemoveZone(DateTimeZone.UtcNow()+#duration(0,8,0,0)),",
+        "    _thisSource = if thisSource is null then paramThisSource else thisSource,",
+        "    _thisType = if thisType is null then paramThisSourceType else thisType,",
+        "    #\"Converted to Table\" = #table(1, {{Source}}),",
+        "    #\"Renamed Columns\" = Table.RenameColumns(#\"Converted to Table\",{{\"Column1\", \"LastRefresh\"}}),",
+        "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Renamed Columns\",{{\"LastRefresh\", type datetime}}),",
+        "  #\"Add name\" = Table.AddColumn(#\"Changed Type\", \"Name\", each _thisSource,type text),",
+        "  #\"Add type\" = Table.AddColumn(#\"Add name\", \"Type\", each _thisType,type text),",
+        "  #\"Removed other columns\" = Table.SelectColumns(#\"Add type\", {\"Name\", \"Type\", \"LastRefresh\"}),",
+        "  retval = if extraTable is null then #\"Removed other columns\" else Table.Combine({extraTable,#\"Removed other columns\"}),",
+        "  sorted = Table.Sort(retval,{\"LastRefresh\", Order.Ascending})",
+        "in",
+        "   sorted",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "e83a4ee8-834b-4ad1-9bfb-c093be404ed3",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "tryInt",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": [
+        "(tableName as table, columnName as text) as table  =>",
+        "let",
+        "  retval = tryConvert(tableName,columnName,Int64.Type)",
+        "in",
+        "  retval"
+      ],
+      "kind": "m",
+      "lineageTag": "77305f72-8be0-4c46-ab7f-645f2fa52a30",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "tryConvert",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": [
+        "(tableName as table, columnName as text,dataType) as table  =>",
+        "let",
+        "  doIt = ",
+        "    let",
+        "      rowcount = Table.RowCount(tableName),",
+        "      Source = try Table.TransformColumnTypes(tableName, {{columnName, dataType}}) otherwise Text.From(\"failed\"),",
+        "      retval = if Value.Is(Value.Type(Source), type text) then tableName else if rowcount = Table.RowCount(Table.RemoveRowsWithErrors(Source)) then Source else tableName",
+        "    in",
+        "      retval,",
+        "  out = try doIt otherwise tableName",
+        "in",
+        "  out"
+      ],
+      "kind": "m",
+      "lineageTag": "6033a8c1-3ab9-4ded-92b2-4f998c4696dc",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "tryConvertMany",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": [
+        "(tableName as table, columnNames as list,dataType) as table  =>",
+        "let",
+        "  retval = List.Accumulate(columnNames, tableName,  ( theTable, thisColumnName ) => tryConvert(theTable,thisColumnName, dataType))",
+        "in",
+        "  retval"
+      ],
+      "kind": "m",
+      "lineageTag": "ee787ff5-5d3d-4c93-9794-871430c3f9a8",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "paramThisSource",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Text"
+        }
+      ],
+      "expression": "\"Analytics Data\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]",
+      "kind": "m",
+      "lineageTag": "ad6c760a-7c99-417f-9c0c-addbdea99325",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "paramThisSourceType",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Text"
+        }
+      ],
+      "expression": "\"Semantic Model\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]",
+      "kind": "m",
+      "lineageTag": "ad1801c7-b39b-4f42-b83d-2f768e56be09",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "addRowIndex",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (inTable as table) as table  =>",
+        "let",
+        "    #\"Added Index\" = Table.AddIndexColumn(inTable, \"FileRowIndex\", 2, 1, Int64.Type)",
+        "in",
+        "  #\"Added Index\"",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "93ddbf87-d97f-4824-993b-4a1b34ab77b1",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "makeTableDistinct",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(tableName as table, groupCols as list) as table =>",
+        "let",
+        "    //Source = tableName,",
+        "    //groupCol =  {\"UnitCode\"},",
+        "    colTypes = getTableColTypesList(tableName),",
+        "    initCols = List.Transform(colTypes,each _{0}), //Table.ColumnNames(tableName),",
+        "    otherCols = List.RemoveMatchingItems (initCols,groupCols),",
+        "    makeOthersText = Table.TransformColumnTypes (tableName, List.Transform(otherCols, each {_, type text})),",
+        "    #\"Grouped\" = Table.Group(makeOthersText,groupCols, {{\"data\", each _, type table}}),",
+        "    addCols = List.Accumulate(otherCols,  #\"Grouped\"",
+        "                             , (state, current) => Table.AddColumn(state, current, each Text.Combine(List.Distinct(Table.RenameColumns([data],{current,\"cc\"})[cc]),\" ##### \"))",
+        "                            ),",
+        "    onlyCols = Table.SelectColumns(addCols,initCols),",
+        "    #\"Changed Type\" = transformColsFromListColTypes(onlyCols,colTypes)",
+        "in",
+        "    #\"Changed Type\""
+      ],
+      "kind": "m",
+      "lineageTag": "e3592993-241c-4f6a-a9c9-833006891a14",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "joinToMetadataTable",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(dataRows as table, dataCols as list, metadataTable as table, optional metadataCols as list, optional colNameOverride as text) as table =>",
+        "let",
+        "    //dataRows = #\"Data Rows Internal\",",
+        "    //dataCols = {\"Course\"},",
+        "    //metadataCols = {\"CourseCode\"},",
+        "    _metadataCols = if metadataCols = null then dataCols else metadataCols,",
+        "    //metadataTable = CourseCode_CourseName,",
+        "    ixCol = List.First(Table.ColumnNames(metadataTable)),",
+        "    merge = Table.NestedJoin(dataRows,dataCols,metadataTable,_metadataCols,\"md\",JoinKind.Inner),",
+        "    destCol = if colNameOverride = null then ixCol else colNameOverride,",
+        "    #\"Expanded md\" = Table.ExpandTableColumn(merge, \"md\", {ixCol}, {destCol})",
+        "in",
+        "    #\"Expanded md\""
+      ],
+      "kind": "m",
+      "lineageTag": "464df881-4e7f-499a-aad6-94837276f9dc",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getDistinctValsFromDataRowsInt",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(colNames, optional rowCountCol as text, optional indexStart as number, optional suppressNullRawScore as logical) as table =>",
+        "let",
+        "    colNameList = if Value.Is(colNames, type list) then colNames else {colNames},",
+        "    Source =  Table.Buffer(#\"Data Rows Internal\"),",
+        "    src = if nullSafeLogical(suppressNullRawScore) then Table.SelectRows(Source,(row) => Record.Field(row,\"RawScore\") <> null) else Source,",
+        "    distinct = Table.Buffer(Table.Group (src, colNameList,if rowCountCol = null or Text.Length(rowCountCol) = 0 then {} else {{rowCountCol, each Table.RowCount(_), Int64.Type}})),",
+        "    #\"Sorted Rows\" = Table.Sort(distinct",
+        "                               ,List.Transform (colNameList",
+        "                                               ,each {_, Order.Ascending}",
+        "                                               )",
+        "                               ),",
+        "    indexCol = Text.Combine(List.Combine({{\"index\"},colNameList})),",
+        "    tabCols = List.InsertRange(Table.ColumnNames(#\"Sorted Rows\"),0,{indexCol}),",
+        "    #\"Added Index\" = Table.AddIndexColumn(#\"Sorted Rows\", indexCol, validateIndexStart(indexStart), 1, Int64.Type),",
+        "    #\"Reordered Columns\" = Table.SelectColumns(#\"Added Index\",tabCols)",
+        "in",
+        "    #\"Reordered Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "ba300fd7-946e-4fb9-8a61-164101dc2cab",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getIndexedMetadataTable",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(metadataTable as table, metadataCols as list, indexColName as text, optional dataTable as table, optional indexStart as number) as table =>",
+        "let",
+        "  //metadataTable = getMetadataTable(metadataTableName),",
+        "  //metadataCols = {\"CourseCode\"},",
+        "  //dataCols = {\"Course\"},",
+        "  dataCols = metadataCols,",
+        "  //indexColName = \"CourseIndex\",",
+        "  theMetadataTable = Table.Buffer(metadataTable),",
+        "  theMetadataCols = List.Buffer(metadataCols),",
+        "  columns= Table.ColumnNames(theMetadataTable),",
+        "  #\"make distinct\" = makeTableDistinct(Table.TransformColumnTypes(theMetadataTable, List.Transform(columns, each {_, type text})),theMetadataCols),",
+        "  renames = List.Buffer(List.Zip({dataCols,theMetadataCols})),",
+        "",
+        "  tableList = if dataTable = null then {#\"Data Rows Internal\"} else {#\"Data Rows Internal\", dataTable},",
+        "  #\"Grouped Rows\" = Table.Buffer(getDistinctColValuesFromTables(dataCols,tableList)),",
+        "",
+        "  #\"Merged Queries\" = Table.Buffer(Table.NestedJoin(#\"Grouped Rows\", metadataCols,  #\"make distinct\", theMetadataCols, \"md\", JoinKind.LeftOuter)),",
+        "  expandCols = List.Buffer(List.RemoveMatchingItems(columns,theMetadataCols)),",
+        "  expandTextCols = List.Intersect({expandCols,Table.ColumnsOfType(metadataTable,{type text, type nullable text})}),",
+        "  #\"Expanded md\" = Table.ExpandTableColumn(#\"Merged Queries\", \"md\", expandCols),",
+        "  #\"Replaced Value\" = Table.ReplaceValue(#\"Expanded md\",null,each Text.Combine({\"Value missing from\",metadataTable},\" \"),Replacer.ReplaceValue,expandTextCols),",
+        "  convertToText = Table.TransformColumnTypes(#\"Replaced Value\",List.Transform(expandTextCols, each {_, type text})),",
+        "  //tryToInt = tryConvertMany(convertToText,expandTextCols,Int64.Type),",
+        "  combine = Table.Combine({convertToText,#\"make distinct\"}),",
+        "  distinctVals = Table.Buffer(Table.Distinct(combine)),",
+        "  convertTypes = convertColumnTypes(distinctVals,-1),",
+        "  sortByKeyCols = Table.Sort(convertTypes,List.Transform(columns, each {_, Order.Ascending})),",
+        "  addIX = Table.AddIndexColumn(sortByKeyCols,indexColName,validateIndexStart(indexStart),1, Int64.Type),",
+        "  cols = List.InsertRange(columns,0,{indexColName}),",
+        "  reOrder = Table.SelectColumns(addIX, cols),",
+        "  addKeys = Table.ReplaceKeys(reOrder,{[Columns = metadataCols, Primary = true], [Columns = {indexColName}, Primary = false]})",
+        "in",
+        "  addKeys"
+      ],
+      "kind": "m",
+      "lineageTag": "0ed7d1df-6bf8-45b1-93e1-95122e8b323b",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "applyFunctionToCols",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (srcTable as table, columnNames as list, theFunction as function, optional datatype as type) as table =>",
+        "let",
+        "    newDT = if datatype = null then type nullable text else datatype,",
+        "    Source = List.Accumulate(columnNames",
+        "                                        ,srcTable",
+        "                                        ,(theTable, thisCol) => Table.TransformColumns(theTable,{{thisCol, theFunction, newDT }})",
+        "                                        )",
+        "in",
+        "    Source",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "570b421a-f8bd-4d55-a653-fe7bbc134089",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Data Rows Internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "  //ECUGrades = tryConvertMany( getMetadataTable(\"ECUGrades\"),{\"Sort\",\"GradeLB\",\"GradeUB\"}, Int64.Type),",
+        "  tempCol = \"fred\",",
+        "  addIgnoreRow = (tableIn, thisType as text, thisCount as number) as table =>",
+        "    let",
+        "      rc = try Table.RowCount(tableIn) otherwise 0,",
+        "      thisRec = [index = rc+1, ignoreType = thisType, ignoreCount = thisCount],",
+        "      tableOut = try ",
+        "                  Table.InsertRows(tableIn, rc, {thisRec})",
+        "                 otherwise",
+        "                  Table.FromRecords({thisRec}),",
+        "      tableOutTypes = Table.TransformColumnTypes(tableOut,{{\"index\", Int64.Type}, {\"ignoreCount\", Int64.Type}, {\"ignoreType\", type text}})",
+        "    in",
+        "      tableOutTypes,",
+        "  getECUGrade = (studentPercentage) =>",
+        "                let",
+        "                    thePercentage = try Number.From(studentPercentage)*100 otherwise -1,",
+        "                    #\"Filtered Rows\" = Table.SelectRows(#\"ECUGrades Internal\"",
+        "                                                        , each thePercentage >= [GradeLB] and thePercentage < [GradeUB]",
+        "                                                        ),",
+        "                    theGrade = try Record.Field(Table.SingleRow(#\"Filtered Rows\"),\"ECUGrade\") otherwise null",
+        "                in",
+        "                    theGrade,",
+        "  rqdCols = List.Buffer(let",
+        "                Source =  #\"getDataflowTable\"(\"dataTableReqdColumns\"),",
+        "                ColumnName = Source[ColumnName]",
+        "            in",
+        "                ColumnName),",
+        "  Source = Table.Buffer(getDataflowTable(\"dataRowsRaw\")),",
+        "  source_rows = Table.RowCount(Source),",
+        "  ignoreCourses = Table.Buffer(#\"IgnoreCourses Internal\"),",
+        "  #\"ignore ignoreCourses\" = Table.Buffer(Table.RemoveColumns(Table.NestedJoin(Source, {\"Course\"}, ignoreCourses, {\"CourseCode\"}, tempCol, JoinKind.LeftAnti),{tempCol})),",
+        "  ignoreCourses_rows = Table.RowCount(#\"ignore ignoreCourses\"),",
+        "  ignore_tab_1 = Table.Buffer(addIgnoreRow(null, \"Course in IgnoreCourses\",(source_rows-ignoreCourses_rows))),",
+        "    #\"filter out rubbish CLO\" = Table.SelectRows(#\"ignore ignoreCourses\", each ([CLO] <> \"\" and Text.Lower([CLO]) <> \"n/a\")),",
+        "  rubbishCLO_rows_after = Table.RowCount(#\"filter out rubbish CLO\"),",
+        "  ignore_tab_2 = Table.Buffer(addIgnoreRow(ignore_tab_1, \"Invalid CLO (null or N/A)\",(ignoreCourses_rows-rubbishCLO_rows_after))),",
+        "    numericExpected = Table.Buffer(removeIfNotNumeric (#\"filter out rubbish CLO\",{\"StudentID\",\"MaxScore\",\"Raw%\"})),",
+        "    notNumeric_rows_after = Table.RowCount(numericExpected),",
+        "  ignore_tab_3 = Table.Buffer(addIgnoreRow(ignore_tab_2, \"Non Numerics\",(rubbishCLO_rows_after-notNumeric_rows_after))),",
+        "",
+        "    indexCols = List.RemoveNulls(List.Transform(Table.ColumnNames(numericExpected)",
+        "                                             ,each if Text.StartsWith(_,\"index\") then _ else null",
+        "                                             )",
+        "                              ),",
+        "  newCols = List.Combine({indexCols,rqdCols}),",
+        "  reorder = Table.SelectColumns(numericExpected,newCols),",
+        "    textCols = Table.ColumnsOfType(reorder,{type nullable text, type text}),",
+        "    setNulls = Table.ReplaceValue(reorder,\"\",null,Replacer.ReplaceValue,textCols),",
+        "  #\"noNullStudentID\" = Table.SelectRows(setNulls, each [StudentID] <> null),",
+        "    noNullStudentID_rows_after = Table.RowCount(noNullStudentID),",
+        "  ignore_tab_4 = Table.Buffer(addIgnoreRow(ignore_tab_3, \"Null StudentID\",(notNumeric_rows_after-noNullStudentID_rows_after))),",
+        "  intConvert = tryConvertMany( #\"noNullStudentID\",{\"StudentID\"}, Int64.Type),",
+        "  floatConvert = tryConvertMany(intConvert,{\"MaxScore\",\"Raw%\"},Decimal.Type),",
+        "    upperCols = {\"Semester\",\"Course\",\"Major\",\"UnitCode\",\"Location.Mode\", \"CLO\"},",
+        "  properCols = {\"Status\",\"AssessLevel\"},",
+        "  uppercase = applyFunctionToCols(floatConvert,upperCols,Text.Upper),",
+        "  propercase = applyFunctionToCols(uppercase,properCols,Text.Proper,Text.Type),",
+        "  #\"ECU Grade\" = Table.AddColumn(propercase, \"ECUGrade\", each if [#\"Raw%\"] = null then null else getECUGrade(Number.From([#\"Raw%\"])),type text),",
+        "  #\"Replaced Value\" = Table.ReplaceValue(#\"ECU Grade\",\"Discontin\",\"Discontinued\",Replacer.ReplaceValue,{\"Status\"}),",
+        "  renamed = renameColumns(#\"Replaced Value\",{\"Course\",\"Major\",\"Location.Mode\",\"Semester\"},{\"CourseCode\",\"MajorCode\",\"LocationCode\",\"TPCode\"}),",
+        "    #\"Raw Score\" = Table.AddColumn(renamed, \"RawScore\", each [MaxScore]*[#\"Raw%\"],Decimal.Type),",
+        "    #\"remove raw%\" = Table.RemoveColumns(#\"Raw Score\",{\"Raw%\"}),",
+        "",
+        "     #\"Final Step\" = #\"remove raw%\",",
+        "    #\"Add Metadata\" = #\"Final Step\" meta [DiscardedRowCounts = ignore_tab_4]",
+        "in",
+        "   #\"Add Metadata\""
+      ],
+      "kind": "m",
+      "lineageTag": "bf937ab4-a2c4-48b6-85fb-566f6cec27ef",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "ECUGrades Internal",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "  Source = makeTableDistinct(getMetadataTable(\"ECUGrades\"),{\"ECUGrade\"}),",
+        "  #\"Sort to int\" = tryInt(Source,\"Sort\"),",
+        "  #\"Grade LB to int\" = tryInt(#\"Sort to int\",\"GradeLB\"),",
+        "  #\"Grade UB to int\" = tryInt(#\"Grade LB to int\",\"GradeUB\")",
+        "in",
+        "  #\"Grade UB to int\""
+      ],
+      "kind": "m",
+      "lineageTag": "df972dfa-2c4f-47c2-8cc2-4533bd5677c0",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "ECU_AACSB_Map",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = getMetadataTable(\"ECU_AACSB_Map\"),",
+        "  disitnct = makeTableDistinct(Source,{\"ECUGrade\",\"AACSB\"}),",
+        "    rec = Table.FromRecords ({ [#\"ECUGrade\" = null, AACSB = null]}),",
+        "    combined = Table.Combine ({disitnct, rec}),",
+        "    changeType = Table.TransformColumnTypes(combined,List.Transform(Table.ColumnNames( Source), each {_, type text}))",
+        "",
+        "in",
+        "    changeType"
+      ],
+      "kind": "m",
+      "lineageTag": "f3839def-3160-4d3b-bdf6-58fa286ef501",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Course Majors internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = getMetadataTable(\"MajorCode_CourseCode\"),",
+        "    #\"Removed Duplicates\" = Table.Distinct(Source)",
+        "in",
+        "    #\"Removed Duplicates\""
+      ],
+      "kind": "m",
+      "lineageTag": "c8fdf8f6-466e-4b2d-a2b4-6cb9bdc27d3c",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Course Units internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = getMetadataTable(\"Course_Units\"),",
+        "    #\"Removed Other Columns\" = Table.Distinct(Table.SelectColumns(Source,{\"CourseCode\", \"UnitCode\"}))",
+        "in",
+        "    #\"Removed Other Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "638fd09b-175d-4639-b73d-2b103bb4b979",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Major Units internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = getMetadataTable(\"MajorCode_UnitCode\"),",
+        "    #\"Removed Duplicates\" = Table.Distinct(Source)",
+        "in",
+        "    #\"Removed Duplicates\""
+      ],
+      "kind": "m",
+      "lineageTag": "3d9bfd92-a4df-4bd6-9e38-d501831091da",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "getDistinctColValuesFromTables",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(colNames as list, tables as list) as table =>",
+        "let",
+        "    combined = Table.Distinct(Table.Combine(tables,colNames))",
+        "in",
+        "    combined"
+      ],
+      "kind": "m",
+      "lineageTag": "8b656780-50c2-41f9-8acc-53ee885d582e",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "renameColumns",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, oldColumns as list, newColumns as list) as table =>",
+        "let",
+        "    renamed = List.Accumulate(List.Zip({oldColumns,newColumns})",
+        "                             ,theTable",
+        "                             ,(_thisTab, _thisRename) => try Table.RenameColumns(_thisTab,{_thisRename}) otherwise _thisTab",
+        "                             )",
+        "in",
+        "    renamed"
+      ],
+      "kind": "m",
+      "lineageTag": "ab176256-4d16-43af-90d9-76d6aa8b54d5",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getCombinedRelationshipItems",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(colNames as list, tables as list, metadataTable as table) as table =>",
+        "let",
+        "    //colNames = {\"MajorCode\"},",
+        "    //tables = {#\"Course Majors internal\",#\"Major Units internal\"},",
+        "    //metadataTable = #\"Major\",",
+        "    combined = getDistinctColValuesFromTables(colNames,tables),",
+        "    addIX = joinToMetadataTable(combined,colNames,metadataTable)",
+        "    //cols = List.InsertRange(colNames,0,List.Last({Table.ColumnNames(addIX)})),",
+        "    //reorder = Table.SelectColumns(addIX, cols)",
+        "in",
+        "    addIX"
+      ],
+      "kind": "m",
+      "lineageTag": "8fe76acc-073c-4a8e-b179-b38acc3c561c",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "addMetadataIndexCols",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, metadataIXCols as list, optional noDrop as logical) as table =>",
+        "let",
+        "    // make sure there's enough entries in the list",
+        "    metadataIXColsTickled = List.Transform(metadataIXCols",
+        "                                          ,(entry) => if List.Count(entry) >= 4 then entry else List.FirstN(List.Combine({entry,{null,null,null,null,null}}),4)",
+        "                                          ),",
+        "    allLinkCols = List.Distinct(List.Accumulate(metadataIXCols",
+        "                                               ,{}",
+        "                                               ,(theList, thisList) => List.Combine({theList,thisList{0}})",
+        "                                               )",
+        "                               ),",
+        "    addMetadataIx = List.Accumulate (metadataIXColsTickled",
+        "                                    ,theTable",
+        "                                    ,(theTable, theArgs) => joinToMetadataTable(theTable, theArgs{0},theArgs{1}, theArgs{2}, theArgs{3})",
+        "                                    ),",
+        "    removeTheLinkCols = if nullSafeLogical(noDrop) then addMetadataIx else Table.RemoveColumns(addMetadataIx,allLinkCols) ",
+        "in",
+        "    removeTheLinkCols"
+      ],
+      "kind": "m",
+      "lineageTag": "8e620fdb-218e-4e2e-894e-987a30db797c",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getRelationshipTable",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, metadataIXCols as list, thisIndexCol as text) as table => ",
+        "let",
+        "//    Source = #\"Course Majors internal\",",
+        "    //metadataIXCols = {{{\"CourseCode\"},#\"Course\"}",
+        "                     //,{{\"MajorCode\"},#\"Major\"}",
+        "                     //},",
+        "    //thisIndexCol = \"indexCourseMajor\",",
+        "    originalColumns = Table.ColumnNames(theTable),",
+        "    addMetadataIx = addMetadataIndexCols(theTable, metadataIXCols),",
+        "    columnsNow = Table.ColumnNames(addMetadataIx),",
+        "    newColumns = List.InsertRange(List.RemoveMatchingItems(columnsNow,originalColumns),0,{thisIndexCol}),",
+        "    addIndexCol = Table.AddIndexColumn(addMetadataIx, thisIndexCol, 0, 1, Int64.Type),",
+        "    redoCols = Table.SelectColumns(addIndexCol,newColumns)",
+        "in",
+        "    redoCols"
+      ],
+      "kind": "m",
+      "lineageTag": "efff9cdd-09ba-4120-be3a-30485362093a",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "dataTableReqdColumns",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "List"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source =  #\"getDataflowTable\"(\"dataTableReqdColumns\"),",
+        "    ColumnName = Source[ColumnName]",
+        "in",
+        "    ColumnName"
+      ],
+      "kind": "m",
+      "lineageTag": "dbe6a82f-831a-47f5-8b86-fa13d8b2dcca",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "getDataflowTable",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": [
+        "(thisTable as text) as table =>",
+        "let",
+        "    //thisTable = \"dataTableReqdColumns\",",
+        "    //getDataflowID = (dfName as text) as text =>",
+        "     //   let",
+        "      //      flow = Record.Field(Table.SingleRow(Table.SelectRows(dataflows,each [dataflowName] = dfName)),\"dataflowName\")",
+        "//        in",
+        "  //          flow,",
+        "    Source = PowerPlatform.Dataflows(null),",
+        "    Workspaces = Source{[Id=\"Workspaces\"]}[Data],",
+        "    //ws = Workspaces{[workspaceName=paramWorkspaceName]}[Data],",
+        "    ws = Workspaces{[workspaceId = paramWorkspaceId]}[Data],",
+        "    //df = ws{[dataflowName=paramDataflowName]}[Data],",
+        "    df = ws{[dataflowId=paramDataflowId]}[Data],",
+        "    theTab = df{[entity=thisTable,version=\"\"]}[Data]",
+        "in",
+        "    theTab"
+      ],
+      "kind": "m",
+      "lineageTag": "b1574686-5ac0-4596-8727-5cd2a5857c10",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getThisLastRefresh",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (dataflowTable as text) as table =>",
+        "let",
+        "    Source = getDataflowTable(dataflowTable),",
+        "",
+        "    LR =#\"getLastRefreshTable\"(Source),",
+        "    ixCol = List.First(Table.ColumnNames(LR)),",
+        "    setIX = Table.ReplaceValue(LR,null,Table.RowCount(LR),Replacer.ReplaceValue,{ixCol}),",
+        "    sort = Table.Sort(setIX,{{ixCol, Order.Ascending}}),",
+        "    #\"ixCol to Int\" = Table.TransformColumnTypes(sort,{{ixCol, Int64.Type}})",
+        "in",
+        "  #\"ixCol to Int\"",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "4cdb21e7-b402-46e1-a977-c2096a412363",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getTableFromJSON",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (dataAsJSON as text) as table =>",
+        "let",
+        "    thisTable = \"dummy\", ",
+        "    dataAsList = Json.Document(dataAsJSON),",
+        "    Source = Table.FromList(dataAsList, Splitter.SplitByNothing(), {thisTable}, null, ExtraValues.Error),",
+        "    cols = List.Distinct(List.Accumulate(dataAsList",
+        "                               ,{}",
+        "                               ,(runningCols, thisRecord) => List.Combine({runningCols,Record.FieldNames(thisRecord)})",
+        "                               )),",
+        "    RecordsToTable = Table.ExpandRecordColumn(Source, thisTable, cols),",
+        "    changeToText = Table.Distinct(Table.TransformColumnTypes(RecordsToTable,List.Transform(cols, each {_, type text}))),",
+        "    filter = Table.SelectRows(changeToText,each not (Record.Field(_,cols{0}) = null))",
+        "in",
+        "    filter",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "0fa42225-ea70-47d8-8270-e2699c3184b0",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "fixUpIsActualMetadataCol",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table) as table =>",
+        "let",
+        "    col = \"isActualMetadata\",",
+        "    doIt = let",
+        "                repl = Table.ReplaceValue(theTable,null,0,Replacer.ReplaceValue,{col}),",
+        "                convert =  tryInt(repl, col)",
+        "           in convert,",
+        "    outTab = try doIt otherwise theTable",
+        "in",
+        "    outTab"
+      ],
+      "kind": "m",
+      "lineageTag": "5666a3c1-7755-49e9-af40-61d5f9bedee1",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Data Rows Indexed",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Data Rows Internal\",",
+        "    #\"Filtered Rows\" = Table.Buffer(Table.SelectRows(Source, each ([MaxScore] <> null and [RawScore] <> null))),",
+        "    metadataIXCols = {{{\"CourseCode\"},Course}",
+        "                     //,{{\"UnitCode\"},Unit}",
+        "                     ,{{\"LocationCode\"},StudyMode}",
+        "                     //,{{\"TPCode\"},TeachingPeriods}",
+        "                     ,{{\"MajorCode\"},Major}",
+        "                     ,{{\"Marker\"},#\"Referenced Staff\",{\"Name\"},\"indexStaff_Marker\"}",
+        "                     ,{{\"UnitCoordinator\"},#\"Referenced Staff\",{\"Name\"},\"indexStaff_UnitCoordinator\"}",
+        "                     ,{{\"Status\"},#\"Status\"}",
+        "                     //,{{\"CLO\"},CLO}",
+        "                     //,{{\"Criteria\"},#\"Criteria\"}",
+        "                     ,{{\"AssessLevel\"},#\"AssessLevel\"}",
+        "                     ,{{\"StudentID\"},#\"Student\"}",
+        "                     ,{{\"TPCode\",\"UnitCode\",\"CLO\",\"Criteria\"},#\"Semester/Unit/CLO/Criteria\"}",
+        "                     },",
+        "    addMetadataIx = addMetadataIndexCols(#\"Filtered Rows\",metadataIXCols),",
+        "    #\"Merged Queries\" = Table.NestedJoin(addMetadataIx, {\"ECUGrade\"}, ECUGrades, {\"ECUGrade\"}, \"ECUGrades\", JoinKind.Inner),",
+        "    #\"Expanded ECUGrades\" = Table.ExpandTableColumn(#\"Merged Queries\", \"ECUGrades\", {\"indexGrade\", \"indexAACSB\"}, {\"indexGrade\", \"indexAACSB\"}),",
+        "    dropECUGrade = Table.RemoveColumns(#\"Expanded ECUGrades\",{\"ECUGrade\"}),",
+        "    #\"Merge Semester/Unit/CLO/Criteria\" = Table.NestedJoin(dropECUGrade, {\"indexTPCodeUnitCodeCLOCriteria\"}, #\"Semester/Unit/CLO/Criteria\", {\"indexTPCodeUnitCodeCLOCriteria\"}, \"Semester/Unit/CLO/Criteria\", JoinKind.Inner),",
+        "    #\"Expanded Semester/Unit/CLO/Criteria\" = Table.ExpandTableColumn(#\"Merge Semester/Unit/CLO/Criteria\", \"Semester/Unit/CLO/Criteria\", {\"indexCLO\", \"indexTeachingPeriod\", \"indexUnit\",\"indexCriteria\"}),",
+        "    tabCols = Table.ColumnNames(#\"Expanded Semester/Unit/CLO/Criteria\"),",
+        "    indexCols = List.Distinct(List.InsertRange(List.Sort(List.Select(tabCols, (col) => Text.StartsWith(col,\"index\")))",
+        "                                              ,0",
+        "                                              ,List.FirstN(tabCols,2)",
+        "                                              )",
+        "                             ),",
+        "    ",
+        "    remainingCols = List.Sort(List.RemoveMatchingItems(tabCols,indexCols)),",
+        "    newCols = List.Combine({indexCols,remainingCols}),",
+        "    //groupCols = List.Transform({\"Course\",\"Major\",\"Unit\",\"StudentID\",\"Staff_UnitCoordinator\",\"AssessLevel\",\"Status\",\"StudyMode\",\"TeachingPeriod\"}",
+        "                              //,each Text.Combine({\"index\",_})",
+        "                              //),",
+        "    reorder = Table.SelectColumns(#\"Expanded Semester/Unit/CLO/Criteria\", newCols),",
+        "    #\"Grouped Rows\" = Table.Group(reorder, resultFactGroupCols, {{\"facts\", each _, type table [indexDataFile=nullable number, indexDataFileRow=nullable number, indexAACSB=number",
+        "                                                                                    ,indexAssessLevel=number, indexCLO=nullable number, indexCriteria=number, indexGrade=number",
+        "                                                                                    ,indexStaff_Marker=number, MaxScore=nullable number, RawScore=number",
+        "                                                                                    ]",
+        "                                                        }}",
+        "                                ),",
+        "    ixCol = \"indexStudentScore\",",
+        "    theseCols = List.InsertRange(Table.ColumnNames (#\"Grouped Rows\"),0,{ixCol}),",
+        "    addIx = Table.SelectColumns(Table.AddIndexColumn(#\"Grouped Rows\",ixCol,5000000,1,Int64.Type),theseCols),",
+        "    addPK = Table.ReplaceKeys(addIx,{[Columns = {ixCol},Primary=true]})",
+        "in",
+        "    addPK"
+      ],
+      "kind": "m",
+      "lineageTag": "ec2421e6-7e3e-4b57-bd63-cf383caa477b",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "lastRefreshMetadata Int",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "  Source = getThisLastRefresh(\"lastRefreshMetadata\")",
+        "in",
+        "  Source"
+      ],
+      "kind": "m",
+      "lineageTag": "e6409e78-8b20-4432-af4f-e10ec5c91087",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "MetadataTablesForLastRefresh",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = MetadataTables,",
+        "    #\"Removed Columns\" = Table.RemoveColumns(Source,{\"Data\", \"tableCols\"}),",
+        "    #\"Renamed Columns\" = Table.RenameColumns(#\"Removed Columns\",{{\"Item\", \"Name\"}}),",
+        "    #\"Added Custom\" = Table.AddColumn(#\"Renamed Columns\", \"Type\", each \"Excel Table\",type text),",
+        "    #\"Added Custom1\" = Table.AddColumn(#\"Added Custom\", \"indexLastRefreshMetadata\", each 1,Int64.Type)",
+        "in",
+        "    #\"Added Custom1\""
+      ],
+      "kind": "m",
+      "lineageTag": "b0451664-01cb-4b4f-90de-c2147645ccec",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "MetadataTables",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    tab = getDataflowTable(\"metadataTables\"),",
+        "    #\"Invoked Custom Function\" = Table.AddColumn(tab, \"Data\", each getTableFromJSON([TableData]),type table),",
+        "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Invoked Custom Function\",{\"Item\", \"Data\"}),",
+        "    dataRows = Table.AddColumn(#\"Removed Other Columns\", \"dataRows\", each Table.RowCount([Data]),Int64.Type),",
+        "    tableCols = Table.AddColumn(dataRows, \"tableCols\", each Table.ColumnNames([Data]),type list),",
+        "    columnCnt = Table.AddColumn(tableCols, \"columnCnt\", each List.Count([tableCols]),Int64.Type),",
+        "    tableColumns = Table.AddColumn(columnCnt, \"tableColumns\", each Text.Combine([tableCols],\"; \"),type text)",
+        "in",
+        "    tableColumns"
+      ],
+      "kind": "m",
+      "lineageTag": "967bef84-3051-4196-b09d-a352e4c46a7f",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "resultFactGroupCols",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "List"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source =     List.Sort(List.Transform({\"Course\",\"Major\",\"Unit\",\"StudentID\",\"Staff_UnitCoordinator\",\"AssessLevel\",\"Status\",\"StudyMode\",\"TeachingPeriod\"}",
+        "                              ,each Text.Combine({\"index\",_})",
+        "                              ))",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "207f8aec-bc06-4e40-92fc-1a38d6478fc5",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "Semester/Unit/CLO/Criteria with Hierarchy",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Semester/Unit/CLO/Criteria\",",
+        "    filterToActual = Table.Buffer(filterIsActualMetadata(Source,true)),",
+        "    colsInHierarchy = Table.ColumnNames(#\"CLO Hierarchy\"),",
+        "    expandaCols = List.RemoveMatchingItems(colsInHierarchy,Table.ColumnNames(filterToActual)),",
+        "    #\"Merged Queries\" = Table.NestedJoin(filterToActual, {\"indexCLO\"}, #\"CLO Hierarchy\", {\"indexCLO\"}, \"CLO Hierarchy\", JoinKind.Inner),",
+        "",
+        "    #\"Expanded CLO Hierarchy\" = Table.ExpandTableColumn(#\"Merged Queries\", \"CLO Hierarchy\", expandaCols)",
+        "    //indexCLOParent = Table.AddColumn(#\"Expanded CLO Hierarchy\", \"indexCLOParent\", each if [Level] = 1 then null else  Record.Field(_, Text.Combine({\"CLO.L\",Text.From([Level]-1)})),type text)",
+        "in",
+        "    #\"Expanded CLO Hierarchy\"",
+        "    //indexCLOParent"
+      ],
+      "kind": "m",
+      "lineageTag": "b9582996-d0a8-4052-bcff-ad2a26c5fee5",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "convertColumnTypes",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, optional topRecords as number, optional theCulture as nullable text) as table =>",
+        "let",
+        "    // set culture based on parameter if not supplied",
+        "    culture = if theCulture = null or theCulture = \"\" then paramCulture else theCulture,",
+        "",
+        "    // if we don't supply \"topRecords\" then base it on 10% of the table rows (when >= 50) (up to max of 200)",
+        "    workOutTopRecs = ",
+        "        let",
+        "            rc = Table.RowCount(theTable),",
+        "            topRecs = List.Min({Int64.From(if rc < 50 then 0 else ((rc/10)+0.5)),200})",
+        "        in",
+        "            topRecs,",
+        "",
+        "    //we use up to 200 rows to establish a column type",
+        "    topRecs = Int64.From(if topRecords = null then workOutTopRecs else topRecords),",
+        "",
+        "    ValidTypes = {type any, type number, type date, type datetime, type datetimezone, ",
+        "                  type time, type duration, type logical, type text, type binary, ",
+        "                  Int64.Type, Percentage.Type, Currency.Type",
+        "                 },",
+        "",
+        "    // if we supply < 1 for \"topRecords\" then use the entire input table",
+        "    Top200Rows = if topRecs < 1 then theTable else Table.FirstN(theTable, topRecs),",
+        "",
+        "    ColumnNameList = Table.ColumnNames(Top200Rows),",
+        "    ColumnDataLists = List.Accumulate(ColumnNameList, {}, (accumulated, i) => accumulated & {Table.Column(Top200Rows, i)}),",
+        "    ColumnTypes = List.Transform(ColumnDataLists, (i) => List.ItemType(i)),",
+        "    TransformList = List.Select(List.Zip({ColumnNameList, ColumnTypes}), each List.Contains(ValidTypes,_{1})),",
+        "    TypedTable = Table.TransformColumnTypes(theTable, TransformList, culture),",
+        "         ",
+        "        List.ItemType = (list as list) =>",
+        "        let            ",
+        "            ItemTypes = List.Transform(",
+        "                            list, ",
+        "                            each if Value.Type(Value.FromText(_, culture)) = type number",
+        "                                 then if Text.Contains(Text.From(_, culture),\"%\") then Percentage.Type",
+        "                                      else if Text.Length(Text.Remove(Text.From(_, culture), {\"0\"..\"9\"} & Text.ToList(\"., -+eE()/'\"))) > 0 ",
+        "                                           then Currency.Type",
+        "                                           else if Int64.From(_, culture) = Value.FromText(_, culture)",
+        "                                                then Int64.Type ",
+        "                                           else type number",
+        "                                 else Value.Type(Value.FromText(_, culture))",
+        "                        ),",
+        "            ListItemType = Type.NonNullable(Type.Union(ItemTypes))",
+        "        in",
+        "            ListItemType",
+        "in",
+        "    TypedTable"
+      ],
+      "kind": "m",
+      "lineageTag": "46ec3387-6f84-4f96-98d0-078caddb0354",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "filterIsActualMetadata",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, optional removeCols as logical) as table =>",
+        "let",
+        "    getIsActualMetadataCols = (_theTable as table) as list =>",
+        "    let",
+        "        _isActualMetadataCols= List.Select(Table.ColumnNames(_theTable)",
+        "                                        ,each Text.StartsWith(_,\"isActualMetadata\")",
+        "                                        )",
+        "    in",
+        "        _isActualMetadataCols,",
+        "    doTheFilter = (_theTable as table, _theCols as list) as table =>",
+        "    let",
+        "        filterToActual = Table.SelectRows(_theTable",
+        "                                        ,(row) => List.Sum(List.Transform(_theCols",
+        "                                                                        ,(col) => Record.Field(row,col)",
+        "                                                                        )",
+        "                                                        ) = List.Count(_theCols)",
+        "                                        ),",
+        "        ret = if nullSafeLogical(removeCols) then Table.RemoveColumns(filterToActual,_theCols) else filterToActual",
+        "    in",
+        "        ret,",
+        "    isActualMetadataCols= getIsActualMetadataCols(theTable),",
+        "    tableOut = if List.Count(isActualMetadataCols) = 0 then theTable else doTheFilter(theTable, isActualMetadataCols)",
+        "in",
+        "    tableOut"
+      ],
+      "kind": "m",
+      "lineageTag": "2c310c6d-6fac-4a44-9504-9bd3b3a7bc8e",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getColsActuallyInTable",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, theCols as list) as list =>",
+        "let",
+        "    colsToDo = List.Intersect({theCols,Table.ColumnNames(theTable)})",
+        "in",
+        "    colsToDo"
+      ],
+      "kind": "m",
+      "lineageTag": "980c4b95-a666-47c6-9b0b-574bd19c8ad3",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "getTableColTypesList",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table) as list => ",
+        "let",
+        "//    theTable = getMetadataTable(\"AACSB\"),",
+        "    sch = Table.Schema(theTable),",
+        "    cols = sch[Name],",
+        "    dt = List.Transform(sch[TypeName],each Type_FromText(_)),",
+        "    zippy = List.Zip({cols,dt})",
+        "in",
+        "    zippy"
+      ],
+      "kind": "m",
+      "lineageTag": "4b0324ad-5ab0-430c-a0c6-cc286db2ec18",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "setEmptyToNull",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(tableIn as table, columns as list) as table =>",
+        "let",
+        "    colsToDo = getColsActuallyInTable(tableIn,columns),",
+        "    Repl = Table.ReplaceValue(tableIn,\"\",null,Replacer.ReplaceValue,colsToDo)",
+        "in",
+        "    Repl"
+      ],
+      "kind": "m",
+      "lineageTag": "6cd89588-cbd9-4990-853d-384a8f3a5bf3",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "transformColsFromListColTypes",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, theList as list) as table =>",
+        "let",
+        "    trans = Table.TransformColumnTypes(theTable,theList)",
+        "in",
+        "    trans"
+      ],
+      "kind": "m",
+      "lineageTag": "1acf65bc-1f7a-41d7-8e24-4e196450a9aa",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Type_FromText",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "let",
+        "func = (TypeAsText as text) =>",
+        "Record.Field(",
+        "[type null = type null,",
+        "type logical = type logical,",
+        "Int64.Type = Int64.Type,",
+        "Text.Type = Text.Type,",
+        "type number = type number,",
+        "type time = type time,",
+        "type date = type date,",
+        "type datetime = type datetime,",
+        "type datetimezone = type datetimezone,",
+        "type duration = type duration,",
+        "type text = type text,",
+        "type binary = type binary,",
+        "type type = type type,",
+        "type list = type list,",
+        "type record = type record,",
+        "type table = type table,",
+        "type function = type function,",
+        "type anynonnull = type anynonnull],",
+        "TypeAsText),",
+        "documentation = [",
+        "Documentation.Name = \" Type_FromText \",",
+        "Documentation.Description = \" Returns a type from its textual representation. \",",
+        "Documentation.LongDescription = \" Returns a type from its textual representation. \",",
+        "Documentation.Category = \" Type functions \",",
+        "Documentation.Source = \" http://www.TheBIccountant.com https://wp.me/p6lgsG-2dd . \",",
+        "Documentation.Version =  1.0,",
+        "Documentation.Author = \" Imke Feldmann: http://www.TheBIccountant.com. \",",
+        "Documentation.Examples = {[Description =  \"  \",",
+        "Code = \" Type.FromText(\"\"type number\"\") \",",
+        "Result = \" number (as type) \"]}]",
+        " in  ",
+        "  Value.ReplaceType(func, Value.ReplaceMetadata(Value.Type(func), documentation))"
+      ],
+      "kind": "m",
+      "lineageTag": "860df7f9-0379-48f2-84b2-80b9199d1dfe",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "uppercaseCols",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, theCols as list) as table =>",
+        "let",
+        "    // only cols which actually exist",
+        "    colsToDo = getColsActuallyInTable(theTable,theCols),",
+        "    ",
+        "    upperIt = Table.TransformColumns(theTable,List.Transform(colsToDo, each {_, Text.Upper, type text}))",
+        "in",
+        "    upperIt"
+      ],
+      "kind": "m",
+      "lineageTag": "377abe16-cb85-4110-a66a-5e763ab6325d",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "validateIndexStart",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(optional indexStart as number) as number =>",
+        "let",
+        "    ixStart = if indexStart = null then 0 else try Int64.From(indexStart) otherwise 0",
+        "in",
+        "    ixStart"
+      ],
+      "kind": "m",
+      "lineageTag": "e4c78c4b-30f9-4602-bbdf-e8ea7c3a105c",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "paramCulture",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Text"
+        }
+      ],
+      "expression": "\"en-AU\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]",
+      "kind": "m",
+      "lineageTag": "486bc956-52b3-4be0-8fda-8f53eb09a812",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "getCLOParent",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(_indexCLO as number) as table =>",
+        "let",
+        "    indexCLO = Int64.From(_indexCLO),",
+        "    Source = CLO,",
+        "    cloParent = Record.Field(Table.SingleRow(Table.SelectRows(Source,each [indexCLO] = indexCLO)),\"CLOParent\"),",
+        "    filtered = if cloParent = null or cloParent = \"\" then null else Record.Field(Table.SingleRow(Table.SelectRows(Source, each [CLO] = cloParent)),\"indexCLO\")",
+        "in",
+        "    filtered"
+      ],
+      "kind": "m",
+      "lineageTag": "7601fe98-ca66-4546-8707-f5dca434c63e",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Fact Student Unit Results All Levels",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = Table.Buffer(#\"Data Rows Indexed\"),",
+        "    tabCols = List.RemoveMatchingItems(Table.ColumnNames(Source{0}[facts]),List.Select(resultFactGroupCols,each _ <> \"indexStudentID\")),",
+        "    colsOnly = Table.SelectColumns(Source,{\"indexStudentScore\",\"facts\"}),",
+        "    #\"Expanded facts\" = Table.ExpandTableColumn(colsOnly, \"facts\",tabCols),",
+        "    setColumnDatatypes = convertColumnTypes(#\"Expanded facts\",200),",
+        "    indexTPCodeUnitCodeCLOCriteria = \"indexTPCodeUnitCodeCLOCriteria\",",
+        "    hierarchyTableCLO = #\"Semester/Unit/CLO/Criteria with Hierarchy\",",
+        "    hierarchyTableCLOCols = Table.ColumnNames(hierarchyTableCLO),",
+        "    setColumnDatatypesCols = Table.ColumnNames(setColumnDatatypes),",
+        "    extraCols = List.RemoveMatchingItems(hierarchyTableCLOCols",
+        "                                        ,setColumnDatatypesCols",
+        "                                        ),",
+        "    mergeColName = Text.NewGuid(),",
+        "    mergeWithHier = Table.NestedJoin(setColumnDatatypes, {indexTPCodeUnitCodeCLOCriteria}, hierarchyTableCLO, {indexTPCodeUnitCodeCLOCriteria}, mergeColName, JoinKind.Inner),",
+        "    expandMerge = Table.ExpandTableColumn(mergeWithHier, mergeColName,extraCols),",
+        "    colOrder = List.Combine({List.RemoveMatchingItems(Table.ColumnNames(expandMerge),{\"indexAACSB\",\"indexGrade\"})}),",
+        "    reOrder = Table.SelectColumns(expandMerge,colOrder),",
+        "    #\"Removed Columns\" = Table.RemoveColumns(reOrder,{\"COP CR Description\", \"COP CR Number\", \"resultCnt\"})",
+        "in",
+        "    #\"Removed Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "a9868d14-67ff-41b5-afd2-5f412d77712e",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "nullSafeLogical",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(optional logiVal) as logical => ",
+        "let",
+        "",
+        "    val1 = if Value.Is(logiVal,Null.Type) then false else logiVal,",
+        "    val2 = if Value.Is(val1,type number) then (Int64.From(val1) = 1) else val1,",
+        "    ",
+        "    valFinal = if Value.Is(val2,Logical.Type) then val2 else Logical.From(Logical.FromText(Text.Lower(Text.From(val2))))",
+        "in",
+        "    valFinal"
+      ],
+      "kind": "m",
+      "lineageTag": "b625e8c0-3cfb-4160-b10f-0afca79e719f",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Fact Student Unit Results All",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Data Rows Indexed\",",
+        "    tabCols = List.RemoveMatchingItems(Table.ColumnNames(Source{0}[facts]),List.Select(resultFactGroupCols, each _ <> \"indexStudent\")),",
+        "    colsOnly = Table.SelectColumns(Source,{\"indexStudentScore\",\"facts\"}),",
+        "    #\"Expanded facts\" = Table.ExpandTableColumn(colsOnly, \"facts\",tabCols),",
+        "    //#\"COP Text\" = Table.TransformColumnTypes(#\"Expanded facts\",{{\"COP CR Number\", type text}, {\"COP CR Description\", type text}}),",
+        "    //indexCols = List.Select(tabCols,each Text.StartsWith(_,\"index\")),",
+        "    //INTify = tryConvertMany(#\"Expanded facts\",List.Combine({indexCols,{\"COP CR Number\"}}),Int64.Type),",
+        "    INTify = convertColumnTypes(#\"Expanded facts\",50),",
+        "    indexTPCodeUnitCodeCLOCriteria = \"indexTPCodeUnitCodeCLOCriteria\",",
+        "    extraCols = List.RemoveMatchingItems(Table.ColumnNames(#\"Semester/Unit/CLO/Criteria with Hierarchy\")",
+        "                                        ,Table.ColumnNames(INTify)",
+        "                                        ),",
+        "    //extraCols = List.Select (Table.ColumnNames(#\"Semester/Unit/CLO/Criteria with Hierarchy\")",
+        "                            //,each (_ <> indexTPCodeUnitCodeCLOCriteria)",
+        "                            //),",
+        "    #\"Merged Queries\" = Table.NestedJoin(INTify, {indexTPCodeUnitCodeCLOCriteria}, #\"Semester/Unit/CLO/Criteria with Hierarchy\", {indexTPCodeUnitCodeCLOCriteria}, \"CLO\", JoinKind.Inner),",
+        "    #\"Expanded CLO\" = Table.ExpandTableColumn(#\"Merged Queries\", \"CLO\",extraCols),",
+        "    removeOriginalCLO = #\"Expanded CLO\", //Table.RemoveColumns(#\"Expanded CLO\",{indexCLO}),",
+        "    //ixCriteria = \"indexCriteria\",",
+        "    colOrder = List.Combine({List.RemoveMatchingItems(Table.ColumnNames(removeOriginalCLO),{\"indexAACSB\",\"indexGrade\"})}),",
+        "    reOrder = Table.SelectColumns(removeOriginalCLO,colOrder)",
+        "in",
+        "    reOrder"
+      ],
+      "kind": "m",
+      "lineageTag": "baf65cf5-9525-49bc-b32f-406f06607f38",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "setNameForImpliedMetadata",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTable as table, theThingType as text) as table => ",
+        "let",
+        "",
+        "",
+        "  doThisCol = (_theTable as table, _theCol as text) as table =>",
+        "    let",
+        "      setText = Table.ReplaceValue(_theTable",
+        "                                   ,each if [isActualMetadata] = 1 then false else Record.Field(_,_theCol), (row) => if Record.Field(row,codeColumn) = null then Text.Combine({\"No\",theThingType},\" \") else Text.Combine({theThingType,Record.Field(row,codeColumn) ,\"not in metadata\"}, \" \")",
+        "                                   ,Replacer.ReplaceValue",
+        "                                   ,{_theCol}",
+        "                                   )",
+        "    in setText,",
+        "",
+        "//  theTable = Table.Buffer(getIndexedMetadataTable(getMetadataTable(\"CourseCode_CourseName\"),{\"CourseCode\"},\"indexCourse\",null,10000)),",
+        "//  theThingType = \"Course\",",
+        "  codeColumn = Text.Combine({theThingType,\"Code\"}),",
+        "  nameCols = List.Buffer(List.Select(Table.ColumnsOfType(theTable,{type text, type nullable text})",
+        "                                    ,each Text.StartsWith(_,theThingType) and _ <> codeColumn",
+        "                                    )",
+        "                        ),",
+        "  setText = List.Accumulate(nameCols",
+        "                           ,theTable",
+        "                           ,(_tab, _col) => doThisCol(_tab,_col)",
+        "                           ),",
+        "",
+        "   #\"Changed Type\" = Table.TransformColumnTypes(setText",
+        "                                               ,List.Transform(nameCols, each {_, type text})",
+        "                                               ),",
+        "   fuam = fixUpIsActualMetadataCol( #\"Changed Type\" )",
+        "in",
+        "  fuam"
+      ],
+      "kind": "m",
+      "lineageTag": "ef6dd1a4-7551-419c-8a9d-e0952d9e800f",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Student Unit Results at CLO level Inner",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = Table.Buffer(#\"Fact Student Unit Results at CLO level Internal\"),",
+        "    cols = List.Buffer(List.Select(Table.ColumnNames(Source),each Text.StartsWith (_,\"CLO.L\"))),",
+        "    groupCols = {\"TPCode\", \"UnitCode\", \"CLO\", \"CLOParent\", \"Level\"},",
+        "    allCLO = Table.Buffer(#\"CLO\"),",
+        "    getCLOParent = (thisCLO) => ",
+        "        let",
+        "            theCLO = if thisCLO = null or thisCLO = \"\" then null else allCLO{[CLO = thisCLO]}[CLOParent]",
+        "        in",
+        "            theCLO,",
+        "    getGroupedRows = (colCLO as text) as table =>",
+        "        let",
+        "            rename = Table.RenameColumns(Source,{colCLO, \"CLO\"}),",
+        "            parentCol = Table.AddColumn(rename,\"CLOParent\",each getCLOParent([CLO]),type text),",
+        "            levelCol = Table.Buffer(Table.AddColumn(parentCol,\"Level\",each Int64.From(Text.End(colCLO,1)),Int64.Type)),",
+        "            selectCols = Table.SelectColumns(levelCol,List.Combine({groupCols,{\"indexStudentID\"}})),",
+        "            //#\"Grouped Rows\" = Table.Group(levelCol, groupCols, {{\"indexStudentID\", each List.Distinct(_[indexStudentID]),type list}}),",
+        "            //addCol = Table.AddColumn(#\"Grouped Rows\",\"studentCount\",each List.Count(Record.Field(_,\"indexStudentID\")),Int64.Type),",
+        "            filtered = Table.Distinct(Table.SelectRows(selectCols,each [CLO] <> null))",
+        "        in",
+        "            filtered,",
+        "    combinedList = Table.Combine(List.Transform (cols",
+        "                                  ,(_colCLO) => getGroupedRows(_colCLO)",
+        "                                  ))",
+        "in",
+        "    combinedList"
+      ],
+      "kind": "m",
+      "lineageTag": "2d6f8927-3a70-4511-82dd-6879c1626d5f",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Student Unit Results at CLO level Outer",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = (#\"Student Unit Results at CLO level Inner\"),",
+        "    #\"Grouped Rows\" = Table.Buffer(Table.Group(Source, {\"TPCode\", \"UnitCode\"}, {})),",
+        "    cols = Table.ColumnNames(#\"Count Student Unit Results at CLO level\"),",
+        "    newCol = Text.NewGuid(),",
+        "    addNew = Table.AddColumn(#\"Grouped Rows\", newCol, each #\"Count Student Unit Results at CLO level (2)\"([TPCode], [UnitCode]),type table),",
+        "    expand = Table.Combine(Table.Column(addNew,newCol))",
+        "in",
+        "   expand"
+      ],
+      "kind": "m",
+      "lineageTag": "5d8f7c7d-50e3-4879-8765-516c94bc6c44",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Count Student Unit Results at CLO level (2)",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theTP as text, theUnit as text) as table =>",
+        "let",
+        "    theTable = #\"Count Student Unit Results at CLO level\",",
+        "    //theTP = \"19SEM1\",",
+        "    //theUnit = \"ACC6040\",",
+        "    ",
+        "    filtered = Table.Buffer(Table.SelectRows(theTable,each [TPCode] = theTP and [UnitCode] = theUnit)),",
+        "    L1 = Table.SelectRows(filtered, each [Level] = 1)[CLO],",
+        "    deal = (_tab as table) as table =>",
+        "    let",
+        "        intx = List.Buffer(List.Intersect(_tab[indexStudentId])),",
+        "        ix = \"indexStudentId\",",
+        "        cnt = \"studentCount\",",
+        "        rn = Table.RenameColumns(_tab,{{cnt, Text.Combine({cnt,\"Orig\"})}}),",
+        "        drop = Table.RemoveColumns(rn,{ix}),",
+        "        add = Table.AddColumn(drop,ix,each intx, type list),",
+        "        add2= Table.AddColumn(add,cnt,each List.Count([indexStudentId]), Int64.Type)",
+        "    in",
+        "        add2,",
+        "    byCLO = List.Transform(L1,(clo) => Table.Buffer(Table.SelectRows(filtered, each Text.StartsWith([CLO],clo)))),",
+        "    byCLO2 = List.Transform(byCLO, (clo)=> deal(clo)),",
+        "    comb = Table.Combine(byCLO2)",
+        "in",
+        "    comb"
+      ],
+      "kind": "m",
+      "lineageTag": "363e447b-7a41-41cd-b38c-642ae51733e4",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Student Unit Results at CLO level",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Student Unit Results at CLO level Outer\"",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "c4cbd5c8-6966-4882-9486-66485ce0a179",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Student Unit Results at CLO level Outer (2)",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Student Unit Results at CLO level Outer\"",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "80fc024d-e27d-453f-b507-5ac660d985ec",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Fact Student Unit Results at CLO level Internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = Table.Buffer(#\"Fact Student Unit Results All Levels\"),",
+        "    allTabCols = List.Buffer(Table.ColumnNames(Source)),",
+        "    critCols = List.Select(allTabCols, each Text.Contains(_,\"Criteria\")),",
+        "    rollupCols = List.Intersect({{\"indexStudentScore\",\"indexDataFile\",\"indexDataFileRow\",\"MaxScore\",\"RawScore\"},allTabCols}),",
+        "    grpCols = List.RemoveMatchingItems(allTabCols,List.Combine({critCols,rollupCols})),",
+        "    grouped = Table.Group(Source,grpCols",
+        "                         ,List.Transform(rollupCols",
+        "                                        ,(col) => {col",
+        "                                                  ,(row) => if Text.StartsWith(col,\"index\") then List.Min(Record.Field(row,col)) else List.Sum(Record.Field(row,col))",
+        "                                                  ,if Text.StartsWith(col,\"index\") then Int64.Type else Decimal.Type",
+        "                                                  }",
+        "                                        )",
+        "                         ),",
+        "    #\"Removed Columns\" = Table.Buffer(Table.RemoveColumns(grouped,{\"indexCLO\", \"Level\", \"CLOParent\"})),",
+        "    reorder = Table.SelectColumns(#\"Removed Columns\",List.Intersect({allTabCols,Table.ColumnNames(#\"Removed Columns\")})),",
+        "    #\"Renamed Columns\" = Table.RenameColumns(reorder,{{\"CLO\", \"thisCLO\"}})",
+        "in",
+        "    #\"Renamed Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "5bf7fba0-e15f-4342-8446-c7fcca50b433",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "getECUGrade",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(theVal as number) as record =>",
+        "let",
+        "//    theVal = .666,",
+        "    theVal100 = theVal * 100,",
+        "    Grade = Record.Field(Table.SingleRow(Table.SelectRows(#\"ECUGrades Internal\",each theVal100 >= [GradeLB] and theVal100 < [GradeUB])),\"ECUGrade\"),",
+        "    GradeRec = Table.SingleRow(Table.SelectRows(ECUGrades,each [ECUGrade] = Grade)),",
+        "    return = List.Accumulate({\"indexGrade\",\"indexAACSB\"}",
+        "                            ,[]",
+        "                            ,(rec, col) => Record.AddField(rec,col,Record.Field(GradeRec,col))",
+        "                            )",
+        "in",
+        "    return"
+      ],
+      "kind": "m",
+      "lineageTag": "5e4e6d9a-e060-4bbf-b5d9-155271affe4a",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Count Student Unit Results at CLO level",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = Table.Buffer(#\"Fact Student Unit Results at CLO level Internal\"),",
+        "    cols = List.Buffer(List.Select(Table.ColumnNames(Source),each Text.StartsWith (_,\"CLO.L\"))),",
+        "    groupCols = {\"TPCode\", \"UnitCode\", \"CLO\", \"CLOParent\", \"Level\"},",
+        "    allCLO = Table.Buffer(#\"CLO\"),",
+        "    getCLOParent = (thisCLO) => ",
+        "        let",
+        "            theCLO = if thisCLO = null or thisCLO = \"\" then null else allCLO{[CLO = thisCLO]}[CLOParent]",
+        "        in",
+        "            theCLO,",
+        "    getGroupedRows = (colCLO as text) as table =>",
+        "        let",
+        "            rename = Table.RenameColumns(Source,{colCLO, \"CLO\"}),",
+        "            parentCol = Table.AddColumn(rename,\"CLOParent\",each getCLOParent([CLO]),type text),",
+        "            levelCol = Table.Buffer(Table.AddColumn(parentCol,\"Level\",each Int64.From(Text.End(colCLO,1)),Int64.Type)),",
+        "            #\"Grouped Rows\" = Table.Group(levelCol, groupCols, {{\"indexStudentId\", each List.Distinct(_[indexStudentID]),type list}}),",
+        "            addCol = Table.AddColumn(#\"Grouped Rows\",\"studentCount\",each List.Count(Record.Field(_,\"indexStudentId\")),Int64.Type),",
+        "            filtered = Table.SelectRows(addCol,each [CLO] <> null)",
+        "        in",
+        "            filtered,",
+        "    combinedList = List.Transform (cols",
+        "                                  ,(_colCLO) => getGroupedRows(_colCLO)",
+        "                                  ),",
+        "    combinedTable = Table.Combine(combinedList),",
+        "    sorted = Table.Buffer(Table.Sort (combinedTable",
+        "                        ,List.Transform (groupCols",
+        "                                        ,each {_, Order.Ascending}",
+        "                                        )",
+        "                        )),",
+        "    s2 = sorted",
+        "in",
+        "    s2"
+      ],
+      "kind": "m",
+      "lineageTag": "85f1a241-3426-4fee-880f-df7518c91af8",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "MultipleStaffMembers",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Record"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = [indexStaff = 49999, Name = \"Multiple Staff Members\"]",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "a6676222-a5a9-475a-9bfc-f7a6647dd033",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "indexStaff_MultipleStaffMembers",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Number"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = Record.Field(MultipleStaffMembers,\"indexStaff\")",
+        "in",
+        "    Source"
+      ],
+      "kind": "m",
+      "lineageTag": "238d96aa-ca64-469c-aa42-09116f5169d9",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "Fact Student Unit",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Data Rows Indexed\",",
+        "    #\"Removed Columns\" = Table.RemoveColumns(Source,{\"facts\"})",
+        "in",
+        "    #\"Removed Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "b69257d8-8598-4d9a-a67b-1bd71ce6fe16",
+      "queryGroup": "Data\\Fact Tables"
+    },
+    {
+      "name": "paramDataflowId",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Text"
+        },
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        }
+      ],
+      "expression": "\"e1c241a1-22ab-427e-81a5-600e3c0fea44\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]",
+      "kind": "m",
+      "lineageTag": "7fb7a383-d07c-4ffd-985a-b99b063e6b17",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "paramWorkspaceId",
+      "annotations": [
+        {
+          "name": "PBI_ResultType",
+          "value": "Text"
+        }
+      ],
+      "expression": "\"866b230b-50bb-41bd-a088-d07b730e8049\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]",
+      "kind": "m",
+      "lineageTag": "df8cfe36-f0ed-4ca9-b4a1-104346aa924f",
+      "queryGroup": "Parameters and Static Information"
+    },
+    {
+      "name": "removeIfNotNumeric",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(tableIn as table, numericCols  as list) as table =>",
+        "let",
+        "    removeThisOne = (theTable as table, thisCol as text) as table =>",
+        "        let",
+        "            tempCol = Text.NewGuid(),",
+        "            addCol = Table.AddColumn(theTable, tempCol, each try (Record.Field(_,thisCol) = null or Number.From(Record.Field(_,thisCol)) <> null) otherwise false,type logical),",
+        "            filtered = Table.SelectRows(addCol, each Record.Field(_,tempCol) = true),",
+        "            removeTemp = Table.RemoveColumns(filtered, {tempCol})",
+        "        in",
+        "            removeTemp,",
+        "    Source = Table.Buffer(tableIn),",
+        "    filters = List.Accumulate (numericCols",
+        "                              ,Source",
+        "                              ,(runningTable, theCol) => removeThisOne(runningTable, theCol)",
+        "                              )",
+        "in",
+        "    filters"
+      ],
+      "kind": "m",
+      "lineageTag": "07a8ef63-61d3-4ee0-9c30-3519236cb529",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "Course CLO Type",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = #\"Course CLO\",",
+        "    #\"Removed Other Columns\" = Table.SelectColumns(Source,{\"CourseCode\", \"CLO Type\"}),",
+        "    #\"Grouped Rows\" = Table.Group(#\"Removed Other Columns\", {\"CourseCode\"}, {{\"CLO Type\", each List.Distinct([CLO Type]) , type list}}),",
+        "    #\"Extracted Values\" = Table.TransformColumns(#\"Grouped Rows\", {\"CLO Type\", each Text.Combine(List.Transform(_, Text.From)), type text})",
+        "in",
+        "    #\"Extracted Values\""
+      ],
+      "kind": "m",
+      "lineageTag": "1cd170b3-92e0-467e-80da-a95a368c5081",
+      "queryGroup": "Data\\Dimension Tables\\Inferred From Data"
+    },
+    {
+      "name": "IgnoreCourses Internal",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Table"
+        }
+      ],
+      "expression": [
+        "let",
+        "    Source = getMetadataTable(\"IgnoreCourses\"),",
+        "    #\"Changed Type\" = Table.TransformColumnTypes(Source,{{\"CourseCode\", type text}}),",
+        "    #\"Removed Columns\" = Table.RemoveColumns(#\"Changed Type\",{\"isActualMetadata\"}),",
+        "    #\"Removed Duplicates\" = Table.Distinct(#\"Removed Columns\")",
+        "in",
+        "    #\"Removed Duplicates\""
+      ],
+      "kind": "m",
+      "lineageTag": "4c9ef94e-6260-41ec-8e5b-8efa95aa00d3",
+      "queryGroup": "Supporting Queries"
+    },
+    {
+      "name": "getResultsGroupedByDiscipline",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(colsOfInterest) as table =>",
+        "let",
+        "//    colsOfInterest = \"UnitCode\",",
+        "    columnsOfInterest = textOrList_toList(colsOfInterest),",
+        "    discipline = \"Discipline\",",
+        "    idf = \"indexDataFile\",",
+        "    keepCols = List.InsertRange(columnsOfInterest,0,{idf}),",
+        "    grpCols = List.InsertRange(columnsOfInterest, List.Count(columnsOfInterest), {discipline}),",
+        "    theFiles = Table.Buffer(Table.SelectColumns(#\"Data Files\",{idf,discipline})),",
+        "    getDisc = (theIndex as number) => ",
+        "        let",
+        "         val = try Record.Field(Table.SingleRow(Table.SelectRows(theFiles, each [indexDataFile] = theIndex)),discipline) otherwise Text.Combine({\"Not Found : \",Text.From(theIndex)})",
+        "        in",
+        "         val,",
+        "    #\"Removed Other Columns\" = Table.Buffer(Table.SelectColumns(#\"Data Rows Internal\",keepCols)),",
+        "    addCol = Table.Buffer(Table.AddColumn(#\"Removed Other Columns\", discipline, each getDisc([indexDataFile]),type text)),",
+        "    #\"Grouped Rows\" = (Table.Group(addCol, grpCols , {{\"Count\", each Table.RowCount(_), Int64.Type}})),",
+        "    #\"Sorted Rows\" = Table.Sort(#\"Grouped Rows\"",
+        "                               ,List.Transform (columnsOfInterest",
+        "                                               ,each {_, Order.Ascending}",
+        "                                               )",
+        "                               )",
+        "in",
+        "    #\"Sorted Rows\""
+      ],
+      "kind": "m",
+      "lineageTag": "1731fb46-92f0-436d-adc1-31f701b0dc3d",
+      "queryGroup": "Data\\Dimension Tables\\Inferred From Data"
+    },
+    {
+      "name": "getResultsGroupedByDisciplineMany",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(colsOfInterest) as table =>",
+        "let",
+        "//    colsOfInterest = \"UnitCode\",",
+        "    columnsOfInterest = textOrList_toList(colsOfInterest),",
+        "    Source = Table.Buffer(getResultsGroupedByDiscipline(columnsOfInterest)),",
+        "    tabCols = List.Buffer(Table.ColumnNames(Source)),",
+        "    tmpCol = \"fred\",",
+        "    #\"Grouped Rows\" = Table.Group(Source, columnsOfInterest, {{\"DisciplineCount\", each Table.RowCount(_), Int64.Type}, {tmpCol, each _, type table [Discipline=text, Count=number]}}),",
+        "    #\"Filtered Rows\" = Table.SelectRows(#\"Grouped Rows\", each [DisciplineCount] > 1),",
+        "    #\"Removed Other Columns\" = Table.SelectColumns(#\"Filtered Rows\",{tmpCol}),",
+        "    #\"Expanded Disciplines\" = Table.ExpandTableColumn(#\"Removed Other Columns\", tmpCol, tabCols),",
+        "    trans = Table.TransformColumnTypes  (#\"Expanded Disciplines\"",
+        "                                        ,List.Transform(columnsOfInterest, each {_, type text})",
+        "                                        )",
+        "in",
+        "    trans"
+      ],
+      "kind": "m",
+      "lineageTag": "7782c61d-20c1-4a87-a16e-9e879552d318",
+      "queryGroup": "Data\\Dimension Tables\\Inferred From Data"
+    },
+    {
+      "name": "textOrList_toList",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(textOrList) as list =>",
+        "let",
+        "    asList = if Type.Is(Value.Type(textOrList),type list) then",
+        "                textOrList",
+        "             else",
+        "                {textOrList}",
+        "in",
+        "    asList"
+      ],
+      "kind": "m",
+      "lineageTag": "e6a2e806-3a8e-4080-a5f8-cd5d5111a7da",
+      "queryGroup": "Functions"
+    },
+    {
+      "name": "rollupResultsCLOforTP",
+      "annotations": [
+        {
+          "name": "PBI_NavigationStepName",
+          "value": "Navigation"
+        },
+        {
+          "name": "PBI_ResultType",
+          "value": "Function"
+        }
+      ],
+      "expression": [
+        "(tpIX as number) as table =>",
+        "let",
+        " // tpIX = 100140,",
+        "    Source = Table.Buffer(Table.SelectRows(#\"Fact Student Unit Results at CLO level Internal\",each [indexTeachingPeriod] = tpIX)),",
+        "    newCol = \"dummyCol\",",
+        "    qryCLO = Table.Buffer(CLO),",
+        "    toKeep = Table.Buffer(Table.ExpandListColumn(#\"Student Unit Results at CLO level Outer (2)\", \"indexStudentId\")),",
+        "    mrg = Table.Buffer(Table.RemoveColumns(Table.NestedJoin(Source,{\"TPCode\", \"UnitCode\", \"thisCLO\", \"indexStudentID\"}, toKeep, {\"TPCode\", \"UnitCode\", \"CLO\", \"indexStudentId\"},newCol,JoinKind.Inner),{newCol})),",
+        "    thisCLO = {\"thisCLO\"},",
+        "    thisLevel = \"thisLevel\",",
+        "    colCLO = {\"CLO\"},",
+        "    mrgCLOLevel = Table.Buffer(Table.ExpandTableColumn(Table.NestedJoin(mrg,thisCLO, qryCLO, colCLO,newCol,JoinKind.Inner),newCol,{\"Level\"},{thisLevel})),",
+        "    doTheRollup = (_thisLevel as number) as table =>",
+        "        let",
+        "          cloRollup = colCLO{0},",
+        "          filtered = Table.Buffer(Table.RenameColumns(Table.SelectRows(mrgCLOLevel, each [thisLevel] >= _thisLevel),{{Text.Combine({\"CLO.L\",Text.From(_thisLevel)}),cloRollup}})),",
+        "          groupCols = {\"indexTeachingPeriod\",\"indexUnit\",cloRollup,\"indexStudentID\"},",
+        "          grouped = Table.Group (filtered",
+        "                                ,groupCols",
+        "                                ,{   {\"indexDataFile\", each List.Min([indexDataFile]), Int64.Type}",
+        "                                    ,{\"indexDataFileRow\", each List.Min([indexDataFileRow]), Int64.Type}",
+        "                                    ,{\"indexStaff_MarkerList\", each List.Distinct([indexStaff_Marker]), type list}",
+        "                                    ,{\"RawScore\", each List.Sum([RawScore]), type number}",
+        "                                    ,{\"MaxScore\", each List.Sum([MaxScore]), type number}",
+        "                                    ,{\"resultRollupCnt\", each Table.RowCount(_), Int64.Type}",
+        "                                 }",
+        "                                ),",
+        "          addLevel = Table.AddColumn(grouped,thisLevel,each _thisLevel,Int64.Type)",
+        "        in",
+        "          addLevel,",
+        "    maxLevel = List.Max(Table.Column(mrgCLOLevel,thisLevel)),",
+        "    theRange = List.Reverse({1..maxLevel}),",
+        "    ",
+        "    rolled = Table.Buffer(Table.Combine (List.Transform (theRange",
+        "                                                        ,(lvl) => doTheRollup(lvl)",
+        "                                                        )",
+        "                                        )",
+        "                         ),",
+        "",
+        "    pct = Table.AddColumn(rolled,\"PctScore\", each Value.Divide([RawScore],[MaxScore],Precision.Decimal),Decimal.Type),",
+        "    gradeCols = {\"indexGrade\",\"indexAACSB\"},",
+        "    addGrade = Table.ExpandRecordColumn(Table.AddColumn(pct, newCol, each getECUGrade([PctScore]),type record)",
+        "                                       ,newCol,gradeCols",
+        "                                       ),",
+        "    types = Table.TransformColumnTypes(addGrade",
+        "                                      ,List.Transform(gradeCols",
+        "                                                     ,(col) => {col, Int64.Type}",
+        "                                                     )",
+        "                                      ),",
+        "                  ",
+        "    mrgCLO = Table.Buffer(Table.RemoveColumns(Table.ExpandTableColumn(Table.NestedJoin(types,colCLO, qryCLO, colCLO,newCol,JoinKind.Inner),newCol,{\"indexCLO\"}),colCLO)),",
+        "    addMarkerCount = Table.AddColumn(mrgCLO,\"markerCount\",each List.Count([indexStaff_MarkerList]),Int64.Type),",
+        "    addMarker = Table.AddColumn(addMarkerCount,\"indexStaff_Marker\",each if [markerCount] = 1 then [indexStaff_MarkerList]{0} else if [markerCount] > 1 then indexStaff_MultipleStaffMembers else null, Int64.Type),",
+        "    joinCols = {\"indexTeachingPeriod\", \"indexUnit\", \"indexStudentID\"},",
+        "    studentUnit = Table.Buffer(#\"Fact Student Unit\"),",
+        "    mrgSU = Table.ExpandTableColumn(Table.NestedJoin(addMarker, joinCols, studentUnit, joinCols, newCol, JoinKind.LeftOuter),newCol,expandCols),",
+        "    keepCols_pt1 = {\"indexTeachingPeriod\",\"indexUnit\",\"indexCLO\",\"indexStudentID\",\"indexStaff_Marker\",\"markerCount\",\"indexDataFile\"},",
+        "    expandCols = {\"indexAssessLevel\",\"indexCourse\",\"indexMajor\",\"indexStaff_UnitCoordinator\",\"indexStatus\",\"indexStudyMode\"},",
+        "    //\"indexStudentScore\",",
+        "    keepCols = List.Combine({keepCols_pt1,expandCols,{\"indexDataFileRow\",\"indexGrade\",\"indexAACSB\",\"resultRollupCnt\",\"RawScore\",\"MaxScore\",\"PctScore\"}}),",
+        "    //cols = Text.Combine(List.Transform(List.Sort(Table.ColumnNames(mrgCLO))",
+        "                        //,each Text.Combine({\"\"\"\",_,\"\"\",\"})",
+        "    result = Table.Buffer(Table.RemoveRowsWithErrors(Table.SelectColumns(mrgSU, keepCols))),",
+        "    #\"Renamed Columns\" = Table.RenameColumns(result,{{\"indexStudentID\", \"Student\"}})",
+        "in",
+        "    #\"Renamed Columns\""
+      ],
+      "kind": "m",
+      "lineageTag": "332d7cca-f2c5-4462-81e2-fe3528ec51cd",
+      "queryGroup": "Data\\Fact Tables"
+    }
+  ]

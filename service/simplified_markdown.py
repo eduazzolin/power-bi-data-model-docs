@@ -24,6 +24,7 @@ class SimplifiedMarkdown:
         """
         result = '# Resumo\n'
         result += f'- **Data do relatório:** {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
+        result += f'- **Quantidade de expressions:** {len(self.model.expressions)}\n'
         result += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'
         result += f'- **Quantidade de colunas:** {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])}\n'
         result += f'- **Quantidade de colunas calculadas:** {sum([len([c for c in table.table_itens if c.table_item_type == "calculated"]) for table in self.model.tables])}\n'
@@ -51,7 +52,7 @@ class SimplifiedMarkdown:
             colunas = [c for c in t.table_itens if c.table_item_type == 'column']
             colunas.sort(key=lambda x: x.name)
             result += f'### {t.name}\n'
-            result += f'```M\n'
+            result += f'```M=\n'
             for step in t.power_query_steps:
                 result += f'{step}\n'
             result += f'```\n'
@@ -62,13 +63,32 @@ class SimplifiedMarkdown:
             for c in colunas: result += f'  - **{c.name}** {c.data_type}\n'
             result += '\n---\n'
 
+        result += '\n# expressions\n'
+        for e in self.model.expressions:
+            result += f'### {e.name}\n'
+            if e.description:
+                result += f'- **descrição:** {" ".join(e.description)}\n'
+            result += f'- **Query Group:** {e.query_group}\n'
+            result += f'- **Result Type:** {e.result_type}\n'
+            if e.navigation_step_name:
+                result += f'- **Navigation Step Name:** {e.navigation_step_name}\n'
+            result += f'- **Kind:** {e.kind}\n'
+            if e.annotations:
+                result += '- **Annotations:**\n'
+                for k, v in e.annotations.items():
+                    result +=f'    *{k}* : {v}\n'
+            result += f'\n```{e.kind.upper()}=\n'
+            result += '\n'.join(e.expression)
+            result += '\n```\n---\n'
+
+
         result += '\n# medidas\n'
         for m in self.model.get_all_measures():
             result += f'### {m.name}\n'
             result += f'- **tabela:** {m.table}\n'
             result += f'- **Pasta:** {m.display_folder if m.display_folder else "Nenhuma"}\n'
             result += f'- **Formato:** ``{m.format_string if m.format_string else "Automático"}``\n'
-            result += f'\n```dax\n'
+            result += f'\n```dax=\n'
             result += f'{m.get_expression_cleaned()}\n'
             result += f'```\n'
             result += '\n---\n'
@@ -79,7 +99,7 @@ class SimplifiedMarkdown:
             result += f'- **tabela:** {c.table}\n'
             result += f'- **tipo:** {c.data_type}\n'
             result += f'- **formato:** ``{c.format_string if c.format_string else "Automático"}``\n'
-            result += f'\n```dax\n'
+            result += f'\n```dax=\n'
             result += f'{c.get_expression_cleaned()}\n'
             result += f'```\n'
             result += '\n---\n'
