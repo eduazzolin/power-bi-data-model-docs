@@ -5,6 +5,7 @@ import model.data_model as dm
 import clr
 import pandas as pd
 import os
+import psutil
 
 sys.path.append('./service')
 from pyadomd import Pyadomd
@@ -18,22 +19,60 @@ except:
 
 import Microsoft.AnalysisServices.Tabular as Tabular
 
+def get_tcp_connections():
+    """
+    Retrieves all TCP connections.
+    :return: list of tcp connections
+    """
+    return psutil.net_connections(kind='tcp')
 
-def list_running_ssas():
+def find_ssas_ports(tcp_connections):
     """
-    Search for running SSAS instances and return a list of instances.
-    :return: list of string like 'localhost:port_number'
+    Finds all localhost ports used by SSAS (msmdsrv.exe) instances.
+    :param tcp_connections: list of TCP connections
+    :return: list of SSAS ports
     """
-    import psutil
-    instances = []
-    tcp_connections = psutil.net_connections(kind='tcp')
+    ssas_ports = []
     for proc in psutil.process_iter(attrs=['pid', 'name']):
         if proc.info['name'] == 'msmdsrv.exe':
             for conn in tcp_connections:
                 if conn.pid == proc.info['pid'] and conn.status == psutil.CONN_LISTEN:
-                    port = conn.laddr.port
-                    instances.append('localhost:' + str(port))
+                    ssas_ports.append(conn.laddr.port)
                     break
+    return ssas_ports
+
+def find_pbi_files():
+    """
+    Finds all running Power BI Desktop instances and retrieves the open .pbix file names.
+    :return: list of Power BI .pbix files
+    """
+    pbi_files = []
+    for proc in psutil.process_iter(attrs=['pid', 'name', 'cmdline']):
+        if proc.info['name'] == 'PBIDesktop.exe':
+            for arg in proc.info['cmdline']:
+                if arg.endswith('.pbix'):
+                    pbi_files.append(os.path.basename(arg))
+                    break
+    return pbi_files
+
+def list_running_ssas():
+    """
+    Returns a list of SSAS instances with associated .pbix files and localhost:port.
+    :return: list of dictionaries with 'instance' (localhost:port) and 'file_name' (.pbix file)
+    """
+    tcp_connections = get_tcp_connections()
+    ssas_ports = find_ssas_ports(tcp_connections)
+    pbi_files = find_pbi_files()
+
+    instances = []
+    
+    # Zip the SSAS ports and PBI files together, assuming they were started together
+    for port, pbix_file in zip(ssas_ports, pbi_files):
+        instances.append({
+            'instance': f'localhost:{port}',
+            'file_name': pbix_file
+        })
+
     return instances
 
 def list_running_valid_ssas():
@@ -46,7 +85,7 @@ def list_running_valid_ssas():
     valid_instances = []
     for instance in instances:
         try:
-            dm.DataModel(instance, skip_loading=True)
+            dm.DataModel(instance['instance'], skip_loading=True)
             valid_instances.append(instance)
         except:
             pass
