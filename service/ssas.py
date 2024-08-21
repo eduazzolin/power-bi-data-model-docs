@@ -19,6 +19,17 @@ except:
 
 import Microsoft.AnalysisServices.Tabular as Tabular
 
+def format_instance_and_filename(data):
+    """
+    Formats the string by concatenating the instance name and file name.
+    :param data: Dictionary containing the keys 'instance' and 'file_name'.
+    :return: Formatted string in the format 'instance - file_name'. Example: localhost:666 - Data Model.pbix
+    """
+    instance = data.get('instance', '')
+    file_name = data.get('file_name', '')
+
+    return f'{instance} - {file_name}'
+
 def get_tcp_connections():
     """
     Retrieves all TCP connections.
@@ -86,7 +97,8 @@ def list_running_valid_ssas():
     for instance in instances:
         try:
             dm.DataModel(instance['instance'], skip_loading=True)
-            valid_instances.append(instance)
+            formated_instance = format_instance_and_filename(instance)
+            valid_instances.append(formated_instance)
         except:
             pass
     return valid_instances
