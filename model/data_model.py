@@ -202,7 +202,8 @@ class DataModel:
         :return: json model
         """
         from service.ssas import get_model_bim
-        _model_bim = get_model_bim(self.path)
+        formated_path = self.path.split()[0]
+        _model_bim = get_model_bim(formated_path)
         return json.loads(_model_bim)
 
     def get_all_measures(self):
