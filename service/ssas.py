@@ -6,6 +6,7 @@ import sys
 import clr
 import pandas as pd
 import psutil
+from debugpy.launcher.debuggee import process
 
 sys.path.append('./service')
 from pyadomd import Pyadomd
@@ -30,58 +31,59 @@ def format_instance_and_filename(data):
 
     return f'{instance} - {file_name}'
 
-
+def get_power_bi_processes():
+    """
+    Retrieves a list of running Power BI Desktop processes.
+    :return: A list of psutil.Process objects representing running Power BI Desktop processes.
+    """
+    processes = []
+    for proc in psutil.process_iter(attrs=['pid', 'name', 'cmdline', 'create_time']):
+        if proc.info['name'] == 'PBIDesktop.exe':
+            processes.append(proc)
+    return processes
 
 def list_running_instances():
     """
-    Retrieves a list of running Power BI Desktop SSAS instances, along with associated .pbix or .pbip files and the localhost port.
+    Lists active instances of Power BI Desktop, providing details about each.
 
-    Returns:
-        list of dict: A list where each dictionary contains information about a running SSAS instance:
-            - 'instance' (str): The local host and port number where the SSAS instance is running (e.g., 'localhost:12345').
-            - 'file_name' (str): The name of the associated .pbix or .pbip file being used by the instance. If no such file is found, defaults to 'Semantic Model'.
-            - 'start_time' (str): The start time of the process in 'YYYY-MM-DD HH:MM:SS' format.
+    This function retrieves all running Power BI Desktop processes, then 
+    extracts information such as the instance's localhost address with port 
+    number, the name of the associated .pbix or .pbip file, and the start time 
+    of the process.
 
-    Example:
-        [
-            {
-                'instance': 'localhost:12345',
-                'file_name': 'Example.pbix',
-                'start_time': '2024-08-23 14:15:30'
-            },
-            ...
-        ]
-
-    Notes:
-        - This function relies on the `psutil` module to iterate over running processes and identify Power BI Desktop instances (`PBIDesktop.exe`).
-        - It checks the command-line arguments of each process to find associated .pbix or .pbip files.
-        - The function identifies the port by examining established network connections.
-        - If multiple Power BI Desktop instances are running, each instance is returned as a separate entry in the list.
+    :return:
+        list: A list of dictionaries, each containing the following keys:
+            - 'instance' (str): The localhost address and port where the 
+              instance is running.
+            - 'file_name' (str): The name of the Power BI file (.pbix or .pbip) 
+              being worked on, or 'Semantic Model' if not applicable.
+            - 'start_time' (str): The start time of the Power BI process in the 
+              format 'YYYY-MM-DD HH:MM:SS'.
     """
+    processes = get_power_bi_processes()
     instances = []
-    for proc in psutil.process_iter(attrs=['pid', 'name', 'cmdline', 'create_time']):
 
-        if proc.info['name'] == 'PBIDesktop.exe':
+    for proc in processes:
 
-            port = None
-            name = 'Semantic Model'
-            start_time = datetime.datetime.fromtimestamp(proc.info['create_time']).strftime('%Y-%m-%d %H:%M:%S')
+        port = None
+        name = 'Semantic Model'
+        start_time = datetime.datetime.fromtimestamp(proc.info['create_time']).strftime('%Y-%m-%d %H:%M:%S')
 
-            for conn in proc.connections():
-                if conn.status == psutil.CONN_ESTABLISHED:
-                    port = conn.raddr.port
-                    break
+        for conn in proc.connections():
+            if conn.status == psutil.CONN_ESTABLISHED:
+                port = conn.raddr.port
+                break
 
-            for arg in proc.info['cmdline']:
-                if arg.endswith('.pbix') or arg.endswith('.pbip'):
-                    name = os.path.basename(arg)
-                    break
+        for arg in proc.info['cmdline']:
+            if arg.endswith('.pbix') or arg.endswith('.pbip'):
+                name = os.path.basename(arg)
+                break
 
-            instances.append({
-                'instance': f'localhost:{port}',
-                'file_name': name,
-                'start_time': start_time
-            })
+        instances.append({
+            'instance': f'localhost:{port}',
+            'file_name': name,
+            'start_time': start_time
+        })
 
     return instances
 
