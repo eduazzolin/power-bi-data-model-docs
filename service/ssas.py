@@ -1,10 +1,10 @@
+import datetime
 import json
+import os
 import sys
-import model.data_model as dm
 
 import clr
 import pandas as pd
-import os
 import psutil
 
 sys.path.append('./service')
@@ -30,78 +30,73 @@ def format_instance_and_filename(data):
 
     return f'{instance} - {file_name}'
 
-def get_tcp_connections():
-    """
-    Retrieves all TCP connections.
-    :return: list of tcp connections
-    """
-    return psutil.net_connections(kind='tcp')
 
-def find_ssas_ports(tcp_connections):
-    """
-    Finds all localhost ports used by SSAS (msmdsrv.exe) instances.
-    :param tcp_connections: list of TCP connections
-    :return: list of SSAS ports
-    """
-    ssas_ports = []
-    for proc in psutil.process_iter(attrs=['pid', 'name']):
-        if proc.info['name'] == 'msmdsrv.exe':
-            for conn in tcp_connections:
-                if conn.pid == proc.info['pid'] and conn.status == psutil.CONN_LISTEN:
-                    ssas_ports.append(conn.laddr.port)
-                    break
-    return ssas_ports
 
-def find_pbi_files():
+def list_running_instances():
     """
-    Finds all running Power BI Desktop instances and retrieves the open .pbix file names.
-    :return: list of Power BI .pbix files
-    """
-    pbi_files = []
-    for proc in psutil.process_iter(attrs=['pid', 'name', 'cmdline']):
-        if proc.info['name'] == 'PBIDesktop.exe':
-            for arg in proc.info['cmdline']:
-                if arg.endswith('.pbix'):
-                    pbi_files.append(os.path.basename(arg))
-                    break
-    return pbi_files
+    Retrieves a list of running Power BI Desktop SSAS instances, along with associated .pbix or .pbip files and the localhost port.
 
-def list_running_ssas():
-    """
-    Returns a list of SSAS instances with associated .pbix files and localhost:port.
-    :return: list of dictionaries with 'instance' (localhost:port) and 'file_name' (.pbix file)
-    """
-    tcp_connections = get_tcp_connections()
-    ssas_ports = find_ssas_ports(tcp_connections)
-    pbi_files = find_pbi_files()
+    Returns:
+        list of dict: A list where each dictionary contains information about a running SSAS instance:
+            - 'instance' (str): The local host and port number where the SSAS instance is running (e.g., 'localhost:12345').
+            - 'file_name' (str): The name of the associated .pbix or .pbip file being used by the instance. If no such file is found, defaults to 'Semantic Model'.
+            - 'start_time' (str): The start time of the process in 'YYYY-MM-DD HH:MM:SS' format.
 
+    Example:
+        [
+            {
+                'instance': 'localhost:12345',
+                'file_name': 'Example.pbix',
+                'start_time': '2024-08-23 14:15:30'
+            },
+            ...
+        ]
+
+    Notes:
+        - This function relies on the `psutil` module to iterate over running processes and identify Power BI Desktop instances (`PBIDesktop.exe`).
+        - It checks the command-line arguments of each process to find associated .pbix or .pbip files.
+        - The function identifies the port by examining established network connections.
+        - If multiple Power BI Desktop instances are running, each instance is returned as a separate entry in the list.
+    """
     instances = []
-    
-    # Zip the SSAS ports and PBI files together, assuming they were started together
-    for port, pbix_file in zip(ssas_ports, pbi_files):
-        instances.append({
-            'instance': f'localhost:{port}',
-            'file_name': pbix_file
-        })
+    for proc in psutil.process_iter(attrs=['pid', 'name', 'cmdline', 'create_time']):
+
+        if proc.info['name'] == 'PBIDesktop.exe':
+
+            port = None
+            name = 'Semantic Model'
+            start_time = datetime.datetime.fromtimestamp(proc.info['create_time']).strftime('%Y-%m-%d %H:%M:%S')
+
+            for conn in proc.connections():
+                if conn.status == psutil.CONN_ESTABLISHED:
+                    port = conn.raddr.port
+                    break
+
+            for arg in proc.info['cmdline']:
+                if arg.endswith('.pbix') or arg.endswith('.pbip'):
+                    name = os.path.basename(arg)
+                    break
+
+            instances.append({
+                'instance': f'localhost:{port}',
+                'file_name': name,
+                'start_time': start_time
+            })
 
     return instances
 
-def list_running_valid_ssas():
+
+def list_formatted_instances():
     """
-    Search for running SSAS instances and return a list of instances that can be connected,
-    excluding reports without a data model.
-    :return: list of string like 'localhost:port_number'
+    Retrieves a list of running Power BI Desktop SSAS instances, along with associated .pbix or .pbip files and the localhost port.
+    :return: list of formatted instances in the format 'instance - file_name'. Example: localhost:666 - Data Model.pbix
     """
-    instances = list_running_ssas()
-    valid_instances = []
+    instances = list_running_instances()
+    formatted_instances = []
     for instance in instances:
-        try:
-            dm.DataModel(instance['instance'], skip_loading=True)
-            formated_instance = format_instance_and_filename(instance)
-            valid_instances.append(formated_instance)
-        except:
-            pass
-    return valid_instances
+        formated_instance = format_instance_and_filename(instance)
+        formatted_instances.append(formated_instance)
+    return formatted_instances
 
 def connect_ssas(port_number):
     """

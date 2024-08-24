@@ -4,6 +4,7 @@ import time
 from model.relationship import Relationship
 from model.table import Table
 from model.table_item import TableItem
+from service.ssas import list_running_instances
 
 
 class DataModel:
@@ -25,14 +26,19 @@ class DataModel:
         self.path = path
         self.skip_loading = skip_loading
         self.DELAY = 0.001
+        self.name = None
+        self.start_time = None
 
         if path.startswith('localhost'):
+            self.path = self.path.split()[0]
             self.model_bim = self.open_model_bim_ssas()
+            self.extract_name_and_start_time_from_ssas()
         else:
             self.model_bim = self.open_model_bim_file()
 
         self.tables = self.extract_tables()
         self.relationships = self.extract_relationships()
+
 
     def extract_tables(self) -> list:
         """
@@ -106,6 +112,7 @@ class DataModel:
 
         return sorted(tables, key=lambda x: x.name)
 
+
     def extract_measures(self, table, table_measures):
         """
         Extract measures from table
@@ -134,6 +141,7 @@ class DataModel:
                                                                      str) else measure.get('expression')
             ))
 
+
     def extract_columns(self, table, table_columns):
         """
         Extract columns from table
@@ -156,6 +164,7 @@ class DataModel:
                 format_string=column.get('formatString'),
                 is_hidden=column.get('isHidden', False)
             ))
+
 
     def extract_relationships(self):
         """
@@ -187,6 +196,7 @@ class DataModel:
                 ))
         return sorted(relationships, key=lambda x: x.origin_table)
 
+
     def open_model_bim_file(self):
         """
         Open model.bim file from file system
@@ -196,15 +206,16 @@ class DataModel:
             model = json.load(file)
         return model
 
+
     def open_model_bim_ssas(self):
         """
         Open model.bim file from SSAS connection
         :return: json model
         """
         from service.ssas import get_model_bim
-        formated_path = self.path.split()[0]
-        _model_bim = get_model_bim(formated_path)
+        _model_bim = get_model_bim(self.path)
         return json.loads(_model_bim)
+
 
     def get_all_measures(self):
         """
@@ -219,6 +230,7 @@ class DataModel:
                     measures.append(measure)
         return sorted(measures, key=lambda x: x.name)
 
+
     def get_all_calculated_columns(self):
         """
         Get all calculated columns from the model
@@ -232,3 +244,13 @@ class DataModel:
                     calculated.append(column)
         return sorted(calculated, key=lambda x: x.name)
 
+
+    def extract_name_and_start_time_from_ssas(self):
+        try:
+            instances = list_running_instances()
+            instance_info = [instance for instance in instances if instance['instance'] == self.path][0]
+            self.name = instance_info['file_name']
+            self.start_time = instance_info['start_time']
+            print(f'Instance: {self.name} - Start time: {self.start_time}')
+        except:
+            pass

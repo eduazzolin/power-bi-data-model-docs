@@ -12,7 +12,7 @@ from service.fields_table import FieldsTable
 from service.html import HTML
 from service.measures_table import MeasuresTable
 from service.simplified_markdown import SimplifiedMarkdown
-from service.ssas import list_running_valid_ssas
+from service.ssas import list_formatted_instances
 from service.system import save, save_xlsx, save_csv
 
 
@@ -60,7 +60,7 @@ class MainApp(tk.Tk):
         self.model1_var = tk.StringVar()
         self.model1_combobox = ttk.Combobox(self, textvariable=self.model1_var, font=("Arial", 12), width=50,
                                             state="readonly")
-        self.model1_combobox['values'] = list_running_valid_ssas() + ['Arquivo model.bim']
+        self.model1_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
         self.model1_combobox.current(0)
         self.model1_combobox.pack(pady=10)
         self.file_path_var = tk.StringVar()
@@ -69,7 +69,7 @@ class MainApp(tk.Tk):
         self.model2_var = tk.StringVar()
         self.model2_combobox = ttk.Combobox(self, textvariable=self.model2_var, font=("Arial", 12), width=50,
                                             state="readonly")
-        self.model2_combobox['values'] = list_running_valid_ssas() + ['Arquivo model.bim']
+        self.model2_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
 
         self.run_button = tk.Button(self, text="Executar", command=self.run_function, font=("Arial", 14), width=15,
                                     bg="lightgray")
@@ -83,8 +83,8 @@ class MainApp(tk.Tk):
         """
         Method to refresh the list of running valid SSAS instances
         """
-        self.model1_combobox['values'] = list_running_valid_ssas() + ['Arquivo model.bim']
-        self.model2_combobox['values'] = list_running_valid_ssas() + ['Arquivo model.bim']
+        self.model1_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
+        self.model2_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
 
     def on_function_select(self, event):
         """
