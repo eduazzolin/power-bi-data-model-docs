@@ -22,7 +22,7 @@ class MainApp(tk.Tk):
         super().__init__()
         self.title("Power BI Data Model Documentation Tool")
         self.geometry("550x500")
-        self.version = 1.1
+        self.version = 1.2
         try:
             self.iconbitmap('docs/ico.ico')
         except:
