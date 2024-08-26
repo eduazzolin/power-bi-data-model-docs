@@ -23,6 +23,10 @@ class SimplifiedMarkdown:
         :return: str
         """
         result = '# Resumo\n'
+        result += f'\n\n- **Nome do arquivo:** {self.model.name}\n'
+        result += f'- **Hora de execução do arquivo:** {self.model.start_time}\n'
+        result += f'\n\n'
+
         result += f'- **Data do relatório:** {dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n'
         result += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'
         result += f'- **Quantidade de colunas:** {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])}\n'
