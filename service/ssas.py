@@ -31,6 +31,65 @@ def format_instance_and_filename(data):
 
     return f'{instance} - {file_name}'
 
+def get_tcp_connections():
+    """
+    Retrieves all TCP connections.
+    :return: list of tcp connections
+    """
+    return psutil.net_connections(kind='tcp')
+
+def get_ssas_ports(tcp_connections):
+    """
+    Finds all localhost ports used by SSAS (msmdsrv.exe) instances.
+    :param tcp_connections: list of TCP connections
+    :return: list of SSAS ports
+    """
+    ssas_ports = []
+    for proc in psutil.process_iter(attrs=['pid', 'name']):
+        if proc.info['name'] == 'msmdsrv.exe':
+            for conn in tcp_connections:
+                if conn.pid == proc.info['pid'] and conn.status == psutil.CONN_LISTEN:
+                    ssas_ports.append(conn.laddr.port)
+                    break
+    return ssas_ports
+
+
+def add_power_bi_details(port):
+    """
+    Retrieves details about a Power BI Desktop instance for a given port number.
+    :param port: The port number of the ssas instance.
+    :return: A dictionary containing details about the Power BI instance in the format:
+        {
+            'instance': 'localhost:port',
+            'file_name': 'Semantic Model' or 'file_name.pbix',
+            'start_time': 'YYYY-MM-DD HH:MM:SS'
+        }
+    """
+    processes = get_power_bi_processes()
+
+    instance_json = {
+        'instance': f'localhost:{port}',
+        'file_name': 'Semantic Model',
+        'start_time': None
+    }
+
+    for proc in processes:
+
+        process_connections_ports = [port.raddr.port for port in proc.connections() if
+                                     port.status == psutil.CONN_ESTABLISHED]
+        if port in process_connections_ports:
+
+            for arg in proc.info['cmdline']:
+                if arg.endswith('.pbix') or arg.endswith('.pbip'):
+                    instance_json['file_name'] = os.path.basename(arg)
+                    break
+
+            instance_json['start_time'] = datetime.datetime.fromtimestamp(proc.info['create_time']).strftime(
+                '%Y-%m-%d %H:%M:%S')
+            return instance_json
+
+    return instance_json
+
 def get_power_bi_processes():
     """
     Retrieves a list of running Power BI Desktop processes.
@@ -42,48 +101,26 @@ def get_power_bi_processes():
             processes.append(proc)
     return processes
 
+
 def list_running_instances():
     """
     Lists active instances of Power BI Desktop, providing details about each.
-
-    This function retrieves all running Power BI Desktop processes, then 
-    extracts information such as the instance's localhost address with port 
-    number, the name of the associated .pbix or .pbip file, and the start time 
-    of the process.
-
-    :return:
-        list: A list of dictionaries, each containing the following keys:
-            - 'instance' (str): The localhost address and port where the 
-              instance is running.
-            - 'file_name' (str): The name of the Power BI file (.pbix or .pbip) 
-              being worked on, or 'Semantic Model' if not applicable.
-            - 'start_time' (str): The start time of the Power BI process in the 
-              format 'YYYY-MM-DD HH:MM:SS'.
+    :return: a list of dictionaries, each containing details about a Power BI instance. example:
+    [
+        {
+            'instance': 'localhost:port',
+            'file_name': 'Semantic Model' or 'file_name.pbix',
+            'start_time': 'YYYY-MM-DD HH:MM:SS'
+        },
+        ...
+    ]
     """
-    processes = get_power_bi_processes()
+    ssas_ports = get_ssas_ports(get_tcp_connections())
     instances = []
 
-    for proc in processes:
-
-        port = None
-        name = 'Semantic Model'
-        start_time = datetime.datetime.fromtimestamp(proc.info['create_time']).strftime('%Y-%m-%d %H:%M:%S')
-
-        for conn in proc.connections():
-            if conn.status == psutil.CONN_ESTABLISHED:
-                port = conn.raddr.port
-                break
-
-        for arg in proc.info['cmdline']:
-            if arg.endswith('.pbix') or arg.endswith('.pbip'):
-                name = os.path.basename(arg)
-                break
-
-        instances.append({
-            'instance': f'localhost:{port}',
-            'file_name': name,
-            'start_time': start_time
-        })
+    for ssas_port in ssas_ports:
+        instance = add_power_bi_details(ssas_port)
+        instances.append(instance)
 
     return instances
 
