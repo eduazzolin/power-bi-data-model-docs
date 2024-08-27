@@ -22,8 +22,7 @@ class SimplifiedMarkdown:
         Method to generate the markdown file.
         :return: str
         """
-        result = '# Resumo\n'
-        result += f'\n\n- **Nome do arquivo:** {self.model.name}\n'
+        result = f'# {self.model.name}\n'
         result += f'- **Hora de execução do arquivo:** {self.model.start_time}\n'
         result += f'\n\n'
 
@@ -33,7 +32,7 @@ class SimplifiedMarkdown:
         result += f'- **Quantidade de colunas calculadas:** {sum([len([c for c in table.table_itens if c.table_item_type == "calculated"]) for table in self.model.tables])}\n'
         result += f'- **Quantidade de medidas:** {sum([len([m for m in table.table_itens if m.table_item_type == "measure"]) for table in self.model.tables])}\n'
 
-        result += '\n# relacionamentos\n'
+        result += '\n## relacionamentos\n'
         relacionamentos = [rel for rel in self.model.relationships]
         relacionamentos.sort(key=lambda x: x.origin_column)
         result += f'|  |  |  |  |  |\n'
@@ -48,7 +47,7 @@ class SimplifiedMarkdown:
                 result += f'| (Desativado) *{origin}* | *{r.origin_cardinality}* | {direction} | *{r.target_cardinality}* | *{target}*\n'
         result += f'|  |  |  |  |  |\n'
 
-        result += '\n# tables\n'
+        result += '\n## tabelas\n'
         tables = [table for table in self.model.tables]
         tables.sort(key=lambda x: x.name)
         for t in tables:
@@ -66,7 +65,7 @@ class SimplifiedMarkdown:
             for c in colunas: result += f'  - **{c.name}** {c.data_type}\n'
             result += '\n---\n'
 
-        result += '\n# medidas\n'
+        result += '\n## medidas\n'
         for m in self.model.get_all_measures():
             result += f'### {m.name}\n'
             result += f'- **tabela:** {m.table}\n'
