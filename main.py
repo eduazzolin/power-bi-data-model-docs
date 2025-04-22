@@ -200,7 +200,7 @@ class MainApp(tk.Tk):
                 if function_index == 1:
                     service = HTML(model)
                     html = service.gerar_html()
-                    save(html, model.path, format='html', prefix='data_model_doc')
+                    save(html, model.path, format='html', prefix=f'{model.name}_data_model_doc')
                     os.startfile(path)
 
                 # Export simplified markdown documentation
