@@ -25,7 +25,7 @@ class HTML:
             retorno = f'''
 <div class="row pt-4">
     <div class="col-12">
-        <h2>Documentação de modelo de dados</h2>
+        <h2>Documentação de modelo de dados - {self.model.name}</h2>
         <p>{dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}</p>
     </div>
     <div class="col-lg-6">
