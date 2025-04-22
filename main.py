@@ -75,6 +75,14 @@ class MainApp(tk.Tk):
                                     bg="lightgray")
         self.run_button.pack(pady=20)
 
+        self.refresh_button = tk.Button(self, text="🔄 Atualizar Aplicativo", 
+                                      command=self.refresh_list,
+                                      font=("Arial", 10))
+        self.refresh_button.place(relx=1.0, rely=1.0, anchor="se", x=-10, y=-10)
+
+        self.model1_label.pack(pady=10)
+        self.model1_combobox.pack(pady=10)
+
         self.update_button = tk.Button(self, text="Verificar atualização", command=self.check_update,
                                        font=("Arial", 10))
         self.update_button.pack(side=tk.BOTTOM, pady=10)
@@ -82,10 +90,19 @@ class MainApp(tk.Tk):
     def refresh_list(self):
         """
         Method to refresh the list of running valid SSAS instances
-        """
-        self.model1_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
-        self.model2_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
-
+        """   
+        new_instances = list_formatted_instances() + ['Arquivo model.bim']
+        
+        self.model1_combobox['values'] = new_instances
+        self.model2_combobox['values'] = new_instances
+        
+        self.model1_combobox.current(0)
+        self.model2_combobox.current(0)
+            
+        # Visual feedback that refresh was done
+        self.refresh_button.config(text="✓ Atualizado")
+        self.after(1000, lambda: self.refresh_button.config(text="Atualizar modelos"))
+        
     def on_function_select(self, event):
         """
         Method to handle the event when the user selects a function
