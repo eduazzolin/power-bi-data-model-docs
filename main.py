@@ -75,6 +75,14 @@ class MainApp(tk.Tk):
                                     bg="lightgray")
         self.run_button.pack(pady=20)
 
+        self.refresh_button = tk.Button(self, text="Atualizar modelos", 
+                                      command=self.refresh_list,
+                                      font=("Arial", 10))
+        self.refresh_button.place(relx=1.0, rely=1.0, anchor="se", x=-10, y=-10)
+
+        self.model1_label.pack(pady=10)
+        self.model1_combobox.pack(pady=10)
+
         self.update_button = tk.Button(self, text="Verificar atualização", command=self.check_update,
                                        font=("Arial", 10))
         self.update_button.pack(side=tk.BOTTOM, pady=10)
@@ -82,10 +90,19 @@ class MainApp(tk.Tk):
     def refresh_list(self):
         """
         Method to refresh the list of running valid SSAS instances
-        """
-        self.model1_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
-        self.model2_combobox['values'] = list_formatted_instances() + ['Arquivo model.bim']
-
+        """   
+        new_instances = list_formatted_instances() + ['Arquivo model.bim']
+        
+        self.model1_combobox['values'] = new_instances
+        self.model2_combobox['values'] = new_instances
+        
+        self.model1_combobox.current(0)
+        self.model2_combobox.current(0)
+            
+        # Visual feedback that refresh was done
+        self.refresh_button.config(text="✓ Atualizado")
+        self.after(1000, lambda: self.refresh_button.config(text="Atualizar modelos"))
+        
     def on_function_select(self, event):
         """
         Method to handle the event when the user selects a function
@@ -183,14 +200,14 @@ class MainApp(tk.Tk):
                 if function_index == 1:
                     service = HTML(model)
                     html = service.gerar_html()
-                    save(html, model.path, format='html', prefix='data_model_doc')
+                    save(html, model.path, format='html', prefix=f'{model.name}_data_model_doc')
                     os.startfile(path)
 
                 # Export simplified markdown documentation
                 elif function_index == 2:
                     service = SimplifiedMarkdown(model)
                     md = service.generate_md()
-                    save(md, model.path, 'data_model_simpl_doc')
+                    save(md, model.path, f'{model.name}_data_model_simpl_doc')
                     os.startfile(path)
 
                 # Export measures table
@@ -201,9 +218,9 @@ class MainApp(tk.Tk):
                     if not export_type:
                         return
                     if export_type == 'xlsx':
-                        save_xlsx(data_frame, model.path, 'measures_table')
+                        save_xlsx(data_frame, model.path, f'{model.name}_measures_table')
                     elif export_type == 'csv':
-                        save_csv(data_frame, model.path, 'measures_table')
+                        save_csv(data_frame, model.path, f'{model.name}_measures_table')
                     os.startfile(path)
 
                 # Export fields table
@@ -214,9 +231,9 @@ class MainApp(tk.Tk):
                     if not export_type:
                         return
                     if export_type == 'xlsx':
-                        save_xlsx(data_frame, model.path, 'fields_table')
+                        save_xlsx(data_frame, model.path, f'{model.name}_fields_table')
                     elif export_type == 'csv':
-                        save_csv(data_frame, model.path, 'fields_table')
+                        save_csv(data_frame, model.path, f'{model.name}_fields_table')
                     os.startfile(path)
 
                 # Compare two data models
