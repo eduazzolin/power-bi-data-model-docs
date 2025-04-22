@@ -1,5 +1,6 @@
 import json
 import time
+import os
 
 from model.relationship import Relationship
 from model.table import Table
@@ -26,7 +27,7 @@ class DataModel:
         self.path = path
         self.skip_loading = skip_loading
         self.DELAY = 0.001
-        self.name = None
+        self.name = self._extract_name_from_path(path)
         self.start_time = None
 
         if path.startswith('localhost'):
@@ -39,7 +40,12 @@ class DataModel:
         self.tables = self.extract_tables()
         self.relationships = self.extract_relationships()
 
-
+    def _extract_name_from_path(self, path: str) -> str:
+        """Extracts model name from path"""
+        if path.startswith('localhost'):
+            return path.split('/')[-1]
+        return os.path.splitext(os.path.basename(path))[0]
+    
     def extract_tables(self) -> list:
         """
         Extract tables from model.bim file

@@ -38,7 +38,7 @@ class Markdown:
             de colunas, de medidas, e relacionamentos.
             :return: str
             """
-            retorno = f'\n# Resumo do modelo de dados\n'
+            retorno = f'\n# Resumo do modelo de dados - {self.model.name}\n'
             retorno += f'- **Quantidade de tabelas:** {len(self.model.tables)}\n'
             retorno += f'- **Quantidade de relacionamentos:** {len(self.model.relationships)}\n'
             retorno += f'- **Quantidade de colunas:** {sum([len([c for c in table.table_itens if c.table_item_type == "column"]) for table in self.model.tables])}\n'

@@ -200,14 +200,14 @@ class MainApp(tk.Tk):
                 if function_index == 1:
                     service = HTML(model)
                     html = service.gerar_html()
-                    save(html, model.path, format='html', prefix='data_model_doc')
+                    save(html, model.path, format='html', prefix=f'{model.name}_data_model_doc')
                     os.startfile(path)
 
                 # Export simplified markdown documentation
                 elif function_index == 2:
                     service = SimplifiedMarkdown(model)
                     md = service.generate_md()
-                    save(md, model.path, 'data_model_simpl_doc')
+                    save(md, model.path, f'{model.name}_data_model_simpl_doc')
                     os.startfile(path)
 
                 # Export measures table
@@ -218,9 +218,9 @@ class MainApp(tk.Tk):
                     if not export_type:
                         return
                     if export_type == 'xlsx':
-                        save_xlsx(data_frame, model.path, 'measures_table')
+                        save_xlsx(data_frame, model.path, f'{model.name}_measures_table')
                     elif export_type == 'csv':
-                        save_csv(data_frame, model.path, 'measures_table')
+                        save_csv(data_frame, model.path, f'{model.name}_measures_table')
                     os.startfile(path)
 
                 # Export fields table
@@ -231,9 +231,9 @@ class MainApp(tk.Tk):
                     if not export_type:
                         return
                     if export_type == 'xlsx':
-                        save_xlsx(data_frame, model.path, 'fields_table')
+                        save_xlsx(data_frame, model.path, f'{model.name}_fields_table')
                     elif export_type == 'csv':
-                        save_csv(data_frame, model.path, 'fields_table')
+                        save_csv(data_frame, model.path, f'{model.name}_fields_table')
                     os.startfile(path)
 
                 # Compare two data models
