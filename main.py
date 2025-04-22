@@ -75,7 +75,7 @@ class MainApp(tk.Tk):
                                     bg="lightgray")
         self.run_button.pack(pady=20)
 
-        self.refresh_button = tk.Button(self, text="🔄 Atualizar Aplicativo", 
+        self.refresh_button = tk.Button(self, text="Atualizar modelos", 
                                       command=self.refresh_list,
                                       font=("Arial", 10))
         self.refresh_button.place(relx=1.0, rely=1.0, anchor="se", x=-10, y=-10)
