@@ -1,6 +1,8 @@
 pyadomd==0.1.1
-pythonnet==3.0.3
+pythonnet==3.0.5
 psutil
 pandas
 xlsxwriter
 requests
+debugpy
+pyinstaller
