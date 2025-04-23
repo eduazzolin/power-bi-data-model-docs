@@ -5,7 +5,7 @@ as [these examples](https://github.com/eduazzolin/power-bi-data-model-documentor
 
 ## Download
 
-1. Download the [latest executable release](https://github.com/eduazzolin/power-bi-data-model-docs/releases/download/1.2/Power-BI-Data-Model-Docs.exe).
+1. Download the [latest executable release](https://github.com/eduazzolin/power-bi-data-model-docs/releases/download/1.3/Power-BI-Semantic-Model-Docs.exe).
 2. Run the executable file and follow the instructions. No installation is required.
 
 ## Features
